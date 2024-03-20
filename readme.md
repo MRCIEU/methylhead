@@ -2,7 +2,9 @@
 For nextflow usage Description:
 
 Pipeline for analysing data generated from the DNAm lung cancer screening panel (https://github.com/MRCIEU/dnam-lung-cancer-screening-panel).
+
 conda create -n Bismark
+
 conda install -c bioconda multiqc bismark trim-galore samtools trimmomatic fastqc bedtools cutadapt bs-seeker2 bowtie
 
 name: Bismark
