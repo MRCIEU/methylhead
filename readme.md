@@ -38,7 +38,10 @@ This parameter determines how many reads will be used.
 t_param (Fastqc)
 
 Fastqc Specifies the number of files which can be processed simultaneously. Each thread will be allocated 250MB of memory so you shouldn't run more threads than your available memory will cope with, and not more than 6 threads on a 32 bit machine. 
-memory_param (Fastqc) : Sets the base amount of memory, in Megabytes,  used to process each file. Defaults to 512MB. You may need to increase this if you have a file with very long sequences in it. Allowed range (100 - 10000)
+
+memory_param (Fastqc) 
+
+Sets the base amount of memory, in Megabytes,  used to process each file. Defaults to 512MB. You may need to increase this if you have a file with very long sequences in it. Allowed range (100 - 10000)
 
 Usage:
 nextflow nextflow.nf --reads 'path/*_{1,2}.fastq.gz' --t_param number --u_param number --memory_param number --genome_folder 'bismark.ref path'
