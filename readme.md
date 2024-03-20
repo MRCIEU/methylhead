@@ -11,6 +11,7 @@ channels:
   - bioconda
   - defaults
 dependencies:
+
     bcftools     1.10         
     bedtools     2.31.1        
     bismark      0.24.2        
