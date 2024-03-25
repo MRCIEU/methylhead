@@ -1,24 +1,27 @@
 ## dnam-lung-cancer-pipeline
+
 For nextflow usage Description:
 
 Pipeline for analysing data generated from the DNAm lung cancer screening panel (https://github.com/MRCIEU/dnam-lung-cancer-screening-panel).
 
-conda create -n Bismark
+conda create -n Bismark python=3.0
 
-conda install -c bioconda multiqc bismark trim-galore samtools trimmomatic fastqc bedtools cutadapt bs-seeker2 bowtie
+conda install -c bioconda multiqc bismark trim-galore samtools trimmomatic fastqc bedtools cutadapt bowtie
 
 name: Bismark
+
 channels:
+
   - conda-forge
   - bioconda
   - defaults
+
 dependencies:
 
     bcftools     1.10         
     bedtools     2.31.1        
     bismark      0.24.2        
-    bowtie2      2.3.5.1       
-    bs-seeker2   2.1.7         
+    bowtie2      2.3.5.1             
     fastqc       0.12.1        
     hisat2       2.2.0         
     multiqc      1.8           
@@ -45,6 +48,30 @@ memory_param (Fastqc)
 
 Sets the base amount of memory, in Megabytes,  used to process each file. Defaults to 512MB. You may need to increase this if you have a file with very long sequences in it. Allowed range (100 - 10000)
 
-Usage:
-nextflow nextflow.nf --reads 'path/*_{1,2}.fastq.gz' --t_param number --u_param number --memory_param number --genome_folder 'bismark.ref path'
+multicore (Bismark)   
 
+Number of cores to be used for Bismark Alignement. Allowed range (1-8)
+
+cores (Trim Galore!)
+
+Number of cores to be used for Trimming. It seems that --cores 4 could be a sweet spot, anything above has diminishing returns.    
+
+Usage:
+
+nextflow nextflow.nf --reads 'path/*_{1,2}.fastq.gz' --t_param int --u_param int --memory_param int --genome_folder 'bismark.ref path' --multicore int --outdir "results"
+
+Instructions:
+
+Input files (file1_1.fastq.gz, file1_2.fastq.gz, etc.), the main.nf script, and the output directory (outdir) should all be located in the same folder.
+
+For parallel computing, organize the FASTQ files into separate folders. Each folder represents a distinct sequencing job.
+
+Example 
+
+folder1 [file1_1.fastq.gz, file1_2.fastq.gz, file2_1.fastq.gz, file2_2.fastq.gz]
+folder2 [file3_1.fastq.gz, file3_2.fastq.gz, file3_1.fastq.gz, file3_2.fastq.gz]
+folder3 [file4_1.fastq.gz, file4_2.fastq.gz, file5_1.fastq.gz, file5_2.fastq.gz]
+
+this would be 3 sequencing job. 
+
+All results will be output to the same directory specified by --outdir "results"
