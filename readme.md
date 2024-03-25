@@ -69,7 +69,9 @@ For parallel computing, organize the FASTQ files into separate folders. Each fol
 Example 
 
 folder1 [file1_1.fastq.gz, file1_2.fastq.gz, file2_1.fastq.gz, file2_2.fastq.gz]
+
 folder2 [file3_1.fastq.gz, file3_2.fastq.gz, file3_1.fastq.gz, file3_2.fastq.gz]
+
 folder3 [file4_1.fastq.gz, file4_2.fastq.gz, file5_1.fastq.gz, file5_2.fastq.gz]
 
 this would be 3 sequencing job. 
