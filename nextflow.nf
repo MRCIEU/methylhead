@@ -22,15 +22,19 @@ log.info"""\
                              6 threads on a 32 bit machine. 
      memory_param (Fastqc) : Sets the base amount of memory, in Megabytes,  used to process
                              each file. Defaults to 512MB. You may need to increase this if
-                             you have a file with very long sequences in it.
-                             Allowed range (100 - 10000)
+                             you have a file with very long sequences in it. Allowed range (100 - 10000)
+     multicore (Bismark)   : Number of cores to be used for Bismark Alignement. Allowed range (1-8)
+     cores (Trim Galore!)  : Number of cores to be used for Trimming.
+                             It seems that --cores 4 could be a sweet spot, anything above has diminishing returns.       
 """
 params.reads = ""
 params.genome_folder = ""
-params.outdir = "results"
+params.outdir = ""
 params.u_param = "" 
 params.t_param = ""
 params.memory_param = "" 
+params.multicore= ""
+params.cores= ""
 
 process FASTQC {
     
@@ -64,6 +68,7 @@ process TRIMMING {
     tag "Trim Galore!"
     input:
     tuple val(sample_id), path(reads)
+    val(cores)
     
     output:
     tuple val(sample_id), path("${params.outdir}/${sample_id}_*.fq.gz") , emit: fq                                  
@@ -71,11 +76,13 @@ process TRIMMING {
     tuple val(sample_id), path("*.html")                             , emit: html    , optional: true   
     publishDir "${params.outdir}" , mode: 'copy'
     
+    
     script:
-    """
-    trim_galore --paired ${reads[0]} ${reads[1]} --output_dir "${params.outdir}" --gzip
- 
-    """
+    def trim_galore_cmd = "trim_galore --paired ${reads[0]} ${reads[1]} --output_dir ${params.outdir} --gzip"
+    if(cores) {
+       trim_galore_cmd += " --cores ${cores}"
+    }
+    "${trim_galore_cmd}"
 
 }
 
@@ -86,6 +93,7 @@ process BISMARK {
     input:
     tuple val(sample_id), path(fq)
     val(u_param)
+    val(multicore)
     
     output:
     tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.bam"), emit: bam
@@ -98,6 +106,9 @@ process BISMARK {
     def bismark_cmd = "bismark --genome_folder ${params.genome_folder} --nucleotide_coverage -1 ${fq[0]} -2 ${fq[1]} --bam --output_dir ${params.outdir}"
     if (u_param) {
         bismark_cmd += " --u ${u_param}"
+    }
+    if(multicore) {
+        bismark_cmd += " --parallel ${multicore}"
     }
     "${bismark_cmd}"
 }
@@ -140,32 +151,8 @@ process METHYLATION {
     """
 }
 
-process REPORT {
-
-    tag "Report"
-    
-    input:
-    val txt
-    file txt
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplicated_splitting_report.txt")
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplicated.M-bias.txt")
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplication_report.txt")
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.nucleotide_stats.txt")
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.report.txt")
-    
-    publishDir "${params.outdir}" , mode: 'copy' 
-
-    output:   
-    tuple val(sample_id), path("*report.{html,txt}"), emit: report
-    
-    script:
-    """
- bismark2report --alignment_report "${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplicated_splitting_report.txt" "${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplicated.M-bias.txt" "${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplication_report.txt" "${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.nucleotide_stats.txt" "${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.report.txt"
-    """
-}
-
 log.info("""\
-  +-------------------+-------------------------------------------+
+  +---------------------------------------------------------------+
   | Pipeline Step    | Description                                |
   +------------------+--------------------------------------------+
   | Fastqc           | Fastq Quality Control                      |
@@ -179,24 +166,28 @@ log.info("""\
   |                   Methylation Matrix                          |
   |---------------------------------------------------------------|
   |    DNA methylation indices of exposure and phenotype          |
-  +-------------------+-------------------------------------------+
+  +---------------------------------------------------------------+
 """)
 
 workflow {
-   read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)    
-    t_param=params.t_param
-     memory_param=params.memory_param
-      FASTQC(read_pairs_ch,params.t_param,params.memory_param)
-       TRIMMING(read_pairs_ch)
-        trim_ch=TRIMMING.out.fq
-        u_param= params.u_param  
-         bam_files_ch = BISMARK(trim_ch,params.u_param)
-          ch_bam = BISMARK.out.bam
-           DEDUPLICATION(ch_bam) 
-            dedup_bam=DEDUPLICATION.out.bam
-             METHYLATION(dedup_bam)  
-              REPORT(BISMARK.out,METHYLATION.out)                         
- }
+
+ read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)    
+ t_param=params.t_param
+ memory_param=params.memory_param
+ FASTQC(read_pairs_ch,params.t_param,params.memory_param)
+ cores=params.cores
+ TRIMMING(read_pairs_ch,cores)
+ trim_ch=TRIMMING.out.fq
+ u_param= params.u_param 
+ multicore= params.multicore 
+ bam_files_ch = BISMARK(trim_ch,params.u_param,multicore)
+ ch_bam = BISMARK.out.bam
+ DEDUPLICATION(ch_bam) 
+ dedup_bam=DEDUPLICATION.out.bam
+ METHYLATION(dedup_bam)                          
+
+}
+
 workflow.onComplete {
     log.info("""\
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
