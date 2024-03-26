@@ -25,6 +25,7 @@ start_time=$(date +"%s")
 #source ~/.bashrc ## Required to load what conda init just did
 #conda activate Bismark ## see for more details https://dsbristol.github.io/dst/coursebook/appendix5-bluecrystal.html
 
+## run with -resume to avoid repeating previous analyses
 nextflow run ${WORKFLOW} \
     --reads "${DATA_DIR}/${DATA_SUBDIR}/*_{1,2}.fastq.gz" \
     --t_param 8 \
