@@ -21,6 +21,9 @@ DATA_SUBDIR=data$SLURM_ARRAY_TASK_ID
 
 start_time=$(date +"%s")
 
+#conda init ## Required to make conda happy on the nodes
+#source ~/.bashrc ## Required to load what conda init just did
+#conda activate Bismark ## see for more details https://dsbristol.github.io/dst/coursebook/appendix5-bluecrystal.html
 
 nextflow run ${WORKFLOW} \
     --reads "${DATA_DIR}/${DATA_SUBDIR}/*_{1,2}.fastq.gz" \
