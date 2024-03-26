@@ -17,22 +17,7 @@ DATA_DIR="/user/work/ag24712/Next_1/"
 REFERENCE_DIR="/user/work/ag24712/reference/hg38/"  
 RESULTS_DIR="results" 
 
-case $SLURM_ARRAY_TASK_ID in
-    1)
-        DATA_SUBDIR="data1"
-        ;;
-    2)
-        DATA_SUBDIR="data2"
-        ;;
-    3)
-        DATA_SUBDIR="data3"
-        ;;
-    *)
-        echo "Invalid task ID"
-        exit 1
-        ;;
-esac
-
+DATA_SUBDIR=data$SLURM_ARRAY_TASK_ID
 
 start_time=$(date +"%s")
 
