@@ -139,3 +139,9 @@ Rscript R_codes.R
 * Note: It is now possible to have a single directory with all fastq files.
   If new files are generated, just copy them to the directory and
   rerun the pipeline with the '-resume' option
+
+* 'workflow' code could be simplified
+
+* for some reason the fastqc outputs got to 'results' and the
+  remaining go to 'results/results', possibly the ${params.outdir} in
+  the process outputs paths s unnecessary
