@@ -70,7 +70,7 @@ process TRIMMING {
     tuple val(sample_id), path(reads)
     val(cores)
     
-    output:
+    output:                               
     tuple val(sample_id), path("${params.outdir}/${sample_id}_*.fq.gz") , emit: fq                                  
     tuple val(sample_id), path("*report.txt")                        , emit: log     , optional: true
     tuple val(sample_id), path("*.html")                             , emit: html    , optional: true   
@@ -96,10 +96,9 @@ process BISMARK {
     val(multicore)
     
     output:
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.bam"), emit: bam
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_PE_report.txt"), emit: report
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.nucleotide_stats.txt"), emit: nucstats
-    
+    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.bam"), emit: bam
+    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_PE_report.txt"), emit: report
+    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.nucleotide_stats.txt"), emit: nucstats
     publishDir "${params.outdir}" , mode: 'copy'
      
     script:
@@ -122,8 +121,8 @@ process DEDUPLICATION {
     publishDir "${params.outdir}" , mode: 'copy'
 
     output:   
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplicated.bam")        , emit: bam
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplication_report.txt"), emit: report
+    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplicated.bam")        , emit: bam
+    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplication_report.txt"), emit: report
      
     script:
     """
@@ -140,14 +139,14 @@ process METHYLATION {
     publishDir "${params.outdir}" , mode: 'copy'
 
     output:
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplicated.bedGraph.gz")                 , emit: bedgraph
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz")              , emit: coverage
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplicated_splitting_report.txt")        , emit: report
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_1_val_1_bismark_bt2_pe.deduplicated.M-bias.txt")                  , emit: mbias
+    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplicated.bedGraph.gz")                 , emit: bedgraph
+    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz")              , emit: coverage
+    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplicated_splitting_report.txt")        , emit: report
+    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplicated.M-bias.txt")                  , emit: mbias
    
     script:
     """
- bismark_methylation_extractor --comprehensive --bedGraph --gzip --paired-end "${sample_id}_1_val_1_bismark_bt2_pe.deduplicated.bam" --CX --output_dir "${params.outdir}"  --no_overlap 
+ bismark_methylation_extractor --comprehensive --bedGraph --gzip --paired-end "${bam}" --CX --output_dir "${params.outdir}"  --no_overlap 
     """
 }
 

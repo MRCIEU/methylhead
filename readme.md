@@ -4,19 +4,9 @@ For nextflow usage Description:
 
 Pipeline for analysing data generated from the DNAm lung cancer screening panel (https://github.com/MRCIEU/dnam-lung-cancer-screening-panel).
 
-conda create -n Bismark python=3.0
+### Conda setup
 
-conda install -c bioconda multiqc bismark trim-galore samtools trimmomatic fastqc bedtools cutadapt bowtie
-
-name: Bismark
-
-channels:
-
-  - conda-forge
-  - bioconda
-  - defaults
-
-dependencies:
+Dependencies:
 
     bcftools     1.10         
     bedtools     2.31.1        
@@ -32,35 +22,84 @@ dependencies:
     trim-galore  0.6.10        
     trimmomatic  0.39          
 
-Refernce Genome
+To install these, you will need the following conda channels:
+  - conda-forge
+  - bioconda
+  - defaults
 
-hg38
+Check which channels you have:
+```
+conda config --show channels
+```
 
-u_param (Bismark)
+Add any missing channels like this:
+```
+conda config --add channels bioconda
+```
 
-This parameter determines how many reads will be used.  
+Create a conda environment for the analysis and install packages
+```
+conda create -n Bismark python=3.0
+conda install -c bioconda nextflow multiqc bismark trim-galore samtools trimmomatic fastqc bedtools cutadapt bowtie
+conda install -c conda-forge python-isal
+```
 
-t_param (Fastqc)
+## Prepare reference genome
 
-Fastqc Specifies the number of files which can be processed simultaneously. Each thread will be allocated 250MB of memory so you shouldn't run more threads than your available memory will cope with, and not more than 6 threads on a 32 bit machine. 
+```
+GENOMES=[path to converted genome index]
 
-memory_param (Fastqc) 
+wget https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
+mv hg19.fa.gz ${GENOMES}
+bismark_genome_preparation --path_to_aligner /data/ms13525/lib/miniconda2/envs/Bismark/bin  --verbose ${GENOMES}
+```
 
-Sets the base amount of memory, in Megabytes,  used to process each file. Defaults to 512MB. You may need to increase this if you have a file with very long sequences in it. Allowed range (100 - 10000)
+Running time is about 2 hours.
 
-multicore (Bismark)   
+## Running the pipeline
 
-Number of cores to be used for Bismark Alignement. Allowed range (1-8)
+**Usage:**
 
-cores (Trim Galore!)
+```
+nextflow nextflow.nf \
+  --reads "[fastq path]/*_R{1,2}*.fastq.gz" \
+  --t_param 4 \
+  --memory_param 10000 \
+  --genome_folder [genome index path]
+  --multicore 4 \
+  --outdir "results"
+  -resume
+```
 
-Number of cores to be used for Trimming. It seems that --cores 4 could be a sweet spot, anything above has diminishing returns.    
+**Parameters:**
 
-Usage:
+- u_param (Bismark)
 
-nextflow nextflow.nf --reads 'path/*_{1,2}.fastq.gz' --t_param int --u_param int --memory_param int --genome_folder 'bismark.ref path' --multicore int --outdir "results"
+  This parameter determines how many reads will be used. 
 
-Instructions:
+- t_param (Fastqc)
+
+  Fastqc Specifies the number of files which can be processed
+  simultaneously. Each thread will be allocated 250MB of memory so you
+  shouldn't run more threads than your available memory will cope
+  with, and not more than 6 threads on a 32 bit machine.
+
+- memory_param (Fastqc)
+
+  Sets the base amount of memory, in Megabytes, used to process each
+  file. Defaults to 512MB. You may need to increase this if you have a
+  file with very long sequences in it. Allowed range (100 - 10000)
+
+- multicore (Bismark)
+
+  Number of cores to be used for Bismark Alignement. Allowed range (1-8)
+
+- cores (Trim Galore!)
+
+  Number of cores to be used for Trimming. It seems that --cores 4 could be a sweet spot, anything above has diminishing returns.    
+
+
+**Instructions:**
 
 Input files (file1_1.fastq.gz, file1_2.fastq.gz, etc.), the main.nf script, and the output directory (outdir) should all be located in the same folder.
 
@@ -77,3 +116,26 @@ folder3 [file4_1.fastq.gz, file4_2.fastq.gz, file5_1.fastq.gz, file5_2.fastq.gz]
 this would be 3 sequencing job. 
 
 All results will be output to the same directory specified by --outdir "results"
+
+
+## To do
+
+* Genome indexing should be a process that runs only if the genome index needs to be created
+
+* Add processes for steps that follow, e.g.
+
+```
+cd results
+bismark2report
+bismark2summary
+multiqc .
+Rscript R_codes.R
+```
+
+* 'nextflow.nf' should be renamed 'main.nf' (seems to be the convention for nextflow repos)
+
+* 'R_codes.R' should be renamed 'generate-report.r' or something similar
+
+* Note: It is now possible to have a single directory with all fastq files.
+  If new files are generated, just copy them to the directory and
+  rerun the pipeline with the '-resume' option
