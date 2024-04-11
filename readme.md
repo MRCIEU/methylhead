@@ -14,7 +14,7 @@ Dependencies:
     bowtie2      2.3.5.1             
     fastqc       0.12.1        
     hisat2       2.2.0         
-    multiqc      1.8           
+    multiqc      1.21          
     perl         5.32.1        
     qt           5.6.3         
     rstudio      1.1.456       
