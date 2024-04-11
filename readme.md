@@ -39,8 +39,10 @@ conda config --add channels bioconda
 
 Create a conda environment for the analysis and install packages
 ```
-conda create -n Bismark python=3.0
-conda install -c bioconda nextflow multiqc bismark trim-galore samtools trimmomatic fastqc bedtools cutadapt bowtie
+conda create -n Bismark python=3.8
+pip install multiqc
+conda install -c conda-forge trim-galore
+conda install -c bioconda nextflow bismark samtools trimmomatic fastqc bedtools cutadapt bowtie
 conda install -c conda-forge python-isal
 ```
 
