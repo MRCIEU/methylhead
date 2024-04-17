@@ -24,8 +24,6 @@ library(IlluminaHumanMethylation450kmanifest)
 library(RColorBrewer)
 library(missMethyl)
 library(minfiData)
-library(Gviz)
-library(DMRcate)
 library(stringr)
 library(GenomicRanges)
 library(genomation)
@@ -34,6 +32,7 @@ library(dplyr)
 library(ggplot2)
 library(ggcorrplot)
 library(data.table)
+library(ggpubr)
 ```
 
 ```{r}
@@ -45,18 +44,16 @@ setwd("/user/work/ag24712/new_data/nf/next_f/results/results/")
 file.vector <- list.files(pattern = "bismark\\.cov\\.gz", full.names = FALSE)
 sample.ids <- gsub("_bismark_bt2_pe.deduplicated.bismark.cov.gz", "", basename(file.vector))
 sample.ids<-as.list(sample.ids)
-sample_info<-fread("Sample_info.txt")
 file.list<-as.list(file.vector)
 myobj <- methRead(file.list,
            sample.id=sample.ids,
            pipeline = "bismarkCoverage",                
            assembly="hg38",
-           treatment=sample_info$treatment,
+           treatment=c(rep(0,length(sample.ids))),
            mincov = 10)
 ## fig-cap: "Checking number of samples"
 myobj
 ```
-
 
 ```{r}
 #| echo: false
@@ -82,12 +79,32 @@ myobj.filt <- filterByCoverage(myobj,
                       hi.perc=99.9)
 ## "Filtered Results"
 myobj.filt 
-myobj.filt.norm <- normalizeCoverage(myobj.filt, method = "median")
-meth <- unite(myobj.filt.norm, destrand=FALSE)
-## "Normalizaion"
+meth <- unite(myobj.filt, destrand=FALSE)
 head(meth)
 pm=percMethylation(meth)
 pm=pm/100
+```
+
+```{r}
+#| echo: false
+#| label: Get a correlation plot
+#| warning: false
+
+## "correlation plot"
+pdf("correlation_plot.pdf")
+getCorrelation(meth,plot=TRUE)
+dev.off()
+```
+
+```{r}
+#| echo: false
+#| label: Cluster plot
+#| warning: false
+
+## "Cluster plot"
+pdf("culster_plot.pdf")
+clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
+dev.off()
 ```
 
 ```{r}
@@ -96,29 +113,33 @@ pm=pm/100
 #| warning: false
 meth_df<-data.frame(meth)
 ann450k <- getAnnotation(IlluminaHumanMethylation450kanno.ilmn12.hg19)
-ann4<-data.frame(ann450k)
+ann450k$loc = paste(ann450k$chr, ann450k$pos)
+meth_df$loc = paste(meth_df$chr,meth_df$start)
 meth_df<-cbind(meth_df,(pm))
-merged_data <- left_join(meth_df, ann4, by = c("start" = "pos"))
-data1<-merged_data[,c(1,2,3,17,18,19,20,23,5,8,11,14)]
-final_data<-data1
-final_data2<-na.omit(final_data)
+merged_data <- merge(meth_df, ann450k, by = c("loc"))
+sample.ids2<-unlist(sample.ids)
+mm <- merged_data[c("Name", sample.ids2)]
+methylation<-na.omit(mm)
+colnames(methylation)[1]<-"CpGs"
 ```
 
 ```{r}
 #| echo: false
 #| label: Preparing Data
-#| warning: false   
-methylation<-final_data2[,c(4,5,6,7)]
-rownames(methylation)<-(final_data2$Name)
-meth_matrix<-data.matrix(methylation)
+#| warning: false 
+methylation_matrix<-methylation[,-1]
+rownames(methylation_matrix)<-(methylation$CpGs)
+write.csv(methylation_matrix,"methylation_matrix.csv")
+meth_matrix<-data.matrix(methylation_matrix)
 ```
 
 ```{r}
 #| echo: false
 #| label: DNA methylation indices of exposure and phenotype (meffonym)
 #| warning: false
-ret <- meffonym.score(m2, "hillary")
-age<-c(60,58,39,24)
+ret <- meffonym.score(meth_matrix, "hillary")
+#Example
+age<-c(60,58,39,24),50,61)
 cor(ret$score, age)
 ```
 
