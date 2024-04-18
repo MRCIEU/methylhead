@@ -130,6 +130,7 @@ colnames(methylation)[1]<-"CpGs"
 methylation_matrix<-methylation
 rownames(methylation_matrix)<-(methylation$CpGs)
 write.csv(methylation_matrix,"methylation_matrix.csv")
+methylation_matrix<-methylation_matrix[,-1]
 meth_matrix<-data.matrix(methylation_matrix)
 ```
 
