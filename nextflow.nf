@@ -13,7 +13,7 @@ log.info"""\
      All the process names should be written with BIG LETTERS.
      All workflows are processed sequentially; they cannot be used separately.       
  *** Parameters Info   
-     Refernce Genome       : hg38
+     Refernce Genome       : hg19 (or hg38)
      u_param (Bismark)     : This parameter determines how many reads will be used.  
      t_param (Fastqc)      : Fastqc Specifies the number of files which can be processed
                              simultaneously. Each thread will be allocated 250MB of
@@ -49,7 +49,7 @@ process FASTQC {
     tuple val(sample_id), path("*.html"), emit: html
     tuple val(sample_id), path("*.zip") , emit: zip
     
-    publishDir "${params.outdir}" , mode: 'copy'
+    publishDir "${params.outdir}/fastqc/" , mode: 'copy'
     
     script:
     def fastqc_cmd = "fastqc ${reads[0]} ${reads[1]} --output_dir ${params.outdir}"
@@ -71,14 +71,15 @@ process TRIMMING {
     val(cores)
     
     output:                               
-    tuple val(sample_id), path("${params.outdir}/${sample_id}_*.fq.gz") , emit: fq                                  
+    tuple val(sample_id), path("*_{1,2}.fq.gz") , emit: fq                                  
     tuple val(sample_id), path("*report.txt")                        , emit: log     , optional: true
     tuple val(sample_id), path("*.html")                             , emit: html    , optional: true   
-    publishDir "${params.outdir}" , mode: 'copy'
+   
+    publishDir "${params.outdir}/trimmed/" , mode: 'copy'
     
-    
+ 
     script:
-    def trim_galore_cmd = "trim_galore --paired ${reads[0]} ${reads[1]} --output_dir ${params.outdir} --gzip"
+    def trim_galore_cmd = "trim_galore --paired ${reads[0]} ${reads[1]} --gzip"
     if(cores) {
        trim_galore_cmd += " --cores ${cores}"
     }
@@ -96,13 +97,14 @@ process BISMARK {
     val(multicore)
     
     output:
-    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.bam"), emit: bam
-    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_PE_report.txt"), emit: report
-    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.nucleotide_stats.txt"), emit: nucstats
-    publishDir "${params.outdir}" , mode: 'copy'
+    tuple val(sample_id), path("${sample_id}*_val_1_bismark_bt2_pe.bam"), emit: bam
+    tuple val(sample_id), path("${sample_id}*_val_1_bismark_bt2_PE_report.txt"), emit: report
+    tuple val(sample_id), path("${sample_id}*_val_1_bismark_bt2_pe.nucleotide_stats.txt"), emit: nucstats
+   
+    publishDir "${params.outdir}/Bismark_Alignment/" , mode: 'copy'
      
     script:
-    def bismark_cmd = "bismark --genome_folder ${params.genome_folder} --nucleotide_coverage -1 ${fq[0]} -2 ${fq[1]} --bam --output_dir ${params.outdir}"
+    def bismark_cmd = "bismark --genome_folder ${params.genome_folder} --nucleotide_coverage -1 ${fq[0]} -2 ${fq[1]} --bam" 
     if (u_param) {
         bismark_cmd += " --u ${u_param}"
     }
@@ -118,15 +120,15 @@ process DEDUPLICATION {
     input:
     tuple val(sample_id), path(bam)
     
-    publishDir "${params.outdir}" , mode: 'copy'
+    publishDir "${params.outdir}/Deduplication" , mode: 'copy'
 
     output:   
-    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplicated.bam")        , emit: bam
-    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplication_report.txt"), emit: report
+    tuple val(sample_id), path("${sample_id}*_val_1_bismark_bt2_pe.deduplicated.bam")        , emit: bam
+    tuple val(sample_id), path("${sample_id}*_val_1_bismark_bt2_pe.deduplication_report.txt"), emit: report
      
     script:
     """
-    deduplicate_bismark --p --bam $bam --output_dir ${params.outdir}   
+    deduplicate_bismark --p --bam $bam 
     """
 }
 process METHYLATION {
@@ -136,17 +138,17 @@ process METHYLATION {
     input:
     tuple val(sample_id), path(bam)
     
-    publishDir "${params.outdir}" , mode: 'copy'
+    publishDir "${params.outdir}/Methylation" , mode: 'copy'
 
     output:
-    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplicated.bedGraph.gz")                 , emit: bedgraph
-    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz")              , emit: coverage
-    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplicated_splitting_report.txt")        , emit: report
-    tuple val(sample_id), path("${params.outdir}/${sample_id}*_val_1_bismark_bt2_pe.deduplicated.M-bias.txt")                  , emit: mbias
+    tuple val(sample_id), path("${sample_id}*_val_1_bismark_bt2_pe.deduplicated.bedGraph.gz")                 , emit: bedgraph
+    tuple val(sample_id), path("${sample_id}*_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz")              , emit: coverage
+    tuple val(sample_id), path("${sample_id}*_val_1_bismark_bt2_pe.deduplicated_splitting_report.txt")        , emit: report
+    tuple val(sample_id), path("${sample_id}*_val_1_bismark_bt2_pe.deduplicated.M-bias.txt")                  , emit: mbias
    
     script:
     """
- bismark_methylation_extractor --comprehensive --bedGraph --gzip --paired-end "${bam}" --CX --output_dir "${params.outdir}"  --no_overlap 
+ bismark_methylation_extractor --comprehensive --bedGraph --gzip --paired-end "${bam}" --CX --no_overlap  
     """
 }
 
@@ -183,8 +185,8 @@ workflow {
  ch_bam = BISMARK.out.bam
  DEDUPLICATION(ch_bam) 
  dedup_bam=DEDUPLICATION.out.bam
- METHYLATION(dedup_bam)                          
-
+ METHYLATION(dedup_bam)
+ coverage= METHYLATION.out                      
 }
 
 workflow.onComplete {
