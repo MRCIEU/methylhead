@@ -145,7 +145,7 @@ All results will be output to the same directory specified by --outdir "results"
 cd results
 bismark2report
 bismark2summary
-multiqc . -x .nextflow
+multiqc .
 Rscript R_codes.R
 ```
 
