@@ -161,4 +161,4 @@ Rscript R_codes.R
 
 * for some reason the fastqc outputs got to 'results' and the
   remaining go to 'results/results', possibly the ${params.outdir} in
-  the process outputs paths s unnecessary
+  the process outputs paths s unnecessary (Solved)
