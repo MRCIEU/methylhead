@@ -69,10 +69,10 @@ nextflow nextflow.nf \
   --memory_param 10000 \
   --genome_folder [genome index path]
   --multicore 4 \
-  preview -with-dag flowchart.html
-  --outdir "results"
-  -resume
-  -with-timeline time_line.html
+  preview -with-dag flowchart.html \
+  --outdir "results" \
+  -resume \
+  -with-timeline time_line.html \
   -with-report report.html
 ```
 
