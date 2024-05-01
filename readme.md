@@ -15,6 +15,7 @@ Dependencies:
     fastqc       0.12.1        
     hisat2       2.2.0         
     multiqc      1.21 
+    methyldackel 0.6.1
     nextflow     23.10.1
     perl         5.32.1 
     picard       2.18.23 
