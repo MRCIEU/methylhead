@@ -14,11 +14,14 @@ Dependencies:
     bowtie2      2.3.5.1             
     fastqc       0.12.1        
     hisat2       2.2.0         
-    multiqc      1.21          
-    perl         5.32.1        
+    multiqc      1.21 
+    nextflow     23.10.1
+    perl         5.32.1 
+    picard       2.18.23 
     qt           5.6.3         
-    rstudio      1.1.456       
-    samtools     1.18          
+    rstudio      1.1.456
+    sambamba     1.0
+    samtools     1.18 
     trim-galore  0.6.10        
     trimmomatic  0.39          
 
