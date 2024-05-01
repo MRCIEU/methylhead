@@ -138,6 +138,9 @@ meth_matrix<-data.matrix(methylation_matrix)
 #| echo: false
 #| label: DNA methylation indices of exposure and phenotype (meffonym)
 #| warning: false
+
+###Example###
+
 ret <- meffonym.score(meth_matrix, "hillary")
 #Example
 age<-c(60,58,39,24),50,61)
