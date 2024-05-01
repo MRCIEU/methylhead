@@ -149,18 +149,18 @@ cd results
 bismark2report
 bismark2summary
 multiqc .
-Rscript R_codes.R
+Rscript Creating_Methylation_Matrix.R
 ```
 
-* 'nextflow.nf' should be renamed 'main.nf' (seems to be the convention for nextflow repos)
+* 'nextflow.nf' should be renamed 'main.nf' (seems to be the convention for nextflow repos) (Solved)
 
-* 'R_codes.R' should be renamed 'generate-report.r' or something similar
+* 'R_codes.R' should be renamed 'generate-report.r' or something similar (Solved)
 
 * Note: It is now possible to have a single directory with all fastq files.
   If new files are generated, just copy them to the directory and
   rerun the pipeline with the '-resume' option
 
-* 'workflow' code could be simplified
+* 'workflow' code could be simplified 
 
 * for some reason the fastqc outputs got to 'results' and the
   remaining go to 'results/results', possibly the ${params.outdir} in
