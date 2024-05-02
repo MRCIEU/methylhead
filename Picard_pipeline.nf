@@ -43,8 +43,6 @@ params.intervals= ""
 
 process FASTQC {
     
-    tag "Fastqc"
-    
     input:
     tuple val(sample_id), path(reads)
     
@@ -62,7 +60,6 @@ process FASTQC {
 
 process TRIMMING {
 
-    tag "Trim Galore!"
     input:
     tuple val(sample_id), path(reads)
   
@@ -97,7 +94,7 @@ process BWA{
 process SAMBAMBA {
     
     input:
-     path(myBamSample)
+    path(myBamSample)
     
     publishDir "${params.outdir}/sambamba/" , mode: 'copy'
     
@@ -252,8 +249,7 @@ process MethylDackel {
 
 process MethylDackel_bedGraph{
 
-    input:
-    
+    input:    
     path sorted_mark
    
     publishDir "${params.outdir}/bedGraph/", mode: 'copy'
@@ -270,8 +266,7 @@ process MethylDackel_bedGraph{
 
 process MethylDackel_methylKit{
 
-    input:
-    
+    input:  
     path sorted_mark
     
     publishDir "${params.outdir}/methylKit/", mode: 'copy'
