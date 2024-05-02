@@ -58,6 +58,15 @@ GENOMES=[path to converted genome index]
 wget https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
 mv hg19.fa.gz ${GENOMES}
 bismark_genome_preparation --path_to_aligner /data/ms13525/lib/miniconda2/envs/Bismark/bin  --verbose ${GENOMES}
+wget https://www.twistbioscience.com/sites/default/files/resources/2022-06/covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.bed.zip
+mv covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.bed.zip ${GENOMES}
+samtools faidx hg19.fa
+picard CreateSequenceDictionary REFERENCE=hg19.fa OUTPUT=hg19.fa.dict
+picard BedToIntervalList \
+I=covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.bed \
+O=covered_targets_Twist_Methylome_hg19_annotated_collapsed_final \
+SD=hg19.fa.dict
+
 ```
 
 Running time is about 2 hours.
