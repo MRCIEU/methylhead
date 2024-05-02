@@ -33,7 +33,6 @@ log.info"""\
      
      genome_folder       : hg19 (or hg38)
      intervals           : Covered_targets_Twist_Methylome_reference.intervals
-     Bam_Samples         : Bam files folder (should be use '~/*.bam') 
      outdir              : Results folder    
 """
 
