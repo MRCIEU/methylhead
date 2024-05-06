@@ -297,23 +297,6 @@ process Processed_bedGraph {
     """
 }
 
-process Methylation_Matrix {
-
-    input:
-    path methylKit
-    
-    output:
-    val "picard_methylation.csv", emit: meth_matrix
-
-
-    script:
-    """
-    mkdir -p ${baseDir}/results/Methylation_Matrix
-    cd ${baseDir}/results/methylKit
-    Rscript /user/work/ag24712/newBam/Picard_Methylation_Matrix.R ${baseDir}/results/Methylation_Matrix/
-    """
-}
-
 process Samtools_stats {
     input:
     path(myBamSample)
@@ -351,7 +334,6 @@ log.info("""\
   |MethylDackel bedGraph    |Produce bedGraph for MethylDackel                  |
   |MethylDackel methylKit   |Produce cytosine report for methylKit              |
   |Processed_bedGraph       |Processed bedGraph                                 |
-  |Methylation Matrix       |Creating Methylation Matrix with R codes           | 
   |Samtools Stats           |Statistics on alignment files                      |
   +-----------------------------------------------------------------------------+                
 """)
@@ -378,8 +360,6 @@ workflow {
  bedGraph=MethylDackel_bedGraph.out
  Processed_bedGraph(bedGraph)
  MethylDackel_methylKit(sorted_mark)
- methylKit=MethylDackel_methylKit.out
- Methylation_Matrix(methylKit)
  Samtools_stats(myBamSample,sorted_mark)   
 }
 
