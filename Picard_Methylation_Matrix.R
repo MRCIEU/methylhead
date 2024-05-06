@@ -46,6 +46,4 @@ sample.ids2<-unlist(sample.ids)
 mm <- merged_data[c("Name", sample.ids2)]
 methylation<-na.omit(mm)
 colnames(methylation)[1]<-"CpGs"
-args <- commandArgs(trailingOnly = TRUE)
-output_dir <- args[1]
-write.csv(methylation,file = paste0(output_dir,"/picard_methylation.csv"))
+write.csv(methylation,"picard_methylation.csv")
