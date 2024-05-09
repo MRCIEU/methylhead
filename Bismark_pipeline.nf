@@ -29,7 +29,7 @@ log.info"""\
 """
 params.reads = ""
 params.genome_folder = ""
-params.outdir = ""
+params.outdir = "Bismark_Results"
 params.u_param = "" 
 params.t_param = ""
 params.memory_param = "" 
