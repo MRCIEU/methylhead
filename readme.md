@@ -76,19 +76,17 @@ Running time is about 2 hours.
 **Usage:**
 
 ```
-nextflow nextflow.nf \
+nextflow Bismark_pipeline.nf \
   --reads "[fastq path]/*_R{1,2}*.fastq.gz" \
   --t_param 4 \
   --memory_param 10000 \
   --genome_folder [genome index path]
   --multicore 4 \
   preview -with-dag flowchart.html \
-  --outdir "results" \
   -resume \
   -with-timeline time_line.html \
   -with-report report.html
 ```
-
 **Parameters:**
 
 - u_param (Bismark)
@@ -127,6 +125,15 @@ nextflow nextflow.nf \
 - with-report
  
  It creates an HTML execution report: a single document about resources usage (which includes many useful metrics about a workflow execution).
+
+```
+
+nextflow picard_pipeline.nf \
+  --reads "[fastq path]/*_R{1,2}*.fastq.gz" \
+  --intervals covered_targets_Twist_Methylome_hg19_annotated_collapsed_final
+  --genome_folder  [BWA genome index path]
+
+```
 
 
 **Instructions:**
