@@ -16,9 +16,8 @@ log.info"""\
    6)  Picard tools for processing BAM files    
    7)  Collecting hybrid selection metrics      
    8)  Collecting mark duplicates metrics       
-   9)  DNA Methylation Analysis  
-   10) Creating DNA Methylation Matrix with R codes               
-   11) Statistics on alignment files                
+   9)  DNA Methylation Analysis                
+   10) Statistics on alignment files                
      
  *** Rules
      
