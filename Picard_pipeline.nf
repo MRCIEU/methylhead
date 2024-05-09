@@ -31,14 +31,13 @@ log.info"""\
        
  *** Parameters Info   
      
-     genome_folder       : hg19 (or hg38)
-     intervals           : Covered_targets_Twist_Methylome_reference.intervals
-     outdir              : Results folder    
+     genome_folder       : hg19 (or hg38) BWA Reference folder must be use.
+     intervals           : Covered_targets_Twist_Methylome_reference.intervals.
 """
 
 params.reads = ""
 params.genome_folder = ""
-params.outdir = ""
+params.outdir = "Picard_Results"
 params.intervals= "" 
 
 process FASTQC {
