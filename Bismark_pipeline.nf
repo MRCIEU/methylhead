@@ -37,9 +37,7 @@ params.multicore= ""
 params.cores= ""
 
 process FASTQC {
-    
-    tag "Fastqc"
-    
+      
     input:
     tuple val(sample_id), path(reads)
     val(t_param)
@@ -64,8 +62,6 @@ process FASTQC {
 }
 
 process TRIMMING {
-
-    tag "Trim Galore!"
     input:
     tuple val(sample_id), path(reads)
     val(cores)
@@ -88,8 +84,6 @@ process TRIMMING {
 }
 
 process BISMARK {
-
-    tag "Alignment"
 
     input:
     tuple val(sample_id), path(fq)
@@ -114,8 +108,6 @@ process BISMARK {
     "${bismark_cmd}"
 }
 process DEDUPLICATION {
-
-    tag "Deduplication"
     
     input:
     tuple val(sample_id), path(bam)
@@ -132,8 +124,6 @@ process DEDUPLICATION {
     """
 }
 process METHYLATION {
-
-    tag "Metylation"
     
     input:
     tuple val(sample_id), path(bam)
