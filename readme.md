@@ -130,7 +130,7 @@ nextflow Bismark_pipeline.nf \
 
 ```
 
-nextflow picard_pipeline.nf \
+nextflow Picard_pipeline.nf \
   --reads "[fastq path]/*_R{1,2}*.fastq.gz" \
   --intervals covered_targets_Twist_Methylome_hg19_annotated_collapsed_final
   --genome_folder  [BWA genome index path]
