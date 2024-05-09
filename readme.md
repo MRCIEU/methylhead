@@ -73,7 +73,7 @@ Running time is about 2 hours.
 
 ## Running the pipeline
 
-**Usage:**
+**Bismark Usage:**
 
 ```
 nextflow Bismark_pipeline.nf \
@@ -126,6 +126,8 @@ nextflow Bismark_pipeline.nf \
  
  It creates an HTML execution report: a single document about resources usage (which includes many useful metrics about a workflow execution).
 
+**Picard Usage:**
+
 ```
 
 nextflow picard_pipeline.nf \
@@ -152,7 +154,7 @@ folder3 [file4_1.fastq.gz, file4_2.fastq.gz, file5_1.fastq.gz, file5_2.fastq.gz]
 
 this would be 3 sequencing job. 
 
-All results will be output to the same directory specified by --outdir "results"
+All results will be output to the same directory specified by --outdir "Bismark_Results (or Picard_Results)"
 
 
 ## To do
@@ -162,23 +164,16 @@ All results will be output to the same directory specified by --outdir "results"
 * Add processes for steps that follow, e.g.
 
 ```
-cd results
+cd Bismark_Results
 bismark2report
 bismark2summary
 multiqc .
 Rscript Creating_Methylation_Matrix.R
+
 ```
-
-* 'nextflow.nf' should be renamed 'main.nf' (seems to be the convention for nextflow repos) (Solved)
-
-* 'R_codes.R' should be renamed 'generate-report.r' or something similar (Solved)
 
 * Note: It is now possible to have a single directory with all fastq files.
   If new files are generated, just copy them to the directory and
   rerun the pipeline with the '-resume' option
 
 * 'workflow' code could be simplified 
-
-* for some reason the fastqc outputs got to 'results' and the
-  remaining go to 'results/results', possibly the ${params.outdir} in
-  the process outputs paths s unnecessary (Solved)
