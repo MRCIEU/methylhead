@@ -23,7 +23,7 @@ sample.ids<-as.list(sample.ids)
 file.list<-as.list(file.vector)
 myobj <- methRead(file.list,
            sample.id=sample.ids,
-           pipeline = "bismarkCoverage",                
+           pipeline = "amp",                
            assembly="hg19",
            treatment=c(rep(0,length(sample.ids))),
            mincov = 10)
