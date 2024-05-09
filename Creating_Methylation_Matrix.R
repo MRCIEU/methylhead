@@ -42,13 +42,14 @@ library(ggpubr)
 
 setwd("/user/work/ag24712/new_data/nf/next_f/results/results/")
 file.vector <- list.files(pattern = "bismark\\.cov\\.gz", full.names = FALSE)
+file.vector <- file.vector[!grepl("ctrl", file.vector)]
 sample.ids <- gsub("_bismark_bt2_pe.deduplicated.bismark.cov.gz", "", basename(file.vector))
 sample.ids<-as.list(sample.ids)
 file.list<-as.list(file.vector)
 myobj <- methRead(file.list,
            sample.id=sample.ids,
            pipeline = "bismarkCoverage",                
-           assembly="hg38",
+           assembly="hg19",
            treatment=c(rep(0,length(sample.ids))),
            mincov = 10)
 ## fig-cap: "Checking number of samples"
