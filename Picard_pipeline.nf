@@ -313,6 +313,23 @@ process Samtools_stats {
     """
 }
 
+process Methylation_Matrix {
+
+    input:
+    path methylKit
+
+    output:
+    val "picard_methylation.csv", emit: meth_matrix
+
+
+    script:
+    """
+    mkdir -p ${baseDir}/${params.outdir}/Methylation_Matrix
+    cd ${baseDir}/${params.outdir}/methylKit
+    Rscript ${baseDir}/Picard_Methylation_Matrix.R ${baseDir}/${params.outdir}/Methylation_Matrix/
+    """
+}
+
 log.info("""\
   +-----------------------------------------------------------------------------+
   |      Pipeline Step      |                  Description                      |
@@ -358,7 +375,9 @@ workflow {
  bedGraph=MethylDackel_bedGraph.out
  Processed_bedGraph(bedGraph)
  MethylDackel_methylKit(sorted_mark)
- Samtools_stats(myBamSample,sorted_mark)   
+ methylKit=MethylDackel_methylKit.out 
+ files_ch = MethylDackel_methylKit.out.methylKit.collectFile(name:"*.methylKit", newLine: true)
+ Methylation_Matrix(files_ch) 
 }
 
 workflow.onComplete {
@@ -369,4 +388,3 @@ workflow.onComplete {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """)
 }
-                 
