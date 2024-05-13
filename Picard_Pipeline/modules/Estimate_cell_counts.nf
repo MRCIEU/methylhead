@@ -2,7 +2,7 @@
 process Estimate_cell_counts {
 
     input:
-    path data_ch
+    path file_ch
 
     publishDir "${params.outdir}/Estimate_cell_count/" , mode: 'copy'
     
