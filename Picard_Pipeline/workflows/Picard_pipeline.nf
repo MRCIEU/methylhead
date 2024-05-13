@@ -81,6 +81,7 @@ workflow Picard_pipeline {
     MethylKit = MethylDackel_methylKit.out 
     files_ch = MethylKit.collectFile(name:"*.methylKit", newLine: true)
     Methylation_Matrix(files_ch)
+    Estimate_cell_counts(files_ch)
 }
 
 log.info("""\
