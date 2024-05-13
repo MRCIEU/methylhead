@@ -35,25 +35,7 @@ nextflow run ${WORKFLOW} \
     --genome_folder ${REFERENCE_DIR} \
     --outdir ${RESULTS_DIR}
 
-
-end_time=$(date +"%s")
-
-
-cpu_time=$(sacct -j $SLURM_JOBID --format=JobID,TotalCPU | grep $SLURM_JOBID | awk '{print $2}')
-
-
-total_time=$(($end_time-$start_time))
-
-
-echo "CPU Zamani: $cpu_time"
-echo "Toplam Zaman: $total_time saniye"
-
-
 cp .nextflow.log ${RESULTS_DIR}/nextflow.log
-
-
-echo "CPU Zamani: $cpu_time" >> ${RESULTS_DIR}/execution.log
-echo "Toplam Zaman: $total_time saniye" >> ${RESULTS_DIR}/execution.log
 
 cd /user/work/ag24712/Next_1/results/results/
 
