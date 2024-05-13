@@ -26,6 +26,7 @@ myobj <- methRead(file.list,
            assembly="hg19",
            treatment=c(rep(0,length(sample.ids))),
            mincov = 10)
+
 myobj.filt <- filterByCoverage(myobj,
                       lo.count=10,
                       lo.perc=NULL,
@@ -46,4 +47,15 @@ methylation<-na.omit(mm)
 colnames(methylation)[1]<-"CpGs"
 args <- commandArgs(trailingOnly = TRUE)
 output_dir <- args[1]
+
 write.csv(methylation,file = paste0(output_dir,"/picard_methylation.csv"),row.names=FALSE)
+
+pdf(paste0(output_dir,"/correlation_plot.pdf"))
+getCorrelation(meth,plot=TRUE)
+dev.off()
+
+pdf(paste0(output_dir,"culster_plot.pdf"))
+clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
+dev.off()
+
+
