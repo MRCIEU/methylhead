@@ -15,7 +15,6 @@ library(ggcorrplot)
 library(data.table)
 library(ggpubr)
 
-
 file.vector <- list.files(pattern = "_sorted\\.markdup_CpG\\.methylKit", full.names = TRUE)
 file.vector <- file.vector[!grepl("ctrl", file.vector)]
 sample.ids <- gsub("_sambamba_sorted.markdup_CpG.methylKit", "", basename(file.vector))
@@ -59,13 +58,10 @@ NK=rowMeans(blood_cell_types[c("Blood.NKTM","Blood.NKU1","Blood.NKUF")])
 Mono=rowMeans(blood_cell_types[c("Blood.MonocytesTP","Blood.MonocytesU3","Blood.MonocytesUH")])
 Bcell=rowMeans(blood_cell_types[c("Blood.BTX","Blood.BUB","Blood.BUR")])
 Granulocytes=rowMeans(blood_cell_types[c("Blood.GranulocytesTZ","Blood.GranulocytesUD","Blood.GranulocytesUT")])
-
 beta.cell.types<-cbind(CD4T,CD8T,NK,Mono,Bcell,Granulocytes)        
-
 sample.idx <- names(meth_df)[!names(meth_df) %in% c("chr", "start", "end","coverage1","coverage2","strand","numCs1","numCs2","numTs2","numTs1")]
 beta<-matrix(ncol=length(sample.idx),nrow=nrow(regions))
 colnames(beta)<-sample.idx
-
 
 calculate_mean_values <- function(data_frame, chr_value, start_value, end_value) {
   selected_data <- data_frame %>%
@@ -80,7 +76,6 @@ for (i in 1:nrow(regions)) {
   mean_values <- calculate_mean_values(meth_df2, regions$chr[i], regions$start[i], regions$end[i])
   beta[i,] <- mean_values
 }
-
 
 estimate.cell.counts <- function(beta, beta.cell.types) {
     stopifnot(nrow(beta) == nrow(beta.cell.types))
@@ -100,9 +95,8 @@ estimate.cell.counts0 <- function(beta, beta.cell.types) {
     counts
 }
 
-
 args <- commandArgs(trailingOnly = TRUE)
 output_dir <- args[1]
-
 estimate_cell_counts<-estimate.cell.counts(beta, beta.cell.types)
-write.csv(estimate_cell_counts,file = paste0(output_dir,"/estimate_cell_counts.csv"))
+estimate_cell_counts_Normalized<-estimate_cell_counts/colSums(estimate_cell_counts)
+write.csv(estimate_cell_counts_Normalized,file = paste0(output_dir,"/estimate_cell_counts.csv"))
