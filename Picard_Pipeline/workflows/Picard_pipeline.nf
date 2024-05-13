@@ -15,7 +15,10 @@ log.info"""\
    7)  Collecting hybrid selection metrics      
    8)  Collecting mark duplicates metrics       
    9)  DNA Methylation Analysis                
-   10) Statistics on alignment files                
+   10) Statistics on alignment files
+   11) DNA Methylation Matrix
+   12) Estimate Cell Count 
+   13) Picard Scores          
      
  *** Rules
      
@@ -49,13 +52,14 @@ include { MethylDackel_methylKit } from '../modules/MethylDackel_methylKit'
 include { Processed_bedGraph } from '../modules/Processed_bedGraph'
 include { Samtools_stats } from '../modules/Samtools_stats'
 include { Methylation_Matrix } from '../modules/Methylation_Matrix'
-
+include { Estimate_cell_counts } from '../modules/Estimate_cell_counts'
+include { Picard_scores } from '../modules/Picard_scores'
 
 workflow Picard_pipeline {
 
     take:
     reads   
-    outdir
+    outdir 
     
     main:
     read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)
@@ -79,9 +83,12 @@ workflow Picard_pipeline {
     Processed_bedGraph(bedGraph)
     MethylDackel_methylKit(Picard_mark_duplicated.out.markdup)
     MethylKit = MethylDackel_methylKit.out 
-    files_ch = MethylKit.collectFile(name:"*.methylKit", newLine: true)
+        files_ch = MethylKit.collectFile(name:"*.methylKit", newLine: true)
     Methylation_Matrix(files_ch)
     Estimate_cell_counts(files_ch)
+    Meth_Matrix = Methylation_Matrix.out
+        files_ch2 = Meth_Matrix.collectFile(name:"*.csv", newLine: true)
+    Picard_scores(files_ch2)
 }
 
 log.info("""\
@@ -104,7 +111,9 @@ log.info("""\
   |MethylDackel methylKit   |Produce cytosine report for methylKit              |
   |Processed_bedGraph       |Processed bedGraph                                 |
   |Samtools Stats           |Statistics on alignment files                      |
-  |Methylation Matrix       |Creating Methylation Matrix with R script          |
+  |Methylation Matrix       |Creating Methylation Matrix                        |
+  |Estimate Cell Count      |Estimate Cell Counts from Loyfer Data              |
+  |DNA Methylation Scores   |Creating Metyhlation Scores with R script          |
   +-----------------------------------------------------------------------------+                
 """)
 
