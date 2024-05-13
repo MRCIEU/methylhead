@@ -59,9 +59,9 @@ Mono=rowMeans(blood_cell_types[c("Blood.MonocytesTP","Blood.MonocytesU3","Blood.
 Bcell=rowMeans(blood_cell_types[c("Blood.BTX","Blood.BUB","Blood.BUR")])
 Granulocytes=rowMeans(blood_cell_types[c("Blood.GranulocytesTZ","Blood.GranulocytesUD","Blood.GranulocytesUT")])
 beta.cell.types<-cbind(CD4T,CD8T,NK,Mono,Bcell,Granulocytes)        
-sample.idx <- names(meth_df)[!names(meth_df) %in% c("chr", "start", "end","coverage1","coverage2","strand","numCs1","numCs2","numTs2","numTs1")]
-beta<-matrix(ncol=length(sample.idx),nrow=nrow(regions))
-colnames(beta)<-sample.idx
+
+beta<-matrix(ncol=length(sample.ids),nrow=nrow(regions))
+colnames(beta)<-sample.ids
 
 calculate_mean_values <- function(data_frame, chr_value, start_value, end_value) {
   selected_data <- data_frame %>%
