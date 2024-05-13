@@ -1,11 +1,13 @@
 process Methylation_Matrix {
 
+    
     input:
     path methylKit
 
     output:
-    val "picard_methylation.csv", emit: meth_matrix
-
+    val "picard_methylation.csv" , emit : meth_matrix
+   
+    publishDir "${params.outdir}/Methylation_Matrix/" , mode: 'copy'
 
     script:
     """
