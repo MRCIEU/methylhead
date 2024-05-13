@@ -54,7 +54,7 @@ pdf(paste0(output_dir,"/correlation_plot.pdf"))
 getCorrelation(meth,plot=TRUE)
 dev.off()
 
-pdf(paste0(output_dir,"culster_plot.pdf"))
+pdf(paste0(output_dir,"/culster_plot.pdf"))
 clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
 dev.off()
 
