@@ -217,7 +217,6 @@ cd Bismark_Results
 bismark2report
 bismark2summary
 multiqc .
-Rscript Creating_Methylation_Matrix.R
 
 ```
 
