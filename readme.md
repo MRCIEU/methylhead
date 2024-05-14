@@ -70,6 +70,8 @@ O=covered_targets_Twist_Methylome_hg19_annotated_collapsed_final \
 SD=hg19.fa.dict
 
 ```
+Running time is about 2 hours.
+
 ## Prepare Beta Cell Types for Estimating cell counts
 
 **The script reads blood panel data from a CSV file*
@@ -117,8 +119,6 @@ awk 'BEGIN {FS="[:, -]"; OFS="\t"} {start=$1+$2; end=$3+$4; print $1, start,end 
 ./wgbstools beta_to_table blood_cell.bed --betas *.beta | column -t > blood_cell_types.csv
 ```
 
-
-Running time is about 2 hours.
 
 ## Running the pipeline
 
