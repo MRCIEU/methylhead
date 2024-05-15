@@ -7,9 +7,11 @@ log.info"""\
  *** Steps          
      1. QC Steps
      2. Bismark Alignment& Methylation steps
-     3. Methylation Matrix  
-     4. Estimation cell counts
-     5. DNA Methylation Score
+     3. Methylation Matrix 
+     4. DNAm Full Matrix 
+     5. Estimation cell counts
+     6. DNA Methylation Score
+     7. Multiqc 
            
  *** Parameters Info   
      Refernce Genome       : hg19 (or hg38)
@@ -28,12 +30,15 @@ log.info"""\
 """
 include { Fastqc } from '../modules/Fastqc'
 include { Trim_galore } from '../modules/Trim_galore'
-include { Bismark_alignment } from '../modules/Bismark_alignment'
-include { Bismark_Deduplication } from '../modules/Bismark_Deduplication'
-include { Bismark_methylation_extraction } from '../modules/Bismark_methylation_extraction'
+include { Alignment } from '../modules/Alignment'
+include { Deduplication } from '../modules/Deduplication'
+include { Methylation_extraction } from '../modules/Methylation_extraction'
+include { DNAm_Full_Matrix } from '../modules/DNAm_Full_Matrix'
 include { Methylation_Matrix } from '../modules/Methylation_Matrix'
 include { Estimate_cell_counts } from '../modules/Estimate_cell_counts'
-include { Bismark_scores } from '../modules/Bismark_scores'
+include { DNA_Methylation_Scores } from '../modules/DNA_Methylation_Scores'
+include { Reports } from '../modules/Reports'
+include { Multiqc } from '../modules/Multiqc'
 
 workflow Bismark_pipeline {
 
@@ -42,42 +47,65 @@ workflow Bismark_pipeline {
     outdir 
     
     main:
-   read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)    
+     Fatqc_Files = Channel.fromFilePairs(params.reads, checkIfExists: true)    
          t_param=params.t_param
          memory_param=params.memory_param
-   Fastqc(read_pairs_ch,params.t_param,params.memory_param)
+     Fastqc(Fatqc_Files,t_param,memory_param)
          cores=params.cores
-   Trim_galore(read_pairs_ch,cores)
+     Trim_galore(Fatqc_Files,cores)
          trim_ch=Trim_galore.out.fq         
          u_param= params.u_param 
          multicore= params.multicore 
-   bam_files_ch = Bismark_alignment(trim_ch,params.u_param,multicore)
-        ch_bam = Bismark_alignment.out.bam
-   Bismark_Deduplication(ch_bam) 
-       dedup_bam=Bismark_Deduplication.out.bam
-   Bismark_methylation_extraction(dedup_bam)
-   coverage= Bismark_methylation_extraction.out.coverage               
+     bam_files_ch = Alignment(trim_ch,u_param,multicore)
+        ch_bam = Alignment.out.alignment_bam
+     Deduplication(ch_bam) 
+         dedup_bam=Deduplication.out.dedup_bam
+     Methylation_extraction(dedup_bam)
+     coverage= Methylation_extraction.out.coverage               
         files_ch = coverage.collectFile(name:"*.cov.gz", newLine: true)
-   Methylation_Matrix(files_ch)
-   Estimate_cell_counts(files_ch)    
-   Meth_Matrix = Methylation_Matrix.out
+     Methylation_Matrix(files_ch)
+     DNAm_Full_Matrix(files_ch)
+         full_matrix=DNAm_Full_Matrix.out
+            full_matrix2=full_matrix.collectFile(name:"*.csv", newLine: true)
+     Estimate_cell_counts(full_matrix2)    
+     Meth_Matrix = Methylation_Matrix.out.meth_matrix
         files_ch2 = Meth_Matrix.collectFile(name:"*.csv", newLine: true)
-   Bismark_scores(files_ch2)
+     DNA_Methylation_Scores(files_ch2)
+          alignment_text = Alignment.out.alignment_report
+          deduplication_text = Deduplication.out.dedup_report
+          methylation_text = Methylation_extraction.out.splitting_report 
+          methylation_text2= Methylation_extraction.out.mbias
+            alignment_t = alignment_text.collectFile(name:"*.txt",newLine:true)
+            deduplication_t = deduplication_text.collectFile(name:"*.txt",newLine:true)
+            methylation_t = methylation_text.collectFile(name:"*.txt",newLine:true)
+            methylation_t2 = methylation_text2.collectFile(name:"*.txt",newLine:true)
+     Reports(alignment_t,deduplication_t,methylation_t,methylation_t2) 
+           Channel.empty()
+          .mix( Fastqc.out )
+          .mix( Trim_galore.out )
+          .mix( Alignment.out )
+          .mix( Deduplication.out )
+          .mix( Methylation_extraction.out ) 
+          .map { sample_id, files -> files }
+          .collect()
+          .set { log_files }  
+     Multiqc(log_files)
+
 }
 
-
 log.info("""\
-  +--------------------------------------------------------------------------------+
-  | Pipeline Step               |         Description                              |
-  +----------------------+---------------------------------------------------------+
-  | Fastqc                      | Quality control of Fastq files                   |
-  | Trimming                    | Removal of low-quality bases                     | 
-  | Alignment                   | Alignment of paired-end fastq files to bam files |
-  | Deduplication               | Removal of PCR duplicates                        |
-  | DNA Methylation Extraction  | Analysis of DNA methylation                      |
-  | Methylation Matrix          | Generation of methylation matrix                 |
-  | Bismark Scores              | Calculation of DNA methylation indices           |
-  +--------------------------------------------------------------------------------+
++---------------------------+----------------------------------------------=---+
+| Pipeline Step             | Description                                      |
++---------------------------+--------------------------------------------------+
+| QC Steps                  | Quality control of Fastq files                   |
+| Bismark Alignment&        | Alignment of paired-end fastq files to bam       |
+| Methylation steps         | files                                            |
+| Methylation Matrix        | Generation of methylation matrix                 |
+| DNAm Full Matrix          | Analysis of DNA methylation                      |
+| Estimation cell counts    | Estimation of cell counts from methylation data  | 
+| DNA Methylation Score     | Calculation of DNA methylation scores            |
+| Multiqc                   | Generation of multi-sample quality control report|
++---------------------------+--------------------------------------------------+
 """)
 
 workflow.onComplete {
