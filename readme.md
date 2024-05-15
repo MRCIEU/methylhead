@@ -208,16 +208,7 @@ All results will be output to the same directory specified by --outdir "Bismark_
 
 ## To do
 
-* Genome indexing should be a process that runs only if the genome index needs to be created
-
-* Add processes for steps that follow, e.g.
-
-```
-cd Bismark_Results
-bismark2report
-bismark2summary
-multiqc .
-
+* Genome indexing should be a process that runs only if the genome index needs to be created.
 ```
 
 * Note: It is now possible to have a single directory with all fastq files.
