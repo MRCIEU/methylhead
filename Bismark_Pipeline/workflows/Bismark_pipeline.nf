@@ -98,16 +98,17 @@ log.info("""\
 | Pipeline Step             | Description                                      |
 +---------------------------+--------------------------------------------------+
 | QC Steps                  | Quality control of Fastq files                   |
-| Bismark Alignment&        | Alignment of paired-end fastq files to bam       |
-| Methylation steps         | files                                            |
-| Methylation Matrix        | Generation of methylation matrix                 |
-| DNAm Full Matrix          | Analysis of DNA methylation                      |
+| Trimming Fastqc Files     | Trimming and quality assessment of Fastq files   |
+| Bismark Alignment         | Alignment of paired-end fastq files to bam files |
+| Bismark Deduplication     | Removal of duplicate reads in Bismark alignment  |
+| Methylation steps         | Creation of DNA methylation bedGraph             |
+| Methylation Matrix        | Generation of methylation matrix (CpGs Sites)    |
+| DNAm Full Matrix          | DNA methylation matrix                           |
 | Estimation cell counts    | Estimation of cell counts from methylation data  | 
 | DNA Methylation Score     | Calculation of DNA methylation scores            |
 | Multiqc                   | Generation of multi-sample quality control report|
 +---------------------------+--------------------------------------------------+
 """)
-
 workflow.onComplete {
     log.info("""\
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
