@@ -214,5 +214,3 @@ All results will be output to the same directory specified by --outdir "Bismark_
 * Note: It is now possible to have a single directory with all fastq files.
   If new files are generated, just copy them to the directory and
   rerun the pipeline with the '-resume' option
-
-* 'workflow' code could be simplified 
