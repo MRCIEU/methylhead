@@ -1,21 +1,22 @@
 ### Preparation of Beta Cell Types for Estimating cell counts
 
-**The script reads blood panel data from https://github.com/MRCIEU/dnam-lung-cancer-screening-panel/blob/master/panel-reduced.csv
+** The script reads blood panel data from https://github.com/MRCIEU/dnam-lung-cancer-screening-panel/blob/master/panel-reduced.csv
 
   
-**It writes the unique blood panel data to a CSV file
+** It writes the unique blood panel data to a CSV file
 
 
-**The script iterates through each row of the blood panel to extract genomic regions.
+** The script iterates through each row of the blood panel to extract genomic regions.
 
   
-**It uses the 'wgbstools' command-line tool to extract data for each region and appends it to a file.
+** It uses the 'wgbstools' command-line tool to extract data for each region and appends it to a file.
     
-**After that, it processes the extracted data to create a BED file containing relevant columns.
+** After that, it processes the extracted data to create a BED file containing relevant columns.
 
-**Finally, it converts beta values to table format using 'wgbstools' and saves the result to a CSV file.
+** Finally, it converts beta values to table format using 'wgbstools' and saves the result to a CSV file.
 'wgbstools' tool was used for data extraction and conversion. https://github.com/nloyfer/wgbs_tools
 
+** Blood cell files (beta files) can be downloaded from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE186458
 
 # This script prepares beta cell types files for analysis.
 
