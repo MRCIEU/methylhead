@@ -203,8 +203,6 @@ folder3 [file4_1.fastq.gz, file4_2.fastq.gz, file5_1.fastq.gz, file5_2.fastq.gz]
 
 this would be 3 sequencing job. 
 
-All results will be output to the same directory specified by --outdir "Bismark_Results (or Picard_Results)"
-
 
 ## To do
 
