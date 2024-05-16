@@ -37,4 +37,16 @@ nextflow Bismark_pipeline.nf \
 
 - cores (Trim Galore!)
 
-  Number of cores to be used for Trimming. It seems that --cores 4 could be a sweet spot, anything above has diminishing returns.   
+  Number of cores to be used for Trimming. It seems that --cores 4 could be a sweet spot, anything above has diminishing returns.
+
+  preview -with-dag flowchart
+ 
+ The pipeline will be represented as a direct acyclic graph (DAG)
+
+- with-timeline
+ 
+ Using to enable the creation of the timeline report.
+
+- with-report
+ 
+ It creates an HTML execution report: a single document about resources usage (which includes many useful metrics about a workflow execution).
