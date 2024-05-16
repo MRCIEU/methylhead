@@ -10,6 +10,7 @@
 
 # This script prepares beta cell types files for analysis.
 
+```
 # Read blood panel data
 blood_panel <- fread("panel-reduced_BS.csv")
 
@@ -36,3 +37,4 @@ awk 'BEGIN {FS="[:, -]"; OFS="\t"} {start=$1+$2; end=$3+$4; print $1, start,end 
 
 # Convert beta values to table format and save to CSV file
 ./wgbstools beta_to_table blood_cell.bed --betas *.beta | column -t > blood_cell_types.csv
+```
