@@ -22,7 +22,6 @@ Dependencies:
     perl         5.32.1 
     picard       2.18.23 
     qt           5.6.3         
-    rstudio      1.1.456
     sambamba     1.0
     samtools     1.18 
     trim-galore  0.6.10        
@@ -48,7 +47,7 @@ Create a conda environment for the analysis and install packages
 conda create -n Bismark python=3.8
 pip install multiqc
 conda install -c conda-forge trim-galore
-conda install -c bioconda nextflow bismark samtools trimmomatic fastqc bedtools cutadapt bowtie
+conda install -c bioconda nextflow bismark samtools trimmomatic fastqc bedtools cutadapt bowtie bwa bwameth sambamba methyldackel
 conda install -c conda-forge python-isal
 ```
 
