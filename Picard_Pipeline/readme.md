@@ -11,3 +11,14 @@ nextflow Picard_pipeline.nf \
   -with-report report.html
 
 ```
+preview -with-dag flowchart
+ 
+ The pipeline will be represented as a direct acyclic graph (DAG)
+
+- with-timeline
+ 
+ Using to enable the creation of the timeline report.
+
+- with-report
+ 
+ It creates an HTML execution report: a single document about resources usage (which includes many useful metrics about a workflow execution).
