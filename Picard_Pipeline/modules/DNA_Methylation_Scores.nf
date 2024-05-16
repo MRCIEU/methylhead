@@ -5,7 +5,7 @@ process DNA_Methylation_Scores {
    
     path Meth_Matrix
 
-    publishDir "${params.outdir}/Picard_scores/" , mode: 'copy'
+    publishDir "${params.outdir}/DNA_Methylation_Scores/" , mode: 'copy'
     
     output:
     val "Picard_scores.csv", emit: Picard_scores
