@@ -2,7 +2,7 @@
 
 log.info"""\
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                  Nextflow DNA Methylation Pipeline
+                  Nextflow DNA Bismark Methylation Pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *** Steps          
      1. QC Steps
@@ -34,8 +34,8 @@ include { Alignment } from '../modules/Alignment'
 include { Deduplication } from '../modules/Deduplication'
 include { Methylation_extraction } from '../modules/Methylation_extraction'
 include { DNAm_Full_Matrix } from '../modules/DNAm_Full_Matrix'
-include { Methylation_Matrix } from '../modules/Methylation_Matrix'
 include { Estimate_cell_counts } from '../modules/Estimate_cell_counts'
+include { Methylation_Matrix } from '../modules/Methylation_Matrix'
 include { DNA_Methylation_Scores } from '../modules/DNA_Methylation_Scores'
 include { Reports } from '../modules/Reports'
 include { Multiqc } from '../modules/Multiqc'
@@ -63,11 +63,11 @@ workflow Bismark_pipeline {
      Methylation_extraction(dedup_bam)
      coverage= Methylation_extraction.out.coverage               
         files_ch = coverage.collectFile(name:"*.cov.gz", newLine: true)
-     Methylation_Matrix(files_ch)
      DNAm_Full_Matrix(files_ch)
          full_matrix=DNAm_Full_Matrix.out
             full_matrix2=full_matrix.collectFile(name:"*.csv", newLine: true)
-     Estimate_cell_counts(full_matrix2)    
+     Estimate_cell_counts(full_matrix2) 
+     Methylation_Matrix(files_ch)   
      Meth_Matrix = Methylation_Matrix.out.meth_matrix
         files_ch2 = Meth_Matrix.collectFile(name:"*.csv", newLine: true)
      DNA_Methylation_Scores(files_ch2)
@@ -109,6 +109,7 @@ log.info("""\
 | Multiqc                   | Generation of multi-sample quality control report|
 +---------------------------+--------------------------------------------------+
 """)
+
 workflow.onComplete {
     log.info("""\
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
