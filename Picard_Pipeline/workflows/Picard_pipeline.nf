@@ -91,7 +91,7 @@ workflow Picard_pipeline {
         full_matrix=DNAm_Full_Matrix.out
             full_matrix2=full_matrix.collectFile(name:"*.csv", newLine: true)  
     Estimate_cell_counts(full_matrix2)  
-    Meth_Matrix = Methylation_Matrix.out
+    Meth_Matrix = Methylation_Matrix.out.meth_matrix
         files_ch2 = Meth_Matrix.collectFile(name:"*.csv", newLine: true)
     DNA_Methylation_Scores(files_ch2) 
     
