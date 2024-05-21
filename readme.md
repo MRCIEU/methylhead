@@ -75,13 +75,14 @@ Running time is about 2 hours.
 
 ```
 nextflow main.nf --pipeline bismark \
+--reads "[fastq path]/*_R{1,2}*.fastq.gz" \
 --genome_folder [genome index path] \
 -resume
 
 nextflow main.nf --pipeline picard \
 --reads "[fastq path]/*_R{1,2}*.fastq.gz" \
 --intervals covered_targets_Twist_Methylome_hg19_annotated_collapsed_final \
---genome_folder  [BWA genome index path]
+--genome_folder [BWA genome index path] \
 -resume 
 ```
 **Instructions:**
