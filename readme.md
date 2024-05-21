@@ -71,6 +71,21 @@ SD=hg19.fa.dict
 ```
 Running time is about 2 hours.
 
+## Usage: 
+
+```
+
+nextflow main.nf --pipeline bismark \
+--genome_folder [genome index path] \
+-resume
+
+nextflow main.nf --pipeline picard \
+--reads "[fastq path]/*_R{1,2}*.fastq.gz" \
+--intervals covered_targets_Twist_Methylome_hg19_annotated_collapsed_final \
+--genome_folder  [BWA genome index path]
+-resume 
+
+```
 
 **Instructions:**
 
@@ -88,17 +103,6 @@ folder3 [file4_1.fastq.gz, file4_2.fastq.gz, file5_1.fastq.gz, file5_2.fastq.gz]
 
 this would be 3 sequencing job. 
 
-## Usage: 
-
-nextflow main.nf --pipeline bismark \
---genome_folder [genome index path] \
--resume
-
-nextflow main.nf --pipeline picard \
---reads "[fastq path]/*_R{1,2}*.fastq.gz" \
---intervals covered_targets_Twist_Methylome_hg19_annotated_collapsed_final \
---genome_folder  [BWA genome index path]
--resume 
 
 ## To do
 
