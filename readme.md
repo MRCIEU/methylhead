@@ -74,7 +74,6 @@ Running time is about 2 hours.
 ## Usage: 
 
 ```
-
 nextflow main.nf --pipeline bismark \
 --genome_folder [genome index path] \
 -resume
@@ -84,9 +83,7 @@ nextflow main.nf --pipeline picard \
 --intervals covered_targets_Twist_Methylome_hg19_annotated_collapsed_final \
 --genome_folder  [BWA genome index path]
 -resume 
-
 ```
-
 **Instructions:**
 
 Input files (file1_1.fastq.gz, file1_2.fastq.gz, etc.), the main.nf script, and the output directory (outdir) should all be located in the same folder.
