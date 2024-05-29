@@ -43,7 +43,7 @@ for (i in 1:nrow(panel)) {
 }
 
 # Extract relevant columns from the file and create a BED file
-awk 'BEGIN {FS="[:, -]"; OFS="\t"} {start=$1+$2; end=$3+$4; print $1, start,end , $11,$12}' panel-reduced-BS-sites.txt | tail -n +1 > blood_cell.bed
+awk 'BEGIN {FS="[:-]"; OFS="\t"} {start=$1+$2; end=$3+$4; print $1, start, end, $5, $6}' panel-reduced-BS-sites_old.txt | tail -n +1 > blood_cell_old.bed
 
 # Convert beta values to table format and save to CSV file
 ./wgbstools beta_to_table blood_cell.bed --betas *.beta | column -t > blood_cell_types.csv
