@@ -17,5 +17,5 @@ Parameters
 
 Usage
 ```
- nextflow main.nf --reads "~/path/*_R{1,2}*.fastq.gz" -resume --outdir CAMDA --genome_folder "~/path/hg19.fa" --samtools_path "~/path/"
+ nextflow main.nf --reads "~/path/*_R{1,2}*.fastq.gz" -resume --genome_folder "~/path/hg19.fa" --samtools_path "~/path/"
 ```
