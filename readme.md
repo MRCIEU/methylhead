@@ -86,7 +86,8 @@ nextflow main.nf --pipeline picard \
 -resume 
 ```
 
-## Camda Pipeline
+*Camda Pipeline*
+
 ```
 nextflow main.nf --reads "[fastq path]/*_R{1,2}*.fastq.gz" \ 
 --genome_folder [genome folder path] \
