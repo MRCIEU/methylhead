@@ -85,6 +85,15 @@ nextflow main.nf --pipeline picard \
 --genome_folder [BWA genome index path] \
 -resume 
 ```
+
+## Camda Pipeline
+```
+nextflow main.nf --reads "[fastq path]/*_R{1,2}*.fastq.gz" \ 
+--genome_folder [genome folder path] \
+--samtools_path [samtools fodler path] \
+-resume
+```
+
 **Instructions:**
 
 Input files (file1_1.fastq.gz, file1_2.fastq.gz, etc.), the main.nf script, and the output directory (outdir) should all be located in the same folder.
