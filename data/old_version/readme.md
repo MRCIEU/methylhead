@@ -48,6 +48,3 @@ awk 'BEGIN {FS="[:-]"; OFS="\t"} {start=$1+$2; end=$3+$4; print $1, start, end, 
 # Convert beta values to table format and save to CSV file
 ./wgbstools beta_to_table blood_cell.bed --betas *.beta | column -t > blood_cell_types.csv
 ```
-
-
-** Blood cell types extended download from loyfer's paper : Supplementary Tables 1–17. Supplementary Table S4C. List of 50286 cell type-specific unmethylated markers (top 1000, hg19) was used.
