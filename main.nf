@@ -19,7 +19,8 @@ if (params.pipeline == 'bismark') {
      4. DNAm Full Matrix 
      5. Estimation cell counts
      6. DNA Methylation Score
-     7. Multiqc 
+     7. Bismark Reports
+     8. Multiqc 
     """
 } else if (params.pipeline == 'picard') {
     log.info """
