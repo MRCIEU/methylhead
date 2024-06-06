@@ -36,10 +36,10 @@ workflow Bismark_pipeline {
      Deduplication(ch_bam) 
          dedup_bam=Deduplication.out.dedup_bam
      Methylation_extraction(dedup_bam)
-     coverage= Methylation_extraction.out.coverage               
+     Methylation_extraction_CpG_only(dedup_bam)
+     coverage= Methylation_extraction_CpG_only.out.coverage_CpG               
         files_ch = coverage.collectFile(name:"*.cov.gz", newLine: true)
      Methylation_Matrix(files_ch)
-     Methylation_extraction_CpG_only(dedup_bam)
      DNAm_Full_Matrix(files_ch)
          full_matrix=DNAm_Full_Matrix.out
             full_matrix2=full_matrix.collectFile(name:"*.csv", newLine: true)
