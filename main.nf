@@ -15,12 +15,13 @@ if (params.pipeline == 'bismark') {
      *** Bismark Pipeline Steps
      1. QC Steps
      2. Alignment & Methylation steps
-     3. Methylation Matrix 
-     4. DNAm Full Matrix 
-     5. Estimation cell counts
-     6. DNA Methylation Score
-     7. Bismark Reports
-     8. Multiqc 
+     3. Methylation Matrix
+     4. Concordance   
+     5. DNAm Full Matrix 
+     6. Estimation cell counts
+     7. DNA Methylation Score
+     8. Bismark Reports
+     9. Multiqc 
     """
 } else if (params.pipeline == 'picard') {
     log.info """
