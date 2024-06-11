@@ -45,7 +45,7 @@ workflow Picard_pipeline {
     Processed_bedGraph(bedGraph2)
     Samtools_stats(myBamSample,sorted_mark)
     MethylKit(Mark_duplicated.out.markdup)
-    MethylKit2 = MethylKit.out    
+    MethylKit2 = MethylKit.out.methylKit_CpG    
     files_ch = MethylKit2.collectFile(name:"*.methylKit", newLine: true)
     Methylation_Matrix(files_ch) 
     DNAm_Full_Matrix(files_ch)
