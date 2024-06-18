@@ -237,7 +237,8 @@ seq_context,meth0,meth1,depth,meth_ct,depth_ct,nmap):
                 fo_camda.write('{}\t{}\t{}\t{}\t{:.3f}\t{:.2f}\t{}\t{}\tNA\tNA\t{:.3f}\t{:.3f}\n'.format(cr, i+1, strand, seq, ratio_camda, d, m_camda, dd, CTl_camda, CTu_camda))
     fo_mr.close();fo_camda.close();
     if wig_prefix!=None:fo_mr_wig.close();fo_camda_wig.close();
-    disp('Total {} valid mappings, {} covered cytosines, average coverage: {:.2f} fold.'.format(nmap, nc, float(nd)/nc))
+    if nc>0:
+      disp('Total {} valid mappings, {} covered cytosines, average coverage: {:.2f} fold.'.format(nmap, nc, float(nd)/nc))
 
 def read_methy_files(ifile, cols=[0,1,2,6,7]):
     names = ['chr', 'pos', 'strand', 'methy', 'total']
