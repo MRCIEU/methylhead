@@ -17,6 +17,6 @@ process CAMDA {
      shell:
      """ 
     mkdir -p ${baseDir}/${params.outdir}/CAMDA/     
-    python ${workflow.projectDir}/scripts/CAMDA.py CAMDA ${bam} ${params.genome_folder} -o ${sample_id} -w ${sample_id} -s ${params.samtools_path}
+    python ${workflow.projectDir}/scripts/CAMDA.py CAMDA ${bam} ${params.genome_folder} -o ${sample_id} -w ${sample_id} -s ${params.samtools_path} -X CG
      """
 }
