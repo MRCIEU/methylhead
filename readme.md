@@ -96,8 +96,6 @@ nextflow main.nf --reads "[fastq path]/*_R{1,2}*.fastq.gz" \
 ```
 *Config file and Paralelization*
 
-```
-
 queue = Should be arranged according to HPC cluster features.
 
  - This line specifies the job queue (or partition) on the HPC cluster where the jobs will be submitted.
@@ -117,8 +115,6 @@ maxForks = This line sets the maximum number of parallel processes that can be r
 queueSize = This line sets the maximum number of jobs that can be submitted to the queue at the same time.
 
  - This parameter defines the maximum number of jobs that Nextflow will submit to the queue simultaneously.
-
-```
 
 ## To do
 
