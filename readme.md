@@ -104,7 +104,7 @@ nextflow main.nf --reads "[fastq path]/*_R{1,2}*.fastq.gz" \
 
  - This line provides additional options for the Slurm job submission. You should configure these options based on the requirements and available resources of your HPC cluster.
 
-**scratch**  true  // or scratch = false based on your needs.
+**scratch**  true  // or scratch false based on your needs.
 
  - This line indicates whether to use temporary scratch space on the compute nodes for storing intermediate files during job execution.
 
