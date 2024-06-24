@@ -107,7 +107,9 @@ nextflow main.nf --reads "[fastq path]/*_R{1,2}*.fastq.gz" \
 **scratch**  true  // or scratch false based on your needs.
 
  - This line indicates whether to use temporary scratch space on the compute nodes for storing intermediate files during job execution.
-
+   
+ - true to use local scratch space, which can improve I/O performance, or false to use the default shared work directory.
+ 
 **maxForks**  This line sets the maximum number of parallel processes that can be run concurrently.
 
  - This parameter sets the maximum number of parallel processes that Nextflow can run at the same time.
