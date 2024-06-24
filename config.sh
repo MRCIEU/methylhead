@@ -1,5 +1,0 @@
-WORKFLOW="main.nf"
-DATA_DIR=""
-REFERENCE_DIR=""
-RESULTS_DIR=""
-
