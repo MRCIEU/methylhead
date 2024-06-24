@@ -94,25 +94,25 @@ nextflow main.nf --reads "[fastq path]/*_R{1,2}*.fastq.gz" \
 --samtools_path [samtools fodler path] \
 -resume
 ```
-*Config file and Paralelization*
+**Config file and Paralelization**
 
-# queue = Should be arranged according to HPC cluster features.
+**queue** Should be arranged according to HPC cluster features.
 
  - This line specifies the job queue (or partition) on the HPC cluster where the jobs will be submitted.
 
-# clusterOptions = Should be arranged according to HPC cluster features.
+**clusterOptions**  Should be arranged according to HPC cluster features.
 
  - This line provides additional options for the Slurm job submission. You should configure these options based on the requirements and available resources of your HPC cluster.
 
-# scratch = true  // or scratch = false based on your needs.
+**scratch**  true  // or scratch = false based on your needs.
 
  - This line indicates whether to use temporary scratch space on the compute nodes for storing intermediate files during job execution.
 
-# maxForks = This line sets the maximum number of parallel processes that can be run concurrently.
+**maxForks**  This line sets the maximum number of parallel processes that can be run concurrently.
 
  - This parameter sets the maximum number of parallel processes that Nextflow can run at the same time.
 
-# queueSize = This line sets the maximum number of jobs that can be submitted to the queue at the same time.
+**queueSize**  This line sets the maximum number of jobs that can be submitted to the queue at the same time.
 
  - This parameter defines the maximum number of jobs that Nextflow will submit to the queue simultaneously.
 
