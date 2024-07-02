@@ -4,6 +4,7 @@ process Alignment {
     tuple val(sample_id), path(fq)
     val(u_param)
     val(multicore)
+    path genome_folder
     
     output:
     tuple val(sample_id), path("${sample_id}*_val_1_bismark_bt2_pe.bam"), emit: alignment_bam
