@@ -30,8 +30,9 @@ workflow Bismark_pipeline {
      Trim_galore(Fatqc_Files,cores)
          trim_ch=Trim_galore.out.fq         
          u_param= params.u_param 
-         multicore= params.multicore 
-     bam_files_ch = Alignment(trim_ch,u_param,multicore)
+         multicore= params.multicore
+         genome_folder=params.genome_folder
+     bam_files_ch = Alignment(trim_ch,u_param,multicore, genome_folder)
         ch_bam = Alignment.out.alignment_bam
      Deduplication(ch_bam) 
          dedup_bam=Deduplication.out.dedup_bam
