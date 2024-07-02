@@ -29,7 +29,8 @@ workflow Picard_pipeline {
     read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)
     Fastqc(read_pairs_ch)
     Trim_galore(read_pairs_ch)
-    Alignment(Trim_galore.out.fq)
+       genome_folder=params.genome_folder
+    Alignment(Trim_galore.out.fq, genome_folder)
        myBamSample = Alignment.out.bam
     Sambamba(myBamSample)
        sortedBam = Sambamba.out
