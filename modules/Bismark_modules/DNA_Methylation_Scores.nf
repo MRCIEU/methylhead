@@ -4,6 +4,7 @@ process DNA_Methylation_Scores {
     input:
    
     path Meth_Matrix
+    path script
 
     publishDir "${params.outdir}/DNA_Methylation_Scores/" , mode: 'copy'
     
@@ -14,7 +15,6 @@ process DNA_Methylation_Scores {
 
     shell:
     """
-    mkdir -p ${baseDir}/${params.outdir}/DNA_Methylation_Scores/
-    Rscript ${workflow.projectDir}/scripts/DNA_Methylation_Scores.R ${params.pipeline} ${baseDir}/${params.outdir}/Methylation_Matrix ${baseDir}/${params.outdir}/DNA_Methylation_Scores
+    Rscript ${script}/scripts/DNA_Methylation_Scores.R ${params.pipeline} ${baseDir}/${params.outdir}/Methylation_Matrix ${baseDir}/${params.outdir}/DNA_Methylation_Scores
     """
 }
