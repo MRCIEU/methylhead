@@ -5,6 +5,9 @@ process Methylation_Matrix {
      input:
     
      path files_ch
+     path script
+     
+    
 
      publishDir "${params.outdir}/Methylation_Matrix/", mode: 'copy', pattern: '*.pdf, *.csv'
    
@@ -15,8 +18,7 @@ process Methylation_Matrix {
     
     shell:
     """
-    mkdir -p ${baseDir}/${params.outdir}/Methylation_Matrix
-    Rscript ${workflow.projectDir}/scripts/Methylation_matrix.R ${params.pipeline} ${baseDir}/${params.outdir}/Methylation ${baseDir}/${params.outdir}/Methylation_Matrix
+    Rscript ${script}/scripts/Methylation_matrix.R ${params.pipeline} ${baseDir}/${params.outdir}/Methylation ${baseDir}/${params.outdir}/Methylation_Matrix
     
     """
 }
