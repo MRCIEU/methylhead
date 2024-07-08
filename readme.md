@@ -4,53 +4,6 @@ For nextflow usage Description:
 
 Pipeline for analysing data generated from the DNAm lung cancer screening panel (https://github.com/MRCIEU/dnam-lung-cancer-screening-panel).
 
-### Conda setup
-
-Dependencies:
-
-    bcftools     1.10         
-    bedtools     2.31.1
-    bismark      0.24.2        
-    bowtie2      2.3.5.1
-    bwa          0.7.18 
-    bwameth      0.2.7
-    fastqc       0.12.1        
-    hisat2       2.2.0         
-    multiqc      1.21 
-    methyldackel 0.6.1
-    nextflow     23.10.1
-    perl         5.32.1 
-    picard       2.18.23 
-    qt           5.6.3         
-    sambamba     1.0
-    samtools     1.18 
-    trim-galore  0.6.10        
-    trimmomatic  0.39 
-    
-To install these, you will need the following conda channels:
-  - conda-forge
-  - bioconda
-  - defaults
-
-Check which channels you have:
-```
-conda config --show channels
-```
-
-Add any missing channels like this:
-```
-conda config --add channels bioconda
-```
-
-Create a conda environment for the analysis and install packages
-```
-conda create -n Bismark python=3.8
-pip install multiqc
-conda install -c conda-forge trim-galore
-conda install -c bioconda nextflow bismark samtools trimmomatic fastqc bedtools cutadapt bowtie bwa bwameth sambamba methyldackel picard
-conda install -c conda-forge python-isal
-```
-
 ## Prepare reference genome
 
 ```
