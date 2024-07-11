@@ -1,6 +1,6 @@
 process DNAm_Full_Matrix {
     input:
-    path file_ch
+    path R_files , from: 'R_files/*'
    
     output:
     val ("DNAm_Full_Matrix.csv"), emit: DNAm_Full_Matrix
