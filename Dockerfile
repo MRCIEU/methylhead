@@ -184,8 +184,10 @@ RUN pip3 install cutadapt
 # Install MultiQC
 RUN pip3 install multiqc
 
-# Set PATH for bioinformatics tools
+# Set PATH for tools
+
 ENV PATH="/usr/local/bin:/opt/fastqc:/opt/trim_galore:/opt/bismark:/opt/bowtie:/opt/bowtie2:/opt:${PATH}"
+RUN mkdir -p /opt/nextflow && chmod 777 /opt/nextflow
 
 CMD ["bash"]
 
