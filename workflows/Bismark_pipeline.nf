@@ -13,7 +13,6 @@ include { Reports } from '../modules/Bismark_modules/Reports'
 include { Multiqc } from '../modules/Bismark_modules/Multiqc'
 
 workflow Bismark_pipeline {
-
     take:
     reads   
     outdir 
@@ -35,26 +34,29 @@ workflow Bismark_pipeline {
          dedup_bam=Deduplication.out.dedup_bam
      Methylation_extraction(dedup_bam)
      coverage= Methylation_extraction.out.coverage               
-        files_ch = coverage.collectFile(name:"*.cov.gz", newLine: true)
-        script=params.scripts
-     Methylation_Matrix(files_ch, script)
-     DNAm_Full_Matrix(files_ch, script)
+       Channel.empty()
+         .mix( Methylation_extraction.out )
+         .map { sample_id, files -> files }
+	 .collect()
+	 .set{ R_files }     
+    Methylation_Matrix(R_files)
+     DNAm_Full_Matrix(R_files)
          full_matrix=DNAm_Full_Matrix.out
             full_matrix2=full_matrix.collectFile(name:"*.csv", newLine: true)
-     Estimate_cell_counts(full_matrix2, script)    
+     Estimate_cell_counts(full_matrix2)    
      Meth_Matrix = Methylation_Matrix.out.meth_matrix
         files_ch2 = Meth_Matrix.collectFile(name:"*.csv", newLine: true)
-     DNA_Methylation_Scores(files_ch2, script)
-          alignment_text = Alignment.out.alignment_report
-          deduplication_text = Deduplication.out.dedup_report
-          methylation_text = Methylation_extraction.out.splitting_report 
-          methylation_text2= Methylation_extraction.out.mbias
-            alignment_t = alignment_text.collectFile(name:"*.txt",newLine:true)
-            deduplication_t = deduplication_text.collectFile(name:"*.txt",newLine:true)
-            methylation_t = methylation_text.collectFile(name:"*.txt",newLine:true)
-            methylation_t2 = methylation_text2.collectFile(name:"*.txt",newLine:true)
-     Reports(alignment_t,deduplication_t,methylation_t,methylation_t2) 
-           Channel.empty()
+     DNA_Methylation_Scores(files_ch2)
+     	Channel.empty()
+	     .mix( Alignment.out.alignment_report )
+             .mix( Deduplication.out.dedup_report )
+             .mix( Methylation_extraction.out.splitting_report )
+             .mix( Methylation_extraction.out.mbias )
+  	     .map { sample_id, files -> files}
+             .collect()
+             .set { Report_files }
+     Reports(Report_files) 
+        Channel.empty()
           .mix( Fastqc.out )
           .mix( Trim_galore.out )
           .mix( Alignment.out )
@@ -64,5 +66,4 @@ workflow Bismark_pipeline {
           .collect()
           .set { multiqc_files }  
      Multiqc(multiqc_files)
-
 }
