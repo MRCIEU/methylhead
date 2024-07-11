@@ -1,14 +1,9 @@
-process Reports {
+ process Reports {
 
         input:
         
-        val alignment_t
-        val deduplication_t
-        val methylation_t
-        val methylation_t2
-        val bam2nuc
-
-        
+      	path report_files , from: 'Report_files/*'
+                
         publishDir "${params.outdir}/Reports" , mode: 'copy'
       
         output:
@@ -17,7 +12,7 @@ process Reports {
         
         script:
         """
-       bismark2report --alignment_report "${alignment_t}" --dedup_report "${deduplication_t}" --splitting_report "${methylation_t}" --mbias_report "${methylation_t2}" --nucleotide_report "${bam2nuc}"      
+       bismark2report ${report_files}       
         """
 }
 

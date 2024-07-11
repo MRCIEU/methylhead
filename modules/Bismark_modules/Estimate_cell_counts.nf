@@ -3,7 +3,7 @@ process Estimate_cell_counts {
 
     input:
     path full_matrix2
-    path script
+   
     
     publishDir "${params.outdir}/Estimate_cell_count/" , mode: 'copy'
     
@@ -13,6 +13,7 @@ process Estimate_cell_counts {
 
     shell:
     """  
-    Rscript ${script}/scripts/Estimate_cell_counts.R ${params.pipeline} ${workflow.projectDir}/data ${baseDir}/${params.outdir}/DNAm_Full_Matrix  ${baseDir}/${params.outdir}/Estimate_cell_counts
+    mkdir -p ${baseDir}/${params.outdir}/Estimate_cell_counts
+    Rscript ${baseDir}/bin/Estimate_cell_counts.R ${params.pipeline} ${baseDir}/data ${baseDir}/${params.outdir}/DNAm_Full_Matrix  ${baseDir}/${params.outdir}/Estimate_cell_counts
      """
 }

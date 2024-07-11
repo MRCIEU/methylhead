@@ -1,17 +1,14 @@
 process DNAm_Full_Matrix {
-
     input:
     path file_ch
-    path script
-
-    publishDir "${params.outdir}/DNAm_Full_Matrix/" , mode: 'copy'
-    
-    output:
-    val ("DNAm_Full_Matrix.csv") , emit: DNAm_Full_Matrix
    
+    output:
+    val ("DNAm_Full_Matrix.csv"), emit: DNAm_Full_Matrix
 
-    shell:
+    script:
     """
-    Rscript ${script}/scripts/Full_DNAm_Matrix.R ${params.pipeline} ${baseDir}/${params.outdir}/Methylation ${baseDir}/${params.outdir}/DNAm_Full_Matrix
-    """ 
+     mkdir -p ${baseDir}/${params.outdir}/DNAm_Full_Matrix
+     Rscript ${baseDir}/bin/Full_DNAm_Matrix.R ${params.pipeline} ${baseDir}/${params.outdir}/Methylation ${baseDir}/${params.outdir}/DNAm_Full_Matrix
+    """
 }
+
