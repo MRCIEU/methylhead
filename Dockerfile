@@ -5,7 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 LABEL Author="Onur Oztornaci"
 LABEL Version="1.0"
-LABEL Description="This container includes FastQC, Trim Galore, Bismark, Bowtie, Bowtie2, BWA, BWAmeth, Samtools, Sambamba, Picard and MethylDackel for DNAm analysis."
+LABEL Description="This container includes FastQC, Trim Galore, Bismark, Bowtie, Bowtie2, BWA, BWAmeth, Samtools, Sambamba, Picard, Multiqc and MethylDackel for DNAm analysis."
 
 
 # Install necessary system dependencies
