@@ -1,4 +1,4 @@
-#!/usr/bin/R
+#!/usr/bin/env Rscript
 
 library(methylKit)
 library(dplyr)
@@ -8,9 +8,7 @@ args <- commandArgs(trailingOnly = TRUE)
 pipeline <- args[1]
 input_dir <- args[2]
 output_dir <- args[3]
-
 setwd(input_dir)
-
 
 if (pipeline == "bismark") {
     file.vector <- list.files(pattern = "bismark\\.cov\\.gz", full.names = FALSE)
@@ -54,5 +52,4 @@ pm <- pm / 100
 meth_df <- data.frame(meth)
 meth_df <- cbind(meth_df, pm)
 
-output_file <- paste0(output_dir, "/DNAm_Full_Matrix.csv")
-write.csv(meth_df, file = output_file, row.names = FALSE)
+write.csv(meth_df, file = paste0(output_dir, "/DNAm_Full_Matrix.csv"), row.names = FALSE)
