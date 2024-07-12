@@ -47,6 +47,17 @@ nextflow main.nf --reads "[fastq path]/*_R{1,2}*.fastq.gz" \
 --samtools_path [samtools fodler path] \
 -resume
 ```
+
+### Docker Container Download
+
+To download the required Docker container for the pipeline:
+
+```bash
+
+singularity pull docker://onuroztornaci/dnam_cancer_pipeline:latest
+
+```
+
 **Config file and Paralelization**
 
 **queue** Should be arranged according to HPC cluster features.
