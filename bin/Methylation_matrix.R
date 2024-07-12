@@ -75,7 +75,7 @@ if (pipeline == "bismark") {
   sample.ids <- gsub("_bismark_bt2_pe.deduplicated.bismark.cov.gz", "", basename(file.vector))
   sample.ids <- as.list(sample.ids)
 } else if (pipeline == "picard") {
-  file.vector <- list.files(pattern = "\\.markdup_CpG\\.methylKit", full.names = TRUE)
+  file.vector <- list.files(pattern = "\\.markdup_CpG\\.methylKit", full.names = FALSE)
   file.vector <- file.vector[!grepl("ctrl", file.vector)]
   sample.ids <- gsub(".markdup_CpG.methylKit", "", basename(file.vector))
   sample.ids <- as.list(sample.ids)
