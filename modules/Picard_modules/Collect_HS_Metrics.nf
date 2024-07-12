@@ -3,6 +3,7 @@ process Collect_HS_Metrics {
 
     input:
     tuple val(sample_id) , path (sorted_mark)
+    path intervals  
     
     output:
     tuple val(sample_id) , path ("${sample_id}_coverage_metrics.txt") , emit: coverage_metrics
@@ -12,12 +13,12 @@ process Collect_HS_Metrics {
     
     script:
     """
-    picard -Xmx4g -Xms4g CollectHsMetrics \
+    picard CollectHsMetrics \
     I= ${sorted_mark} \
     O= ${sample_id}_coverage_metrics.txt \
     R= ${params.genome_folder} \
-    BAIT_INTERVALS= ${params.intervals} \
-    TARGET_INTERVALS= ${params.intervals} \
+    BAIT_INTERVALS= ${intervals} \
+    TARGET_INTERVALS= ${intervals} \
     MINIMUM_MAPPING_QUALITY= 20 \
     COVERAGE_CAP= 1000 \
     PER_TARGET_COVERAGE= ${sample_id}_coverage \

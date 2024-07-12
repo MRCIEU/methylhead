@@ -2,6 +2,7 @@
 process MethylDackel {
     input:
      tuple val(sample_id), path (sorted_mark)
+     path reference 
     
     publishDir "${params.outdir}/MethylDackel/", mode: 'copy'
     
@@ -12,6 +13,6 @@ process MethylDackel {
 
    script:    
    """
-   MethylDackel mbias ${params.genome_folder} ${sorted_mark} ${sample_id}.markdup --nOT 0,0,0,98 --nOB 0,0,3,0
+   MethylDackel mbias ${reference} ${sorted_mark} ${sample_id}.markdup --nOT 0,0,0,98 --nOB 0,0,3,0
     """
 }

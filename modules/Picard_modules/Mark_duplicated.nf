@@ -8,8 +8,9 @@ process Mark_duplicated {
     publishDir "${params.outdir}/Mark_duplicated/", mode: 'copy'
     
     output:   
-    tuple val(sample_id) , path("${sample_id}.markdup.bam") , emit: markdup 
+    tuple val(sample_id) , path("${sample_id}.markdup.bam")                , emit: markdup 
     tuple val(sample_id) , path("${sample_id}.picard_markdup_metrics.txt") , emit: picard_markdup_metrics
+    tuple val(sample_id) , path("${sample_id}.markdup.bam.bai")            , emit:bai_files
     
     script:
     """
@@ -21,6 +22,6 @@ process Mark_duplicated {
     ASSUME_SORT_ORDER=coordinate \
     OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500
             
-    samtools index -@ 16 ${sample_id}.markdup.bam  > ${sample_id}.markdup.bam.bai
+    samtools index -@ 16 ${sample_id}.markdup.bam > ${sample_id}.markdup.bam.bai
     """
 }

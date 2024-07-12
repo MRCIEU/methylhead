@@ -2,7 +2,8 @@ process MethylKit{
 
     input:  
     tuple val(sample_id), path (sorted_mark)
-    
+    path  genome_folder
+
     publishDir "${params.outdir}/Methylation/", mode: 'copy'
     
     output:

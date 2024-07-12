@@ -4,7 +4,8 @@ process Collect_MM_Metrics {
     input:
      
     tuple val(sample_id) , path (sorted_mark)
-    
+    path reference    
+
     publishDir "${params.outdir}/CollectMultipleMetrics/", mode: 'copy'
     
     output:
@@ -17,10 +18,10 @@ process Collect_MM_Metrics {
    
   script:    
    """
-   picard -Xmx4g -Xms4g CollectMultipleMetrics \
+   picard CollectMultipleMetrics \
    I=${sorted_mark} \
    O=${sample_id}_collectmultiplemetrics \
-   R=${params.genome_folder} \
+   R=${reference} \
    PROGRAM=null \
    PROGRAM=CollectGcBiasMetrics \
    PROGRAM=CollectInsertSizeMetrics \
