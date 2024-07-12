@@ -2,11 +2,9 @@
 FROM ubuntu:22.04
 ARG DEBIAN_FRONTEND=noninteractive
 
-
 LABEL Author="Onur Oztornaci"
 LABEL Version="1.0"
-LABEL Description="This container includes FastQC, Trim Galore, Bismark, Bowtie, Bowtie2, BWA, BWAmeth, Samtools, Sambamba, Picard, Multiqc and MethylDackel for DNAm analysis."
-
+LABEL Description="This container includes FastQC, Trim Galore, Bismark, Bowtie, Bowtie2, BWA, BWAmeth, Samtools, Sambamba, Picard, Nextflow and MethylDackel for DNAm analysis."
 
 # Install necessary system dependencies
 RUN apt-get update && apt-get install -y \
@@ -46,7 +44,6 @@ RUN apt-get update && apt-get install -y \
     libgsl0-dev \
     libglu1-mesa-dev \
     && rm -rf /var/lib/apt/lists/*
-
 
 # Install R packages
 RUN Rscript -e 'install.packages("BiocManager", repos="https://cran.rstudio.com/");    BiocManager::install(c("methylKit","IlluminaHumanMethylation450kanno.ilmn12.hg19","IlluminaHumanMethylation450kmanifest"),dependencies=TRUE, ask=FALSE)' && \
@@ -184,10 +181,15 @@ RUN pip3 install cutadapt
 # Install MultiQC
 RUN pip3 install multiqc
 
+# Install Nextflow
+RUN wget -O /usr/local/bin/nextflow https://get.nextflow.io && \
+    chmod +x /usr/local/bin/nextflow
+
 # Set PATH for tools
 
 ENV PATH="/usr/local/bin:/opt/fastqc:/opt/trim_galore:/opt/bismark:/opt/bowtie:/opt/bowtie2:/opt:${PATH}"
 RUN mkdir -p /opt/nextflow && chmod 777 /opt/nextflow
 
-CMD ["bash"]
+WORKDIR /mnt
 
+CMD ["bash"]
