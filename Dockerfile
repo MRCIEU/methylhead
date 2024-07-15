@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     bzip2 \
     build-essential \
+    fuse2fs \
     zlib1g-dev \
     libncurses5-dev \
     libncursesw5-dev \
