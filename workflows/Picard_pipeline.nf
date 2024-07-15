@@ -55,8 +55,7 @@ workflow Picard_pipeline {
     Estimate_cell_counts(full_matrix2)  
     Meth_Matrix = Methylation_Matrix.out.meth_matrix
         files_ch2 = Meth_Matrix.collectFile(name:"*.csv", newLine: true)
-    DNA_Methylation_Scores(files_ch2) 
-    
+    DNA_Methylation_Scores(files_ch2)     
     Channel.empty()
           .mix( Fastqc.out )             
           .mix( Trim_galore.out )        
