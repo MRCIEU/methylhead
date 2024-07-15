@@ -3,6 +3,6 @@
 nextflow run main.nf \
 -c nextflow.config \
 -resume \
---reads "" \
+--data "" \
 --pipeline bismark \
 --genome_folder "" 
