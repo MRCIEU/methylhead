@@ -47,7 +47,8 @@ nextflow main.nf --pipeline picard \
 nextflow main.nf --data "[fastq path]" \ 
 --genome_folder [genome folder path] \
 --samtools_path [samtools fodler path] \
--resume
+-resume \
+-N [The email address for the report is]
 ```
 
 ### Docker Container Download
