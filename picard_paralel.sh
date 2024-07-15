@@ -3,7 +3,7 @@
 nextflow run main.nf \
 -c nextflow.config \
 -resume \
---reads "" \
+--data "" \
 --pipeline picard \
 --intervals "" \
 --genome_folder "" 
