@@ -5,5 +5,4 @@ nextflow run main.nf \
 -resume \
 --reads "" \
 --pipeline bismark \
---genome_folder "" \
---cores 24
+--genome_folder "" 
