@@ -6,5 +6,4 @@ nextflow run main.nf \
 --reads "" \
 --pipeline picard \
 --intervals "" \
---genome_folder "" \
---cores 24
+--genome_folder "" 
