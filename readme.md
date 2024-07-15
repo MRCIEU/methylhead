@@ -30,13 +30,15 @@ Running time is about 2 hours.
 nextflow main.nf --pipeline bismark \
 --data "[fastq path]" \
 --genome_folder [genome index path] \
--resume
+-resume \
+-N [The email address for the report is]
 
 nextflow main.nf --pipeline picard \
 --data "[fastq path]" 
 --intervals covered_targets_Twist_Methylome_hg19_annotated_collapsed_final \
 --genome_folder [BWA genome index path] \
--resume 
+-resume \
+-N [The email address for the report is]
 ```
 
 *Camda Pipeline*
