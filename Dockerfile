@@ -4,7 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 LABEL Author="Onur Oztornaci"
 LABEL Version="1.0"
-LABEL Description="This container includes FastQC, Trim Galore, Bismark, Bowtie, Bowtie2, BWA, BWAmeth, Samtools, Sambamba, Picard, Nextflow and MethylDackel for DNAm analysis."
+LABEL Description="This container includes FastQC, Trim Galore, Bismark, BSmap, Bowtie, Bowtie2, BWA, BWAmeth, Samtools, Sambamba, Picard, Nextflow and MethylDackel for DNAm analysis."
 
 # Install necessary system dependencies
 RUN apt-get update && apt-get install -y \
@@ -185,8 +185,21 @@ RUN pip3 install multiqc
 RUN wget -O /usr/local/bin/nextflow https://get.nextflow.io && \
     chmod +x /usr/local/bin/nextflow
 
-# Set PATH for tools
+# Conda installation
+RUN apt-get update && apt-get install -y \
+    wget \
+    bzip2 \
+    && wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda \
+    && rm Miniconda3-latest-Linux-x86_64.sh
 
+# Adding PATH for conda 
+ENV PATH="/opt/conda/bin:${PATH}"
+
+# BSMAP Installation
+RUN conda install bioconda/label/cf201901::bsmap
+
+# Set PATH for tools
 ENV PATH="/usr/local/bin:/opt/fastqc:/opt/trim_galore:/opt/bismark:/opt/bowtie:/opt/bowtie2:/opt:${PATH}"
 RUN mkdir -p /opt/nextflow && chmod 777 /opt/nextflow
 
