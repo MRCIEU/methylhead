@@ -1,7 +1,7 @@
 process DNAm_Full_Matrix {
 
+    executor 'local'
     input:
-    
     path files_ch
    
     output:
