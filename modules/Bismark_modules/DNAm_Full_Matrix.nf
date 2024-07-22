@@ -1,4 +1,5 @@
 process DNAm_Full_Matrix {
+    executor 'local'
     input:
     path R_files , from: 'R_files/*'
    
