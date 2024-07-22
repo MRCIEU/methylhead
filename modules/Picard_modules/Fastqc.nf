@@ -1,6 +1,6 @@
 
 process Fastqc {
-     executor 'local'
+    executor 'local'
     input:
     tuple val(sample_id), path(reads)
     
