@@ -1,6 +1,6 @@
 
 process Estimate_cell_counts {
-
+    executor 'local'
     input:
     path full_matrix2
    
