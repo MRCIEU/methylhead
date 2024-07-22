@@ -1,10 +1,8 @@
 
 process DNA_Methylation_Scores {
-
-    input:
-   
+    executor 'local'
+    input:   
     path Meth_Matrix
-   
 
     publishDir "${params.outdir}/DNA_Methylation_Scores/" , mode: 'copy'
     
