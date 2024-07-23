@@ -3,7 +3,7 @@ process Collect_HS_Metrics {
 
     input:
     tuple val(sample_id) , path (sorted_mark)
-    
+    path intervals  
     
     output:
     tuple val(sample_id) , path ("${sample_id}_coverage_metrics.txt") , emit: coverage_metrics

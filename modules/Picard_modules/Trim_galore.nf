@@ -1,6 +1,8 @@
 process Trim_galore {
   input:
+
     tuple val(sample_id), path(reads)
+
    
 
     output:

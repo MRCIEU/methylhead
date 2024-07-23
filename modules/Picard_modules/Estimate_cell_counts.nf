@@ -1,8 +1,10 @@
 
 process Estimate_cell_counts {
-    executor 'local'
+
     input:
-    path full_matrix2   
+    path full_matrix2
+   
+    
     publishDir "${params.outdir}/Estimate_cell_count/" , mode: 'copy'
     
     output:

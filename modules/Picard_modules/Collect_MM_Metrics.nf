@@ -4,7 +4,7 @@ process Collect_MM_Metrics {
     input:
      
     tuple val(sample_id) , path (sorted_mark)
-    
+    path reference    
 
     publishDir "${params.outdir}/CollectMultipleMetrics/", mode: 'copy'
     

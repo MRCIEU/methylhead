@@ -1,9 +1,14 @@
 
 process Fastqc {
-    executor 'local'
+    
+   
+    
     input:
     tuple val(sample_id), path(reads)
-    
+
+   
+
+     
     output:
     tuple val(sample_id), path("*.html"), emit: html
     tuple val(sample_id), path("*.zip") , emit: zip
