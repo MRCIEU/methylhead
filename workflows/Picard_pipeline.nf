@@ -22,35 +22,38 @@ include { DNA_Methylation_Scores } from '../modules/Picard_modules/DNA_Methylati
 workflow Picard_pipeline {
 
     take:
+     
     reads   
     outdir 
+       
+   main:
     
-    main:
     read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)
     Fastqc(read_pairs_ch)
-    Trim_galore(read_pairs_ch)
+    Trim_galore(read_pairs_ch)   
        genome_folder=params.genome_folder
     Alignment(Trim_galore.out.fq, genome_folder)
        myBamSample = Alignment.out.bam
     Sambamba(myBamSample)
        sortedBam = Sambamba.out
     Sorted_Bam_Files(sortedBam)
-        sorted_ch = Sorted_Bam_Files.out.sorted_bam
+       sorted_ch = Sorted_Bam_Files.out.sorted_bam
     Mark_duplicated(sorted_ch)
-        sorted_mark = Mark_duplicated.out.markdup     
-    Collect_HS_Metrics(sorted_mark)
-    Collect_MM_Metrics(sorted_mark)
-    MethylDackel(sorted_mark)
+       sorted_mark = Mark_duplicated.out.markdup     
+       intervals = params.intervals
+    Collect_HS_Metrics(sorted_mark, intervals)
+       reference = params.genome_folder
+    Collect_MM_Metrics(sorted_mark, reference)
+    MethylDackel(sorted_mark ,reference)
     bedGraph(sorted_mark)
     bedGraph2 = bedGraph.out
     Processed_bedGraph(bedGraph2)
     Samtools_stats(myBamSample,sorted_mark)
-    MethylKit(Mark_duplicated.out.markdup)
-    MethylKit2 = MethylKit.out.methylKit_CpG    
-    files_ch = MethylKit2.collectFile(name:"*.methylKit", newLine: true)
+    MethylKit(Mark_duplicated.out.markdup, genome_folder)    
+    	files_ch = MethylKit.out.methylKit_CpG.collectFile(name:"*_CpG.methylKit",newLine:true)   
     Methylation_Matrix(files_ch) 
     DNAm_Full_Matrix(files_ch)
-        full_matrix=DNAm_Full_Matrix.out
+	    full_matrix=DNAm_Full_Matrix.out
             full_matrix2=full_matrix.collectFile(name:"*.csv", newLine: true)  
     Estimate_cell_counts(full_matrix2)  
     Meth_Matrix = Methylation_Matrix.out.meth_matrix
@@ -69,4 +72,3 @@ workflow Picard_pipeline {
     Multiqc(multiqc_files)
       
 }
-
