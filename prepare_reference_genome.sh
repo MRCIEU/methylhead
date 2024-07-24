@@ -28,7 +28,7 @@ fi
 
 # Prepare the genome with bismark using Singularity if Bismark index does not exist
 if [ ! -d ${GENOMES}/Bisulfite_Genome ]; then
-    singularity exec ${SINGULARITY_IMAGE} bismark_genome_preparation --path_to_aligner /opt/bismark/bismark_genome_preparation --verbose ${GENOMES}
+    singularity exec ${SINGULARITY_IMAGE} bismark_genome_preparation --path_to_aligner /opt/bismark/ --verbose ${GENOMES}
 fi
 
 # Download the BED file if it does not exist
