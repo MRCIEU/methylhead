@@ -1,39 +1,40 @@
 #!/bin/bash
 
-# Shell script to prepare reference genome
+# Check if the user provided the GENOMES path
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <path_to_converted_genome_index>"
+    exit 1
+fi
 
-# Define the genome index path
-GENOMES=[path_to_converted_genome_index]
+# Define the genome index path from user input
+GENOMES=$1
 
-# Define the path to the aligner
-ALIGNER_PATH="~/envs/Bismark/bin"
+# Singularity image path
+SINGULARITY_IMAGE="dnam_cancer_pipeline_latest.sif"
+
+# Create the GENOMES directory if it does not exist
+mkdir -p ${GENOMES}
 
 # Download the hg19 reference genome
-wget https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
+wget https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz -P ${GENOMES}
 
-# Move the downloaded genome to the GENOMES directory
-mv hg19.fa.gz ${GENOMES}
-
-# Prepare the genome with bismark
-bismark_genome_preparation --path_to_aligner ${ALIGNER_PATH} --verbose ${GENOMES}
+# Prepare the genome with bismark using Singularity
+singularity exec ${SINGULARITY_IMAGE} bismark_genome_preparation --path_to_aligner /opt/conda/envs/bismark/bin --verbose ${GENOMES}
 
 # Download the BED file
-wget https://www.twistbioscience.com/sites/default/files/resources/2022-06/covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.bed.zip
-
-# Move the downloaded BED file to the GENOMES directory
-mv covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.bed.zip ${GENOMES}
+wget https://www.twistbioscience.com/sites/default/files/resources/2022-06/covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.bed.zip -P ${GENOMES}
 
 # Unzip the BED file
 unzip ${GENOMES}/covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.bed.zip -d ${GENOMES}
 
-# Index the reference genome
-samtools faidx ${GENOMES}/hg19.fa
+# Index the reference genome using Singularity
+singularity exec ${SINGULARITY_IMAGE} samtools faidx ${GENOMES}/hg19.fa
 
-# Create the sequence dictionary
-picard CreateSequenceDictionary REFERENCE=${GENOMES}/hg19.fa OUTPUT=${GENOMES}/hg19.fa.dict
+# Create the sequence dictionary using Singularity
+singularity exec ${SINGULARITY_IMAGE} picard CreateSequenceDictionary REFERENCE=${GENOMES}/hg19.fa OUTPUT=${GENOMES}/hg19.fa.dict
 
-# Convert BED to interval list
-picard BedToIntervalList \
+# Convert BED to interval list using Singularity
+singularity exec ${SINGULARITY_IMAGE} picard BedToIntervalList \
     I=${GENOMES}/covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.bed \
     O=${GENOMES}/covered_targets_Twist_Methylome_hg19_annotated_collapsed_final \
     SD=${GENOMES}/hg19.fa.dict
