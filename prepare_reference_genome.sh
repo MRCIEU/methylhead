@@ -26,11 +26,6 @@ if [ ! -f ${GENOMES}/hg19.fa.fai ]; then
     singularity exec ${SINGULARITY_IMAGE} samtools faidx ${GENOMES}/hg19.fa
 fi
 
-# Prepare the genome with bismark using Singularity if Bismark index does not exist
-if [ ! -d ${GENOMES}/Bisulfite_Genome ]; then
-    singularity exec ${SINGULARITY_IMAGE} bismark_genome_preparation --path_to_aligner /opt/bowtie2/ --verbose ${GENOMES}
-fi
-
 # Download the BED file if it does not exist
 if [ ! -f ${GENOMES}/covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.bed ]; then
     wget https://www.twistbioscience.com/sites/default/files/resources/2022-06/covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.bed.zip -P ${GENOMES}
@@ -45,9 +40,14 @@ fi
 # Convert BED to interval list using Singularity if it does not exist
 if [ ! -f ${GENOMES}/covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.interval_list ]; then
     singularity exec ${SINGULARITY_IMAGE} picard BedToIntervalList \
-        I=${GENOMES}/covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.bed \
+        I=${GENOMES}/covered_targets_Twist_Methylome_hg19_annotated_collapsed_uniq_final.bed \
         O=${GENOMES}/covered_targets_Twist_Methylome_hg19_annotated_collapsed_final.interval_list \
         SD=${GENOMES}/hg19.fa.dict
+fi
+
+# Prepare the genome with bismark using Singularity if Bismark index does not exist
+if [ ! -d ${GENOMES}/Bisulfite_Genome ]; then
+    singularity exec ${SINGULARITY_IMAGE} bismark_genome_preparation --path_to_aligner /opt/bowtie2/ --verbose ${GENOMES}
 fi
 
 # Index the reference genome using BWA-MEM with bwameth.py if BWA-MEM index does not exist
