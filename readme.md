@@ -27,9 +27,9 @@ conda install -c bioconda nextflow
 ### Prepare reference genome
 
 ```
-bash prepare_reference_genome.sh [path_to_folder] `[bed_file_path]`
+bash prepare_reference_genome.sh [path_to_folder] [bed_file_path]
 ```
-`[bed_file_path]: https://github.com/MRCIEU/dnam-lung-cancer-pipeline/tree/main/data/blood_cell_types_extened.bed`
+`[bed_file_path] <!-- (https://github.com/MRCIEU/dnam-lung-cancer-pipeline/tree/main/data/blood_cell_types_extened.bed) --> 
  
 Running time is about 2 hours.
 
