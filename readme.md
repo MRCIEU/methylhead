@@ -24,11 +24,14 @@ conda install -c bioconda nextflow
 
 ```
 
-### Prepare reference genome
+### Prepare reference genome 
 
 ```bash
-bash prepare_reference_genome.sh [path_to_folder] `[bed_file_path]`
+
+bash prepare_reference_genome.sh [path_to_folder] [bed_file_path]
+
 ```
+
 [bed_file_path](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/raw/main/data/)
 
 Running time is about 2 hours.
