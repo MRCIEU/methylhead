@@ -80,7 +80,7 @@ if (pipeline == "bismark") {
     
     args <- commandArgs(trailingOnly = TRUE)
     
-    blood_cell_types <- fread(paste0(data_dir, "/blood_cell_types.csv"))
+    blood_cell_types <- fread(paste0(data_dir, "/blood_cell_types_extended.zip"))
     blood_cell_types<-data.frame(blood_cell_types)
 
   names(blood_cell_types) <- gsub("GSM\\d+_?", "", names(blood_cell_types))
