@@ -27,7 +27,7 @@ conda install -c bioconda nextflow
 ### Prepare reference genome
 
 ```bash
-bash prepare_reference_genome.sh [path_to_folder]
+bash prepare_reference_genome.sh [path_to_folder] [bed_file_path]
 ```
 Running time is about 2 hours.
 
