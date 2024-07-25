@@ -47,7 +47,7 @@ nextflow main.nf --pipeline bismark \
 
 nextflow main.nf --pipeline picard \
 --data "[fastq path]" 
---intervals covered_targets_Twist_Methylome_hg19_annotated_collapsed_final \
+--intervals [interval_file] \
 --genome_folder [BWA genome index path] \
 -resume \
 -N [The email address for the report is]
