@@ -40,7 +40,7 @@ if [ ! -f ${BED_FILE} ]; then
     exit 1
 fi
 
-INTERVAL_LIST_OUTPUT="${GENOMES}/interval_list"
+INTERVAL_LIST_OUTPUT="${GENOMES}/interval_file"
 
 if [ ! -f ${INTERVAL_LIST_OUTPUT} ]; then
     singularity exec ${SINGULARITY_IMAGE} picard BedToIntervalList \
