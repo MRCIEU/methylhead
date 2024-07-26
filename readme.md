@@ -48,7 +48,7 @@ nextflow main.nf --pipeline bismark \
 nextflow main.nf --pipeline picard \
 --data "[fastq path]" 
 --intervals [genome index path/interval_file] \
---genome_folder [BWA genome index path] \
+--genome_folder [BWA genome index path/hg19.fa] \
 -resume \
 -N [The email address for the report is]
 ```
