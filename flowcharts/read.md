@@ -145,95 +145,60 @@ Input  : txt files
 
 Output : html files
 
-## Bismark Pipeline Steps
+# Bismark Pipeline Steps
 
-* FastQC
+### FastQC
+**Description**: Quality control checks on raw sequence data to generate quality metrics.  
+**Input**: fastqc files  
+**Output**: fastqc files  
 
-Quality control checks on raw sequence data to generate quality metrics.
+### Trim Galore
+**Description**: Trimming adapter sequences and low-quality bases from raw sequence reads.  
+**Input**: fastqc files  
+**Output**: fq.gz files  
 
-Input  : fastqc files
+### Alignment
+**Description**: Aligning trimmed sequence reads to a reference genome.  
+**Input**: fq.gz files  
+**Output**: bam files  
 
-Output : fastqc files
+### Deduplication
+**Description**: Identifying and marking duplicate reads in the BAM files.  
+**Input**: bam files  
+**Output**: bam files, bam.bai files  
 
-* Trim Galore
+### Methylation Extraction
+**Description**: Performing methylation calling to determine the methylation status of cytosines.  
+**Input**: bam files  
+**Output**: svg files  
 
-Trimming adapter sequences and low-quality bases from raw sequence reads.
+### Methylation Matrix
+**Description**: Creating a matrix of methylation values for each sample.  
+**Input**: methylation extraction files  
+**Output**: csv and pdf files  
 
-Input  : fastqc files
+### DNAm Full Matrix
+**Description**: Generating a comprehensive DNA methylation matrix.  
+**Input**: methylation matrix files  
+**Output**: csv files  
 
-Output : fq.gz files
+### Estimate Cell Counts
+**Description**: Estimating cell type composition based on methylation data.  
+**Input**: csv files  
+**Output**: csv files  
 
-* Alignment
+### DNA Methylation Scores
+**Description**: Calculating scores that reflect the methylation status of specific regions.  
+**Input**: csv files  
+**Output**: csv files  
 
-Aligning trimmed sequence reads to a reference genome.
+### Reports
+**Description**: Compiling various reports generated throughout the pipeline.  
+**Input**: Various intermediate files  
+**Output**: Report files (various formats)  
 
-Input  : fq.gz files
+### MultiQC
+**Description**: Aggregating and visualizing quality control metrics from multiple sources.  
+**Input**: txt files  
+**Output**: html files  
 
-Output : bam files
-
-* Deduplication
-
-Identifying and marking duplicate reads in the BAM files.
-
-Input  : bam files
-
-Output : bam files files
-
-* Methylation Extraction
-
-Performing methylation calling to determine the methylation status of cytosines.
-
-Input  : bam files
-
-Output : deduplicated.bedGraph.gz, bismark.cov.gz, deduplicated_splitting_report.txt, deduplicated.M-bias.txt
-
-* Reports
-
-Compiling various reports generated throughout the pipeline.
-
-Input  : Various intermediate files
-
-Output : Report files (various formats)
-
-
-* Methylation Matrix
-
-Creating a matrix of methylation values for each sample.
-
-Input  : methylKit files
-
-Output : csv and pdf files
-
-* DNAm Full Matrix
-
-Generating a comprehensive DNA methylation matrix.
-
-Input  : methylKit files
-
-Output : csv files
-
-
-* Estimate Cell Counts
-
-Estimating cell type composition based on methylation data.
-
-Input  : csv files
-
-Output : csv files
-
-
-* DNA Methylation Scores 
-
-Calculating scores that reflect the methylation status of specific regions.
-
-Input  : csv files
-
-Output : csv files
-
-* MultiQC
-
-Aggregating and visualizing quality control metrics from multiple sources.
-
-Input  : txt files
-
-Output : html files
