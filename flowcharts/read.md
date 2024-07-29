@@ -5,13 +5,16 @@ This file, contains flowcharts to visualize and understand the workflow of both 
 
 Quality control checks on raw sequence data to generate quality metrics.
 
-Input  : fastqc files
+Input  : fastq files
 
-Output : fastqc files
+Output : fastq and html files
 
 * Trim Galore
+
 Trimming adapter sequences and low-quality bases from raw sequence reads.
-Input  : fastqc files
+
+Input  : fastq files
+
 Output : fq.gz  files
 
 * Alignment
