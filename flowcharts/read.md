@@ -2,9 +2,12 @@ This file, contains flowcharts to visualize and understand the workflow of both 
 
 ## Picard Pipeline Steps
 
-# FastQC 
+## FastQC 
+
 Quality control checks on raw sequence data to generate quality metrics.
+
 Input  : fastqc files
+
 Output : fastqc files
 
 # Trim Galore
@@ -12,19 +15,25 @@ Trimming adapter sequences and low-quality bases from raw sequence reads.
 Input  : fastqc files
 Output : fq.gz  files
 
-# Alignment
+## Alignment
 Aligning trimmed sequence reads to a reference genome.
 Input  : fq.gz files
 Output : bam   files
 
-# Sambamba 
+## Sambamba 
+
 Processing and manipulating aligned sequence data, such as sorting and indexing BAM files.
+
 Input  : bam files
+
 output : bam files 
 
-# Sorted BAM Files
+## Sorted BAM Files
+
 Generating sorted BAM files from the aligned data for downstream analysis.
+
 Input  : bam files
+
 output : bam files 
 
 # Mark Duplicates 
