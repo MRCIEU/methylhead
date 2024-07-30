@@ -37,7 +37,7 @@ Running time is about 2 hours.
 
 ```
 DATA_DIR=data/
-PANEL=panel.bed(https://github.com/MRCIEU/dnam-lung-cancer-pipeline/raw/main/data/)
+PANEL=panel.bed
 
 nextflow main.nf --pipeline bismark \
 --data $DATA_DIR \
