@@ -6,6 +6,7 @@ include { Alignment } from '../modules/Picard_modules/Alignment'
 include { Sambamba } from '../modules/Picard_modules/Sambamba' 
 include { Sorted_Bam_Files } from '../modules/Picard_modules/Sorted_Bam_Files' 
 include { Mark_duplicated } from '../modules/Picard_modules/Mark_duplicated' 
+include { Interval_file } from '../modules/Picard_modules/Interval_file'
 include { Collect_HS_Metrics } from '../modules/Picard_modules/Collect_HS_Metrics' 
 include { Collect_MM_Metrics } from '../modules/Picard_modules/Collect_MM_Metrics' 
 include { MethylDackel } from '../modules/Picard_modules/MethylDackel'
@@ -39,10 +40,10 @@ workflow Picard_pipeline {
     Sorted_Bam_Files(sortedBam)
        sorted_ch = Sorted_Bam_Files.out.sorted_bam
     Mark_duplicated(sorted_ch)
-       sorted_mark = Mark_duplicated.out.markdup     
-       intervals = params.intervals
-    Collect_HS_Metrics(sorted_mark, intervals)
-       reference = params.genome_folder
+       sorted_mark = Mark_duplicated.out.markdup 
+       reference   = params.genome_folder 
+       Interval_file(params.panel,params.genome_folder)
+    Collect_HS_Metrics(sorted_mark, params.genome_folder)
     Collect_MM_Metrics(sorted_mark, reference)
     MethylDackel(sorted_mark ,reference)
     bedGraph(sorted_mark)
