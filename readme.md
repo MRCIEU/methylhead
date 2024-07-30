@@ -31,16 +31,13 @@ GENOME_INDEX=genome/
 bash prepare_reference_genome.sh $GENOME_INDEX 
 
 ```
-
-[bed_file_path](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/raw/main/data/)
-
 Running time is about 2 hours.
 
 ## Usage: 
 
 ```
 DATA_DIR=data/
-PANEL=panel.bed
+PANEL=panel.bed(https://github.com/MRCIEU/dnam-lung-cancer-pipeline/raw/main/data/)
 
 nextflow main.nf --pipeline bismark \
 --data $DATA_DIR \
