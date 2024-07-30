@@ -59,10 +59,12 @@ nextflow main.nf --pipeline picard \
 *Camda Pipeline*
 
 ```
+SAMTOOLS_DIR=/bin/
+
 nextflow main.nf \
- --data $DATA_DIR \ 
+--data $DATA_DIR \ 
 --genome_folder $GENOME_INDEX \
---samtools_path [samtools folder path] \
+--samtools_path $SAMTOOLS_DIR \
 -resume \
 -N [The email address for the report is]
 ```
