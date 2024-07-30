@@ -39,15 +39,18 @@ Running time is about 2 hours.
 ## Usage: 
 
 ```
+DATA_DIR=data/
+PANEL=panel.bed
+
 nextflow main.nf --pipeline bismark \
---data "[fastq path]" \
+--data $DATA_DIR \
 --genome_folder $GENOME_INDEX \
 -resume \
 -N [The email address for the report is]
 
 nextflow main.nf --pipeline picard \
---data "[fastq path]" 
---panel \
+--data $DATA_DIR \
+--panel $PANEL \
 --genome_folder $GENOME_INDEX/hg19.fa \
 -resume \
 -N [The email address for the report is]
@@ -56,7 +59,8 @@ nextflow main.nf --pipeline picard \
 *Camda Pipeline*
 
 ```
-nextflow main.nf --data "[fastq path]" \ 
+nextflow main.nf \
+ --data $DATA_DIR \ 
 --genome_folder $GENOME_INDEX \
 --samtools_path [samtools folder path] \
 -resume \
