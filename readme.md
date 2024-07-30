@@ -27,8 +27,8 @@ conda install -c bioconda nextflow
 ### Prepare reference genome 
 
 ```bash
-
-bash prepare_reference_genome.sh [path_to_folder] [bed_file_path]
+GENOME_INDEX=genome/
+bash prepare_reference_genome.sh $GENOME_INDEX 
 
 ```
 
@@ -41,14 +41,14 @@ Running time is about 2 hours.
 ```
 nextflow main.nf --pipeline bismark \
 --data "[fastq path]" \
---genome_folder [genome index path] \
+--genome_folder $GENOME_INDEX \
 -resume \
 -N [The email address for the report is]
 
 nextflow main.nf --pipeline picard \
 --data "[fastq path]" 
---intervals [genome index path/interval_file] \
---genome_folder [BWA genome index path/hg19.fa] \
+--panel \
+--genome_folder $GENOME_INDEX/hg19.fa \
 -resume \
 -N [The email address for the report is]
 ```
@@ -57,8 +57,8 @@ nextflow main.nf --pipeline picard \
 
 ```
 nextflow main.nf --data "[fastq path]" \ 
---genome_folder [genome folder path] \
---samtools_path [samtools fodler path] \
+--genome_folder $GENOME_INDEX \
+--samtools_path [samtools folder path] \
 -resume \
 -N [The email address for the report is]
 ```
