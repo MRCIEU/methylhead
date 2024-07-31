@@ -34,21 +34,6 @@ if [ ! -f ${GENOMES}/hg19.fa.dict ]; then
     singularity exec ${SINGULARITY_IMAGE} picard CreateSequenceDictionary REFERENCE=${GENOMES}/hg19.fa OUTPUT=${GENOMES}/hg19.fa.dict
 fi
 
-# Convert BED to interval list using Singularity if it does not exist
-if [ ! -f ${BED_FILE} ]; then
-    echo "BED file ${BED_FILE} does not exist."
-    exit 1
-fi
-
-INTERVAL_LIST_OUTPUT="${GENOMES}/interval_file"
-
-if [ ! -f ${INTERVAL_LIST_OUTPUT} ]; then
-    singularity exec ${SINGULARITY_IMAGE} picard BedToIntervalList \
-        I=${BED_FILE} \
-        O=${INTERVAL_LIST_OUTPUT} \
-        SD=${GENOMES}/hg19.fa.dict                
-fi
-
 # Prepare the genome with bismark using Singularity if Bismark index does not exist
 if [ ! -d ${GENOMES}/Bisulfite_Genome ]; then
     singularity exec ${SINGULARITY_IMAGE} bismark_genome_preparation --path_to_aligner /opt/bowtie2/ --verbose ${GENOMES}
