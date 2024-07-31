@@ -39,7 +39,9 @@ This file, contains flowcharts to visualize and understand the workflow of both 
 
 ### Interval Files
 **Decription**: Interval files from the panel for collecting HS Matrix.
+
 **Input**: bed file
+
 **Output**: interval file
 
 ### Collect MM Metrics
