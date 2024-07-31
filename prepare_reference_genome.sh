@@ -1,16 +1,7 @@
 #!/bin/bash
 
-# Check if the user provided the GENOMES path and the BED file path
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <path_to_converted_genome_index> <path_to_bed_file>"
-    exit 1
-fi
-
 # Define the genome index path from user input
 GENOMES=$1
-
-# Define the BED file path from user input
-BED_FILE=$2
 
 # Singularity image path
 SINGULARITY_IMAGE="dnam_cancer_pipeline_latest.sif"
