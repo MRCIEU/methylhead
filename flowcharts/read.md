@@ -1,4 +1,6 @@
-This file, contains flowcharts to visualize and understand the workflow of both bismark and picard pipeline.
+# Workflow Overview
+
+This file contains flowcharts to visualize and understand the workflow of both the Bismark and Picard pipelines.
 
 ## Picard Pipeline Steps
 
@@ -38,16 +40,14 @@ This file, contains flowcharts to visualize and understand the workflow of both 
 **Output**: txt files and coverage files  
 
 ### Interval Files
-**Decription**: Interval files from the panel for collecting HS Matrix.
-
-**Input**: bed file
-
-**Output**: interval file
+**Description**: Interval files from the panel for collecting HS Matrix.  
+**Input**: bed file  
+**Output**: interval file  
 
 ### Collect MM Metrics
 **Description**: Collecting mismatch metrics to assess alignment accuracy.  
 **Input**: bam files  
-**Output**: alignment_summary_metrics, gc_bias_detail_metrics, gc_bias(.pdf), summary_metrics, insert_size_histogram.pdf, insert_size_metrics  
+**Output**: alignment_summary_metrics, gc_bias_detail_metrics, gc_bias (.pdf), summary_metrics, insert_size_histogram.pdf, insert_size_metrics  
 
 ### MethylDackel
 **Description**: Performing methylation calling to determine the methylation status of cytosines.  
@@ -67,7 +67,7 @@ This file, contains flowcharts to visualize and understand the workflow of both 
 ### Samtools Stats
 **Description**: Generating statistics from BAM files using Samtools.  
 **Input**: bam files  
-**Output**: samtools_stats(.txt), markdup_samtools_stats(.txt) files  
+**Output**: samtools_stats (.txt), markdup_samtools_stats (.txt) files  
 
 ### MethylKit
 **Description**: Analyzing differential methylation using the MethylKit tool.  
@@ -99,7 +99,7 @@ This file, contains flowcharts to visualize and understand the workflow of both 
 **Input**: txt files  
 **Output**: html files  
 
-# Bismark Pipeline Steps
+## Bismark Pipeline Steps
 
 ### FastQC
 **Description**: Quality control checks on raw sequence data to generate quality metrics.  
@@ -155,4 +155,3 @@ This file, contains flowcharts to visualize and understand the workflow of both 
 **Description**: Aggregating and visualizing quality control metrics from multiple sources.  
 **Input**: txt files  
 **Output**: html files  
-
