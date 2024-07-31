@@ -37,6 +37,11 @@ This file, contains flowcharts to visualize and understand the workflow of both 
 **Input**: bam files  
 **Output**: txt files and coverage files  
 
+### Interval Files
+**Decription**: Interval files from the panel for collecting HS Matrix
+**Input**: Bed file
+**Output**: Interval file
+
 ### Collect MM Metrics
 **Description**: Collecting mismatch metrics to assess alignment accuracy.  
 **Input**: bam files  
