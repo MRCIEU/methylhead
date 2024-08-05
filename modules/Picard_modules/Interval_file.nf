@@ -1,7 +1,7 @@
 process Interval_file {
 
     input:
-    file 'input.bed'
+    path params.panel
     path params.genome_folder
 
     output:
