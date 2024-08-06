@@ -7,7 +7,7 @@ process Interval_file {
     output:
     path "interval_file", emit: panel
 
-    publishDir "${params.outdir}/interval_file/", mode: 'copy'
+    publishDir "${params.outdir}/Interval_file/", mode: 'copy'
 
     script:
     """
