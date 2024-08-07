@@ -43,17 +43,18 @@ workflow Picard_pipeline {
        sorted_mark = Mark_duplicated.out.markdup 
        reference   = params.genome_folder 
        Interval_file(params.panel,params.genome_folder)
-    Collect_HS_Metrics(sorted_mark, params.genome_folder)
+       params.interval_file = Interval_file.out
+    Collect_HS_Metrics(sorted_mark, params.genome_folder,params.interval_file)
     Collect_MM_Metrics(sorted_mark, reference)
     MethylDackel(sorted_mark ,reference)
     bedGraph(sorted_mark)
     bedGraph2 = bedGraph.out
     Processed_bedGraph(bedGraph2)
     Samtools_stats(myBamSample,sorted_mark)
-    MethylKit(Mark_duplicated.out.markdup, genome_folder)    
-    	files_ch = MethylKit.out.methylKit_CpG.collectFile(name:"*_CpG.methylKit",newLine:true)   
-    Methylation_Matrix(files_ch) 
+    MethylKit(Mark_duplicated.out.markdup, genome_folder) 
+   	  files_ch = MethylKit.out.methylKit_CpG.collectFile(name:"*.markdup_CpG.methylKit",newLine:true)       
     DNAm_Full_Matrix(files_ch)
+    Methylation_Matrix(files_ch) 
 	    full_matrix=DNAm_Full_Matrix.out
             full_matrix2=full_matrix.collectFile(name:"*.csv", newLine: true)  
     Estimate_cell_counts(full_matrix2)  
