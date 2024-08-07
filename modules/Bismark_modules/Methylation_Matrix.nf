@@ -13,8 +13,8 @@ process Methylation_Matrix {
     
     shell:
     """
-    mkdir -p ${baseDir}/${params.outdir}/Methylation_Matrix
-    Rscript ${baseDir}/bin/Methylation_matrix.R ${params.pipeline} ${baseDir}/${params.outdir}/Methylation ${baseDir}/${params.outdir}/Methylation_Matrix 
+    mkdir -p ${params.outdir}/Methylation_Matrix
+    Rscript ${baseDir}/bin/Methylation_matrix.R ${params.pipeline} ${params.outdir}/Methylation ${params.outdir}/Methylation_Matrix 
     
     """
 }
