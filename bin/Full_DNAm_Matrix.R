@@ -8,10 +8,10 @@ args <- commandArgs(trailingOnly = TRUE)
 pipeline <- args[1]
 input_dir <- args[2]
 output_dir <- args[3]
-setwd(input_dir)
+
 
 if (pipeline == "bismark") {
-    file.vector <- list.files(pattern = "bismark\\.cov\\.gz", full.names = FALSE)
+    file.vector <- list.files(path = input_dir, pattern = "bismark\\.cov\\.gz", full.names = FALSE)
     file.vector <- file.vector[!grepl("ctrl", file.vector)]
     sample.ids <- gsub("_bismark_bt2_pe.deduplicated.bismark.cov.gz", "", basename(file.vector))
     sample.ids <- as.list(sample.ids)
@@ -24,7 +24,7 @@ if (pipeline == "bismark") {
                       treatment = c(rep(0, length(sample.ids))),
                       mincov = 10)
 } else if (pipeline == "picard") {
-    file.vector <- list.files(pattern = "\\.markdup_CpG\\.methylKit", full.names = FALSE)
+    file.vector <- list.files(path = input_dir, pattern = "\\.markdup_CpG\\.methylKit", full.names = TRUE)
     file.vector <- file.vector[!grepl("ctrl", file.vector)]
     sample.ids <- gsub(".markdup_CpG.methylKit", "", basename(file.vector))
     sample.ids <- as.list(sample.ids)
@@ -36,7 +36,7 @@ if (pipeline == "bismark") {
                       assembly = "hg19",
                       treatment = c(rep(0, length(sample.ids))),
                       mincov = 10)
-} else {
+} else {dos
     stop("Unknown pipeline")
 }
 

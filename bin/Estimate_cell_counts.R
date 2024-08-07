@@ -137,5 +137,5 @@ estimate.cell.counts0 <- function(beta, beta.cell.types) {
 }
 estimate_cell_counts<-estimate.cell.counts(beta, beta.cell.types)
 estimate_cell_counts_Normalized<-estimate_cell_counts/colSums(estimate_cell_counts)
-write.csv(estimate_cell_counts_Normalized,file = paste0(output_dir,"/estimate_cell_counts.csv"))
+write.csv(estimate_cell_counts_Normalized,file = paste0(output_dir,"/Estimate_cell_counts.csv"))
 }
