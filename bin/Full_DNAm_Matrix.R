@@ -46,7 +46,7 @@ myobj.filt <- filterByCoverage(myobj,
                                hi.count = NULL,
                                hi.perc = 99.9)
 
-meth <- unite(myobj.filt, destrand = FALSE)
+meth <- unite(myobj.filt, destrand = TRUE)
 pm <- percMethylation(meth)
 pm <- pm / 100
 meth_df <- data.frame(meth)
