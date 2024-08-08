@@ -11,7 +11,7 @@ output_dir <- args[3]
 
 
 if (pipeline == "bismark") {
-    file.vector <- list.files(path = input_dir, pattern = "bismark\\.cov\\.gz", full.names = FALSE)
+    file.vector <- list.files(path = input_dir, pattern = "bismark\\.cov\\.gz", full.names = TRUE)
     file.vector <- file.vector[!grepl("ctrl", file.vector)]
     sample.ids <- gsub("_bismark_bt2_pe.deduplicated.bismark.cov.gz", "", basename(file.vector))
     sample.ids <- as.list(sample.ids)
