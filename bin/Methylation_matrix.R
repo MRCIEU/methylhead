@@ -92,11 +92,3 @@ if (pipeline == "bismark") {
 } else if (pipeline == "picard") {
   write.csv(methylation, file = paste0(output_dir, "/Methylation_matrix.csv"), row.names = FALSE)
 }
-
-pdf(paste0(output_dir, "/correlation_plot.pdf"))
-getCorrelation(meth, plot = TRUE)
-dev.off()
-
-pdf(paste0(output_dir, "/cluster_plot.pdf"))
-clusterSamples(meth, dist = "correlation", method = "ward", plot = TRUE)
-dev.off()
