@@ -10,9 +10,7 @@ process Methylation_Matrix {
     output:
     
     val  "Methylation_matrix.csv"  , emit : meth_matrix
-    val  "correlation_plot.pdf"    , emit : corr_plot 
-    val  "culster_plot.pdf"        , emit : cluster_plot
-    
+
     publishDir "${params.outdir}/Methylation_Matrix/", mode: 'copy', pattern: '*.pdf, *.csv'
     
     shell:
