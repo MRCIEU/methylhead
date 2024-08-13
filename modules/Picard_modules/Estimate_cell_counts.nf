@@ -1,6 +1,9 @@
 
 process Estimate_cell_counts {
 
+
+     cpus 16
+
     input:
     path full_matrix2
    
