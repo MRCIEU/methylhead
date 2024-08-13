@@ -1,7 +1,7 @@
-
 process DNA_Methylation_Scores {
 
-   cpus 16
+    executor 'local'
+    cpus 16
 
     input:
    
