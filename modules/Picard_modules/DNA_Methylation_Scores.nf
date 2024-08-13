@@ -1,6 +1,8 @@
 
 process DNA_Methylation_Scores {
 
+   cpus 16
+
     input:
    
     path Meth_Matrix
