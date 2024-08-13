@@ -1,6 +1,6 @@
 process DNAm_Full_Matrix {
 
- cpus 16
+
     
    input:
     path files_ch
