@@ -1,7 +1,8 @@
 process Methylation_Matrix {
-
-     cpus 16
      
+     executor 'local'
+     cpus 16
+
      input:
    
      path files_ch         
