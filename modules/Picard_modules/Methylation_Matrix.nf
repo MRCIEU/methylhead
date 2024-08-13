@@ -1,6 +1,6 @@
 process Methylation_Matrix {
 
-     
+     cpus 16
      
      input:
    
