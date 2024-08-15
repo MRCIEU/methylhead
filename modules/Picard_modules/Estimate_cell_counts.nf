@@ -2,7 +2,7 @@ process Estimate_cell_counts {
     
     input:
     
-    path ecc
+      path R_files, from: 'R_files/*'
     
     
     publishDir "${params.outdir}/Estimate_cell_count", mode: 'copy' , pattern: '*.csv'
@@ -15,6 +15,6 @@ process Estimate_cell_counts {
     shell:
     """  
     mkdir -p ${params.outdir}/Estimate_cell_count
-    Rscript ${baseDir}/bin/Estimate_cell_counts.R ${params.pipeline} ${baseDir}/data ${params.outdir}/DNAm_Full_Matrix ${params.outdir}/Estimate_cell_count
+    Rscript ${baseDir}/bin/Estimate_cell_counts.R ${params.pipeline} ${baseDir}/data  ${params.outdir}/Methylation ${params.outdir}/Estimate_cell_count
      """
 }

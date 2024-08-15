@@ -3,7 +3,7 @@ process DNA_Methylation_Scores {
 
     input:
    
-    path dnascore
+    path R_files , from: 'R_files/*'
      
     publishDir "${params.outdir}/DNA_Methylation_Scores/", mode: 'copy' , pattern: '*.csv'
       
@@ -14,6 +14,6 @@ process DNA_Methylation_Scores {
     shell:
     """
     mkdir -p ${params.outdir}/DNA_Methylation_Scores/
-    Rscript ${baseDir}/bin/DNA_Methylation_Scores.R ${params.pipeline} ${params.outdir}/Methylation_Matrix ${params.outdir}/DNA_Methylation_Scores
+    Rscript ${baseDir}/bin/DNA_Methylation_Scores.R ${params.pipeline} ${params.outdir}/Methylation ${params.outdir}/DNA_Methylation_Scores
     """
 }
