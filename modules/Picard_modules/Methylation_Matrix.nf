@@ -1,23 +1,22 @@
 process Methylation_Matrix {
-     
-     executor 'local'
-     cpus 16
+      
+    
+    input:
+    
+    path R_files , from: 'R_files/*'         
 
-     input:
+    publishDir "${params.outdir}/Methylation_Matrix/", mode: 'move' , pattern: '*.csv'
    
-     path files_ch         
 
-        
     output:
+    path("Methylation_matrix.csv"), emit: Meth_matrix ,  optional: true
     
-    val  "Methylation_matrix.csv"  , emit : meth_matrix
-
-    publishDir "${params.outdir}/Methylation_Matrix/", mode: 'copy', pattern: '*.pdf, *.csv'
-    
-    shell:
+    shell:   
     """
     mkdir -p ${params.outdir}/Methylation_Matrix
-    Rscript ${baseDir}/bin/Methylation_matrix.R ${params.pipeline} ${params.outdir}/Methylation ${params.outdir}/Methylation_Matrix 
-    
+    Rscript ${baseDir}/bin/Methylation_matrix.R ${params.pipeline} ${params.outdir}/Methylation  ${params.outdir}/Methylation_Matrix
+    touch ${params.outdir}/Methylation_Matrix/Methylation_matrix.csv 
     """
 }
+
+

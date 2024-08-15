@@ -1,17 +1,15 @@
 process DNA_Methylation_Scores {
 
-    executor 'local'
-    cpus 16
 
     input:
    
-    path Meth_Matrix
+    path dnascore
      
-   output:
-    val "Bismark_scores.csv", emit: Bismark_scores
-    val "Bismark_smoking_scores.csv", emit: Bismark_smoking_scores
-
-    publishDir "${params.outdir}/DNA_Methylation_Scores/", mode: 'copy'
+    publishDir "${params.outdir}/DNA_Methylation_Scores/", mode: 'copy' , pattern: '*.csv'
+      
+    output:
+    path ("Bismark_scores.csv"), emit : Bismark_scores ,optional: true
+    path ("Bismark_smoking_scores.csv"), emit : Bismark_smoking_scores, optional: true
  
     shell:
     """

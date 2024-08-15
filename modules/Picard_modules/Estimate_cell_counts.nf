@@ -1,17 +1,16 @@
 process Estimate_cell_counts {
-         
-   executor 'local'
-   cpus 16
-
-
+    
     input:
-    path full_matrix2
+    
+    path ecc
+    
+    
+    publishDir "${params.outdir}/Estimate_cell_count", mode: 'copy' , pattern: '*.csv'
    
     output:
    
-    val "Estimate_cell_counts.csv", emit: Estimate_cell_count
-   
-    publishDir "${params.outdir}/Estimate_cell_count", mode: 'copy'
+    path ("Estimate_cell_counts.csv"), optional: true
+  
     
     shell:
     """  
