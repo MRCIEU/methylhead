@@ -52,15 +52,21 @@ workflow Picard_pipeline {
     Processed_bedGraph(bedGraph2)
     Samtools_stats(myBamSample,sorted_mark)
     MethylKit(Mark_duplicated.out.markdup, genome_folder) 
-   	  files_ch = MethylKit.out.methylKit_CpG.collectFile(name:"*.markdup_CpG.methylKit",newLine:true)       
-    DNAm_Full_Matrix(files_ch)
-    Methylation_Matrix(files_ch) 
-	    full_matrix=DNAm_Full_Matrix.out
-            full_matrix2=full_matrix.collectFile(name:"*.csv", newLine: true)  
-    Estimate_cell_counts(full_matrix2)  
-    Meth_Matrix = Methylation_Matrix.out.meth_matrix
-        files_ch2 = Meth_Matrix.collectFile(name:"*.csv", newLine: true)
-    DNA_Methylation_Scores(files_ch2)     
+        Channel.empty()
+         .mix (  MethylKit.out.methylKit_CpG )
+         .map { sample_id, files -> files }
+	       .collect()
+	       .set{ R_files }         
+    DNAm_Full_Matrix(R_files)
+         Channel.of('DNAm_Full_Matrix')
+      .collectFile(name: 'DNAm_Full_Matrix.csv', newLine: true)
+      .set { ecc }   
+    Estimate_cell_counts(ecc)   
+    Methylation_Matrix(R_files)     
+      Channel.of('Methylation_Matrix')
+      .collectFile(name: 'Methylation_matrix.csv', newLine: true)
+      .set { dnascore }
+    DNA_Methylation_Scores(dnascore)      
     Channel.empty()
           .mix( Fastqc.out )             
           .mix( Trim_galore.out )        
