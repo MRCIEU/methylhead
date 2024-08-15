@@ -3,6 +3,9 @@
 library(methylKit)
 library(dplyr)
 library(data.table)
+library(parallel)
+options(mc.cores = 24)
+
 
 args <- commandArgs(trailingOnly = TRUE)
 pipeline <- args[1]
@@ -52,4 +55,5 @@ pm <- pm / 100
 meth_df <- data.frame(meth)
 meth_df <- cbind(meth_df, pm)
 
-write.csv(meth_df, file = paste0(output_dir, "/DNAm_Full_Matrix.csv"), row.names = FALSE)
+output_file <- file.path(output_dir, "DNAm_Full_Matrix.csv")
+write.csv(meth_df, file = output_file, row.names = FALSE)

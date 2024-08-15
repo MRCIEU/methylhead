@@ -3,6 +3,9 @@
 library(meffonym)
 library(dplyr)
 library(data.table)
+library(parallel)
+options(mc.cores = 24)
+
 
 args <- commandArgs(trailingOnly = TRUE)
 pipeline <- args[1]

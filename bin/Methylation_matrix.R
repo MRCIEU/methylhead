@@ -12,6 +12,9 @@ library(meffonym)
 library(dplyr)
 library(ggplot2)
 library(data.table)
+library(parallel)
+options(mc.cores = 24)
+
 
 args <- commandArgs(trailingOnly = TRUE)
 pipeline <- args[1]
@@ -48,7 +51,7 @@ process_methylation_data <- function(file.vector, sample.ids, pipeline) {
                                  hi.count = NULL,
                                  hi.perc = 99.9)
   
-  meth <- unite(myobj.filt, destrand = FALSE)
+  meth <- unite(myobj.filt, destrand = TRUE)
   pm <- percMethylation(meth)
   pm <- pm / 100
   meth_df <- data.frame(meth)
@@ -87,8 +90,5 @@ result <- process_methylation_data(file.vector, sample.ids, pipeline)
 methylation <- result$methylation
 meth <- result$meth
 
-if (pipeline == "bismark") {
-  write.csv(methylation, file = paste0(output_dir, "/Methylation_matrix.csv"), row.names = FALSE)
-} else if (pipeline == "picard") {
-  write.csv(methylation, file = paste0(output_dir, "/Methylation_matrix.csv"), row.names = FALSE)
-}
+output_file <- file.path(output_dir, "Methylation_matrix.csv")
+write.csv(methylation, file = output_file, row.names = FALSE)
