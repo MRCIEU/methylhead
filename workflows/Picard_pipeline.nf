@@ -58,14 +58,16 @@ workflow Picard_pipeline {
 	       .collect()
 	       .set{ R_files }         
     DNAm_Full_Matrix(R_files)
-         Channel.of('DNAm_Full_Matrix')
-      .collectFile(name: 'DNAm_Full_Matrix.csv', newLine: true)
-      .set { ecc }   
-    Estimate_cell_counts(ecc)   
-    Methylation_Matrix(R_files)     
-      Channel.of('Methylation_Matrix')
-      .collectFile(name: 'Methylation_matrix.csv', newLine: true)
-      .set { dnascore }
+    Methylation_Matrix(R_files)
+    Channel.empty()
+          .mix ( DNAm_Full_Matrix.out )
+          .collectFile(name: 'DNAm_Full_Matrix.csv', newLine: true)
+          .set { ecc }        
+    Channel.empty()
+         .mix ( Methylation_Matrix.out )
+         .collectFile(name: 'Methylation_matrix.csv', newLine: true)
+         .set { dnascore }
+    Estimate_cell_counts(ecc) 
     DNA_Methylation_Scores(dnascore)      
     Channel.empty()
           .mix( Fastqc.out )             
