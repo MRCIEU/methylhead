@@ -22,10 +22,9 @@ include { DNA_Methylation_Scores } from '../modules/Picard_modules/DNA_Methylati
 
 workflow Picard_pipeline {
 
-    take:
-     
-    reads   
-    outdir 
+   take:  
+   reads   
+   outdir 
        
    main:
     
@@ -57,20 +56,10 @@ workflow Picard_pipeline {
          .map { sample_id, files -> files }
 	       .collect()
 	       .set{ R_files }         
-    DNAm_Full_Matrix(R_files)
-    Methylation_Matrix(R_files)
-    Channel.empty()
-          .mix ( DNAm_Full_Matrix.out )
-          .map { sample_id, files -> files } 
-          .collect()
-          .set { ecc }        
-    Channel.empty()
-         .mix ( Methylation_Matrix.out )
-         .map { sample_id, files -> files } 
-         .collect()
-         .set { dnascore }
-    Estimate_cell_counts(ecc) 
-    DNA_Methylation_Scores(dnascore)      
+    DNAm_Full_Matrix(R_files)      
+    Methylation_Matrix(R_files)   
+    Estimate_cell_counts(R_files) 
+    DNA_Methylation_Scores(R_files)      
     Channel.empty()
           .mix( Fastqc.out )             
           .mix( Trim_galore.out )        
@@ -81,6 +70,5 @@ workflow Picard_pipeline {
           .map { sample_id, files -> files }
           .collect()
           .set { multiqc_files }  
-    Multiqc(multiqc_files)
-      
+    Multiqc(multiqc_files)      
 }
