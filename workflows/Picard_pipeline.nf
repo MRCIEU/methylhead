@@ -61,11 +61,13 @@ workflow Picard_pipeline {
     Methylation_Matrix(R_files)
     Channel.empty()
           .mix ( DNAm_Full_Matrix.out )
-          .collectFile(name: 'DNAm_Full_Matrix.csv', newLine: true)
+          .map { sample_id, files -> files } 
+          .collect()
           .set { ecc }        
     Channel.empty()
          .mix ( Methylation_Matrix.out )
-         .collectFile(name: 'Methylation_matrix.csv', newLine: true)
+         .map { sample_id, files -> files } 
+         .collect()
          .set { dnascore }
     Estimate_cell_counts(ecc) 
     DNA_Methylation_Scores(dnascore)      
