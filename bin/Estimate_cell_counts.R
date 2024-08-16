@@ -66,7 +66,7 @@ if (pipeline == "bismark") {
     names(meth_df) <- gsub("^X", "", names(meth_df))
     names(meth_df) <- gsub("_R1_001_val_1\\d*", "", names(meth_df))
     
-    sample.ids <- grep("_L001", names(meth_df), value = TRUE)
+    sample.ids<- names(meth_df %>% select(-chr, -start, -end, -strand, -contains("coverage"), -starts_with("num")))
     regions <- blood_cell_types[c("chr","start","end")]
     
     CD4T <- rowMeans(blood_cell_types[c("Blood.T.CD4TT","Blood.T.CD4U7","Blood.T.CD4UM")])
@@ -129,7 +129,7 @@ if (pipeline == "bismark") {
   names(meth_df) <- gsub("^X", "", names(meth_df))
   names(meth_df) <- gsub("_R1_001_val_1\\d*", "", names(meth_df))
 
-sample.ids <- grep("_L001", names(meth_df), value = TRUE)
+sample.ids<- names(meth_df %>% select(-chr, -start, -end, -strand, -contains("coverage"), -starts_with("num")))
 regions<-blood_cell_types[c("chr","start","end")]
 
 CD4T=rowMeans(blood_cell_types[c("Blood.T.CD4TT","Blood.T.CD4U7","Blood.T.CD4UM")])
