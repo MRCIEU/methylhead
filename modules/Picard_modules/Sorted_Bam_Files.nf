@@ -15,7 +15,7 @@ process Sorted_Bam_Files {
     
     script:
     """
-    sambamba sort -t 16 -m 16GiB -l 0 ${sortedBam} -o ${sample_id}_sorted.bam    
+    samtools sort -t 16 -m 16GiB -l 0 ${sortedBam} -o ${sample_id}_sorted.bam     
     samtools index -@ 16 ${sample_id}_sorted.bam  > ${sample_id}_sorted.bam.bai
     """
 }
