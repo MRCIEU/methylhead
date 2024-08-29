@@ -42,7 +42,7 @@ workflow Bismark_pipeline {
     Methylation_Matrix(R_files)
     DNAm_Full_Matrix(R_files)
     Estimate_cell_counts(R_files)    
-    DNA_Methylation_Scores(fR_files)
+    DNA_Methylation_Scores(R_files)
      	Channel.empty()
 	     .mix( Alignment.out.alignment_report )
              .mix( Deduplication.out.dedup_report )
