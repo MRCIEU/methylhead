@@ -1,6 +1,5 @@
 process DNA_Methylation_Scores {
 
-
     input:
    
     path R_files , from: 'R_files/*'
