@@ -40,7 +40,7 @@ workflow Bismark_pipeline {
 	 .collect()
 	 .set{ R_files }     
     Methylation_Matrix(R_files)
-     DNAm_Full_Matrix(R_files)
+    DNAm_Full_Matrix(R_files)
          full_matrix=DNAm_Full_Matrix.out
             full_matrix2=full_matrix.collectFile(name:"*.csv", newLine: true)
      Estimate_cell_counts(full_matrix2)    
