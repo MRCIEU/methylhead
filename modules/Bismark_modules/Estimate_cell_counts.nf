@@ -13,6 +13,6 @@ process Estimate_cell_counts {
     shell:
     """  
     mkdir -p ${params.outdir}/Estimate_cell_count
-    Rscript ${baseDir}/bin/Estimate_cell_counts.R ${params.pipeline} ${baseDir}/data ${params.outdir}/Methylation_CpG_only ${params.outdir}/Estimate_cell_count
+    Rscript ${baseDir}/bin/Estimate_cell_counts.R ${params.pipeline} ${baseDir}/data ${params.outdir}/Methylation ${params.outdir}/Estimate_cell_count
      """
 }
