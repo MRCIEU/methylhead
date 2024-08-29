@@ -41,12 +41,8 @@ workflow Bismark_pipeline {
 	 .set{ R_files }     
     Methylation_Matrix(R_files)
     DNAm_Full_Matrix(R_files)
-         full_matrix=DNAm_Full_Matrix.out
-            full_matrix2=full_matrix.collectFile(name:"*.csv", newLine: true)
-     Estimate_cell_counts(full_matrix2)    
-     Meth_Matrix = Methylation_Matrix.out.meth_matrix
-        files_ch2 = Meth_Matrix.collectFile(name:"*.csv", newLine: true)
-     DNA_Methylation_Scores(files_ch2)
+    Estimate_cell_counts(R_files)    
+    DNA_Methylation_Scores(fR_files)
      	Channel.empty()
 	     .mix( Alignment.out.alignment_report )
              .mix( Deduplication.out.dedup_report )
