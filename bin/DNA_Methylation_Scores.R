@@ -134,7 +134,7 @@ smoking_scores <- bismark_scores[bismark_scores$Models %in% c("langdon-agnostic-
 
 smoking_scores<-smoking_scores[!names(smoking_scores)%in%"Models"]
 bismark_scores<-bismark_scores[!names(bismark_scores)%in%"Models"]
-write.csv(bismark_scores,file = paste0(output_dir,"/Bismark_scores.csv"))   
+write.csv(bismark_scores,file = paste0(output_dir,"/DNA_Methylation_Scores.csv"))   
 write.csv(smoking_scores,file = paste0(output_dir,"/Bismark_smoking_scores.csv"))
            
 } else if (pipeline == "picard") {
@@ -179,7 +179,7 @@ smoking_scores <- picard_scores[picard_scores$Models %in% c("langdon-agnostic-cu
 smoking_scores<-smoking_scores[!names(smoking_scores)%in%"Models"]
 picard_scores<-picard_scores[!names(picard_scores)%in%"Models"]
 
-write.csv(picard_scores,file = paste0(output_dir,"/Picard_scores.csv"))   
+write.csv(picard_scores,file = paste0(output_dir,"/DNA_Methylation_Scores.csv"))   
 write.csv(smoking_scores,file = paste0(output_dir,"/Picard_smoking_scores.csv"))
 }
            
