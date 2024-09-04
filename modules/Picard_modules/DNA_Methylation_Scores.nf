@@ -7,7 +7,7 @@ process DNA_Methylation_Scores {
     publishDir "${params.outdir}/DNA_Methylation_Scores/", mode: 'copy' , pattern: '*.csv'
       
     output:
-    path ("Picard_scores.csv"), emit : Picard_scores ,optional: true
+    path ("DNA_Methylation_Scores.csv"), emit : Picard_scores ,optional: true
     path ("Picard_smoking_scores.csv"), emit : Picard_smoking_scores, optional: true
  
     shell:
