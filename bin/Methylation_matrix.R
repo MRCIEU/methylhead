@@ -65,8 +65,9 @@ process_methylation_data <- function(file.vector, sample.ids, pipeline) {
   }  
   meth_df <- cbind(meth_df, pm)
   merged_data <- merge(meth_df, ann450k, by = c("loc"))
+  colnames(merged_data)[colnames(merged_data) == "chr.x"] <- "chr"
   sample.ids2 <- unlist(sample.ids)
-  mm <- merged_data[c("Name","start","end","chr.x",sample.ids2)]
+  mm <- merged_data[c("Name","start","end","chr",sample.ids2)]
   methylation <- na.omit(mm)
   colnames(methylation)[1] <- "CpGs"
   return(list(methylation = methylation, meth = meth))
