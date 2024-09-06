@@ -51,7 +51,7 @@ process_methylation_data <- function(file.vector, sample.ids, pipeline) {
                                  hi.count = NULL,
                                  hi.perc = 99.9)
   
-  meth <- unite(myobj.filt, destrand = TRUE)
+  meth <- unite(myobj.filt, destrand = FALSE, min.per.group = 1L)
   pm <- percMethylation(meth)
   pm <- pm / 100
   meth_df <- data.frame(meth)
@@ -80,7 +80,11 @@ if (pipeline == "bismark") {
   sample.ids <- as.list(sample.ids)
 } else if (pipeline == "picard") {
   file.vector <- list.files(pattern = "\\.markdup_CpG\\.methylKit", full.names = FALSE)
-  file.vector <- file.vector[!grepl("ctrl", file.vector)]
+  file.vector <- file.vector[!grepl("control", file.vector)]
+  file.vector <- file.vector[sapply(file.vector, function(f) {
+  file.size <- file.info(f)$size
+  file.size >= 100 * 1024
+  })]
   sample.ids <- gsub(".markdup_CpG.methylKit", "", basename(file.vector))
   sample.ids <- as.list(sample.ids)
 } else {
