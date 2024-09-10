@@ -8,12 +8,11 @@ process DNAm_Full_Matrix {
 
     output: 
     
-    path ("DNAm_Full_Matrix.csv") , emit: DNAm_Full_Matrix , optional:true 
+    path ("DNAm_Full_Matrix.csv") , emit: DNAm_Full_Matrix
     
     shell:
     """
-    mkdir -p ${params.outdir}/DNAm_Full_Matrix
-    Rscript ${baseDir}/bin/Full_DNAm_Matrix.R ${params.pipeline} ${params.outdir}/Methylation ${params.outdir}/DNAm_Full_Matrix
+    Rscript ${baseDir}/bin/Full_DNAm_Matrix.R ${params.pipeline} ${params.outdir}/Methylation ./
     """
 }
 
