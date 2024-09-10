@@ -8,7 +8,7 @@ process Estimate_cell_counts {
    
     output:
    
-    path ("estimate_cell_counts.csv"), optional: true
+    path ("estimate_cell_counts.csv") , emit: estimate_cell_counts
       
     shell:
     """  
