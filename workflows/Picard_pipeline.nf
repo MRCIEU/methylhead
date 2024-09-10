@@ -55,8 +55,8 @@ workflow Picard_pipeline {
          .mix (  MethylKit.out.methylKit_CpG )
          .map { sample_id, files -> files }
 	       .collect()
-	       .set{ R_files }         
-    DNAm_Full_Matrix(R_files) 
+	       .set{ sample_meth_files }         
+    DNAm_Full_Matrix(sample_meth_files) 
         full_matrix = DNAm_Full_Matrix.out.DNAm_Full_Matrix     
     Methylation_Matrix(full_matrix)   
     Estimate_cell_counts(full_matrix) 
