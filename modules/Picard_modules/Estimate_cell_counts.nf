@@ -17,6 +17,6 @@ process Estimate_cell_counts {
     	    ${params.pipeline} \
 	    ${baseDir}/data/blood_cell_types_extended.zip \
 	    ${full_matrix} \
-	    ${params.outdir}/Estimate_cell_count/estimate_cell_counts.csv
+	    estimate_cell_counts.csv
     """
 }
