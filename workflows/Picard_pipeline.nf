@@ -56,10 +56,11 @@ workflow Picard_pipeline {
          .map { sample_id, files -> files }
 	       .collect()
 	       .set{ R_files }         
-    DNAm_Full_Matrix(R_files)      
-    Methylation_Matrix(R_files)   
-    Estimate_cell_counts(R_files) 
-    DNA_Methylation_Scores(R_files)      
+    DNAm_Full_Matrix(R_files) 
+        full_matrix = DNAm_Full_Matrix.out.DNAm_Full_Matrix     
+    Methylation_Matrix(full_matrix)   
+    Estimate_cell_counts(full_matrix) 
+    DNA_Methylation_Scores(full_matrix)      
     Channel.empty()
           .mix( Fastqc.out )             
           .mix( Trim_galore.out )        
