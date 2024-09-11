@@ -11,12 +11,7 @@ process Estimate_cell_counts {
     path ("estimate_cell_counts.csv") , emit: estimate_cell_counts
       
     shell:
-    """  
-    mkdir -p ${params.outdir}/Estimate_cell_count  
-    Rscript ${baseDir}/bin/Estimate_cell_counts.R \
-    	    ${params.pipeline} \
-	    ${baseDir}/data/blood_cell_types_extended.zip \
-	    ${full_matrix} \
-	    estimate_cell_counts.csv
+    """   
+    Rscript ${baseDir}/bin/Estimate_cell_counts.R ${baseDir}/data/blood_cell_types_extended.zip ${full_matrix} estimate_cell_counts.csv
     """
 }

@@ -2,9 +2,9 @@ process DNAm_Full_Matrix {
 
     input:
     
-    path sample_meth_files, from: 'sample_meth_files/*'
+    path files
 
-    publishDir "${params.outdir}/DNAm_Full_Matrix", mode: 'copy', pattern: '*.csv' 
+    publishDir "${params.outdir}/DNAm_Full_Matrix", mode: 'copy'
 
     output: 
     
@@ -12,7 +12,9 @@ process DNAm_Full_Matrix {
     
     shell:
     """
-    Rscript ${baseDir}/bin/Full_DNAm_Matrix.R ${params.pipeline} ${sample_meth_files} ./
+    Rscript ${baseDir}/bin/Full_DNAm_Matrix.R ${params.pipeline} ${params.outdir}/Methylation/ DNAm_Full_Matrix.csv
     """
 }
+
+
 

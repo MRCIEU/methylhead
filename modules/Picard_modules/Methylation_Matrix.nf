@@ -3,19 +3,19 @@ process Methylation_Matrix {
     
     input:
     
-    path R_files , from: 'R_files/*'         
+    path full_matrix         
 
-    publishDir "${params.outdir}/Methylation_Matrix/", mode: 'move' , pattern: '*.csv' , saveAs: {  Methylation_matrix.csv } 
+    publishDir "${params.outdir}/Methylation_Matrix/" , mode: 'copy' , pattern: '*.csv'
    
 
     output:
-    path 'Methylation_matrix.csv', emit: meth_matrix  , optional: true   
+    path 'Methylation_matrix.csv', emit: meth_matrix    
     
     shell:   
     """
-    mkdir -p ${params.outdir}/Methylation_Matrix
-    Rscript ${baseDir}/bin/Methylation_matrix.R ${params.pipeline} ${params.outdir}/Methylation  ${params.outdir}/Methylation_Matrix
+    Rscript ${baseDir}/bin/Methylation_matrix.R ${full_matrix} Methylation_matrix.csv
     """
 }
+
 
 
