@@ -7,10 +7,9 @@ library(parallel)
 options(mc.cores = 24)
 
 args <- commandArgs(trailingOnly = TRUE)
-pipeline <- args[1] ## pipeline=bismark/picard
-blood_file <- args[2] ## blood cell type reference data file
-meth_file <- args[3] ## DNA methylation file
-output_file <- args[4] ## cell count estimates output file
+blood_file <- args[1] ## blood cell type reference data file
+meth_file <- args[2] ## DNA methylation file
+output_file <- args[3] ## cell count estimates output file
 
 meth_df <- data.frame(fread(meth_file))
    
