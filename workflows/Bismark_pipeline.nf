@@ -18,10 +18,8 @@ workflow Bismark_pipeline {
     outdir 
     
     main:
-     Fatqc_Files = Channel.fromFilePairs(params.reads, checkIfExists: true)    
-         t_param=params.t_param
-         memory_param=params.memory_param
-     Fastqc(Fatqc_Files,t_param,memory_param)
+      Fatqc_Files = Channel.fromFilePairs(params.reads, checkIfExists: true)    
+      Fastqc(Fatqc_Files)
          cores=params.cores
      Trim_galore(Fatqc_Files,cores)
          trim_ch=Trim_galore.out.fq         
@@ -33,16 +31,16 @@ workflow Bismark_pipeline {
      Deduplication(ch_bam) 
          dedup_bam=Deduplication.out.dedup_bam
      Methylation_extraction(dedup_bam)
-     coverage= Methylation_extraction.out.coverage               
-       Channel.empty()
-         .mix( Methylation_extraction.out )
-         .map { sample_id, files -> files }
-	 .collect()
-	 .set{ R_files }     
-    Methylation_Matrix(R_files)
-    DNAm_Full_Matrix(R_files)
-    Estimate_cell_counts(R_files)    
-    DNA_Methylation_Scores(R_files)
+        Channel.empty()
+        .mix (Methylation_extraction.out.coverage) 
+        .map { sample_id, files -> files }                      
+        .collect()                                  
+        .set { files }
+    DNAm_Full_Matrix(files)
+       full_matrix=DNAm_Full_Matrix.out
+    Methylation_Matrix(full_matrix)   
+    Estimate_cell_counts(full_matrix) 
+    DNA_Methylation_Scores(full_matrix)   
      	Channel.empty()
 	     .mix( Alignment.out.alignment_report )
              .mix( Deduplication.out.dedup_report )
