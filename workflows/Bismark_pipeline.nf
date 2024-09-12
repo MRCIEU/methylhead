@@ -31,16 +31,14 @@ workflow Bismark_pipeline {
      Deduplication(ch_bam) 
          dedup_bam=Deduplication.out.dedup_bam
      Methylation_extraction(dedup_bam)
-        Channel.empty()
-        .mix (Methylation_extraction.out.coverage) 
-        .map { sample_id, files -> files }                      
-        .collect()                                  
-        .set { files }
-    DNAm_Full_Matrix(files)
+       files_ch= Methylation_extraction.out.coverage
+       .map { file -> file.toString() }
+       .collectFile(name:"files.csv",newLine:true)
+     DNAm_Full_Matrix(files_ch) 
        full_matrix=DNAm_Full_Matrix.out
-    Methylation_Matrix(full_matrix)   
-    Estimate_cell_counts(full_matrix) 
-    DNA_Methylation_Scores(full_matrix)   
+     Methylation_Matrix(full_matrix)   
+     Estimate_cell_counts(full_matrix) 
+     DNA_Methylation_Scores(full_matrix)   
      	Channel.empty()
 	     .mix( Alignment.out.alignment_report )
              .mix( Deduplication.out.dedup_report )
