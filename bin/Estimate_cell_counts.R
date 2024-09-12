@@ -1,10 +1,7 @@
 #!/usr/bin/env Rscript
 
-library(methylKit)
 library(dplyr)
 library(data.table)
-library(parallel)
-options(mc.cores = 24)
 
 args <- commandArgs(trailingOnly = TRUE)
 blood_file <- args[1] ## blood cell type reference data file
