@@ -1,22 +1,10 @@
 #!/usr/bin/env Rscript
 
-library(limma)
 library(IlluminaHumanMethylation450kanno.ilmn12.hg19)
-library(IlluminaHumanMethylation450kmanifest)
-library(RColorBrewer)
-library(stringr)
-library(GenomicRanges)
-library(genomation)
 library(meffonym)
-library(dplyr)
-library(ggplot2)
 library(data.table)
-library(parallel)
-options(mc.cores = 24)
-
 
 args <- commandArgs(trailingOnly = TRUE)
-
 meth_file <- args[1] 
 output_file <- args[2] 
 
@@ -58,6 +46,4 @@ meth_scores_all <- as.data.frame(scores_list)
 rownames(meth_scores_all)<-colnames(meth_score)
 DNA_Methylation_Scores <- data.frame(t(meth_scores_all))
 names(DNA_Methylation_Scores) <- gsub("^X", "", names(DNA_Methylation_Scores))
-write.csv(DNA_Methylation_Scores, file = output_file)
-           
-                              
+write.csv(DNA_Methylation_Scores, file = output_file)                 
