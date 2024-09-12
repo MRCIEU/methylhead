@@ -1,14 +1,7 @@
 #!/usr/bin/R
 
 library(IlluminaHumanMethylation450kanno.ilmn12.hg19)
-library(IlluminaHumanMethylation450kmanifest)
-library(RColorBrewer)
-library(stringr)
-library(GenomicRanges)
-library(genomation)
 library(data.table)
-library(parallel)
-options(mc.cores = 24)
 
 args <- commandArgs(trailingOnly = TRUE)
 meth_file <- args[1]
@@ -24,6 +17,3 @@ methylation <- merged_data[, c("Name", grep("^(chr|start|end|X)", names(merged_d
 Methylation_matrix <- methylation[, names(methylation) != "chr.y"]
 colnames(Methylation_matrix)[1] <- "CpGs"
 write.csv(Methylation_matrix, file = output_file)
-
-
-
