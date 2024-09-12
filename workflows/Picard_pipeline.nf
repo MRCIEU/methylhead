@@ -50,13 +50,12 @@ workflow Picard_pipeline {
     bedGraph2 = bedGraph.out
     Processed_bedGraph(bedGraph2)
     Samtools_stats(myBamSample,sorted_mark)   
-   MethylKit(Mark_duplicated.out.markdup, genome_folder)      
-       Channel.empty()
-        .mix(MethylKit.out.methylKit_CpG) 
-        .map { sample_id, files -> files }                      
-        .collect()                                  
-        .set { files }
-    DNAm_Full_Matrix(files)
+    MethylKit(Mark_duplicated.out.markdup, genome_folder)      
+       MethylKit(Mark_duplicated.out.markdup, genome_folder)        
+       files_ch= MethylKit.out.methylKit_CpG
+       .map { file -> file.toString() }
+       .collectFile(name:"files.csv",newLine:true)
+    DNAm_Full_Matrix(files_ch) 
        full_matrix=DNAm_Full_Matrix.out
     Methylation_Matrix(full_matrix)   
     Estimate_cell_counts(full_matrix) 
