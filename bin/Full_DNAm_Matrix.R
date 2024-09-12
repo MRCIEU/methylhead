@@ -2,15 +2,21 @@
 
 library(methylKit)
 library(dplyr)
-library(data.table)
 
 args <- commandArgs(trailingOnly = TRUE)
 pipeline <- args[1]
-input_dir <- args[2]
+samples <- args[2]
 output_file <- args[3]
 
+file <-read.csv(samples,header=F)
+file<-data.frame(file)
+file_paths <- file$V2
+cleaned_paths <- gsub("\\[|\\]", "", file_paths)
+cleaned_paths <- trimws(cleaned_paths)
+
+
 if (pipeline == "bismark") {
-    file.vector <- list.files(path =  input_dir, pattern = "bismark\\.cov\\.gz", full.names = TRUE)
+    file.vector <- cleaned_paths
     file.vector <- file.vector[!grepl("control", file.vector)]
     sample.ids <- gsub("_bismark_bt2_pe.deduplicated.bismark.cov.gz", "", basename(file.vector))
     file.vector <- file.vector[sapply(file.vector, function(f) {
@@ -27,7 +33,7 @@ if (pipeline == "bismark") {
                       treatment = c(rep(0, length(sample.ids))),
                       mincov = 10)
 } else if (pipeline == "picard") {
-    file.vector <- list.files(path = input_dir, pattern = "\\.markdup_CpG\\.methylKit", full.names = TRUE)
+    file.vector <- cleaned_paths
     file.vector <- file.vector[!grepl("control", file.vector)]
     file.vector <- file.vector[sapply(file.vector, function(f) {
   file.size <- file.info(f)$size
