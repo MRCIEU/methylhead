@@ -1,7 +1,6 @@
 #!/usr/bin/env Rscript
 
 library(methylKit)
-library(dplyr)
 
 args <- commandArgs(trailingOnly = TRUE)
 pipeline <- args[1]
