@@ -41,9 +41,9 @@ workflow Picard_pipeline {
     Mark_duplicated(sorted_ch)
        sorted_mark = Mark_duplicated.out.markdup 
        reference   = params.genome_folder 
-       Interval_file(params.panel,params.genome_folder)
-       params.interval_file = Interval_file.out
-    Collect_HS_Metrics(sorted_mark, params.genome_folder,params.interval_file)
+    Interval_file(params.panel,params.genome_folder)
+       interval_file = Interval_file.out
+    Collect_HS_Metrics(sorted_mark, params.genome_folder,interval_file)
     Collect_MM_Metrics(sorted_mark, reference)
     MethylDackel(sorted_mark ,reference)
     bedGraph(sorted_mark)
