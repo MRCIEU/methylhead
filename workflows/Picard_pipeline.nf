@@ -50,8 +50,7 @@ workflow Picard_pipeline {
     bedGraph2 = bedGraph.out
     Processed_bedGraph(bedGraph2)
     Samtools_stats(myBamSample,sorted_mark)   
-    MethylKit(Mark_duplicated.out.markdup, genome_folder)      
-       MethylKit(Mark_duplicated.out.markdup, genome_folder)        
+    MethylKit(Mark_duplicated.out.markdup, genome_folder)              
        files_ch= MethylKit.out.methylKit_CpG
        .map { file -> file.toString() }
        .collectFile(name:"files.csv",newLine:true)
