@@ -3,7 +3,7 @@ process Collect_HS_Metrics {
     input:
     tuple val(sample_id), path(sorted_mark)
     path params.genome_folder
-    path params.interval_file
+    path interval_file
     
     
     output:
@@ -18,8 +18,8 @@ process Collect_HS_Metrics {
     I=${sorted_mark} \
     O=${sample_id}_coverage_metrics.txt \
     R=${params.genome_folder} \
-    BAIT_INTERVALS=${params.interval_file} \
-    TARGET_INTERVALS=${params.interval_file} \
+    BAIT_INTERVALS=${interval_file} \
+    TARGET_INTERVALS=${interval_file} \
     MINIMUM_MAPPING_QUALITY=20 \
     COVERAGE_CAP=1000 \
     PER_TARGET_COVERAGE=${sample_id}_coverage \
