@@ -9,7 +9,7 @@ process CAMDA {
      output:
      
      tuple val(sample_id), path("${sample_id}_CpG_MethRatio.tsv")    , emit: MethRatio
-     tuple val(sample_id), path("${sample_id}_CpG_CAMDA.tsv")        , emit: CAMDA
+     tuple val(sample_id), path("${sample_id}_CpG_CAMDA.tsv")        , emit: camda
      tuple val(sample_id), path("${sample_id}_CpG_MethRatio.wig")    , emit: MethRatio_wig
      tuple val(sample_id), path("${sample_id}_CpG_CAMDA.wig")        , emit: CAMDA_wig
 
