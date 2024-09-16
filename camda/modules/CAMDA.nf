@@ -4,7 +4,7 @@ process CAMDA {
      input:
      tuple val(sample_id), path(bam)
      
-     publishDir "${params.outdir}/CAMDA/" , mode: 'copy'
+     publishDir "${params.outdir}/CAMDA" , mode: 'copy'
      
      output:
      
@@ -16,7 +16,6 @@ process CAMDA {
      
      shell:
      """ 
-    mkdir -p ${baseDir}/${params.outdir}/CAMDA/     
     python ${workflow.projectDir}/scripts/CAMDA.py CAMDA ${bam} ${params.genome_folder} -o ${sample_id} -w ${sample_id} -s ${params.samtools_path} -X CG
      """
 }
