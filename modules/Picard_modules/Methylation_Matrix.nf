@@ -5,7 +5,7 @@ process Illumina_Matrix {
     
     path full_matrix         
 
-    publishDir "${params.outdir}/Methylation_Matrix/" , mode: 'copy' , pattern: '*.csv'
+    publishDir "${params.outdir}/Illumina_Matrix/" , mode: 'copy' , pattern: '*.csv'
    
 
     output:
