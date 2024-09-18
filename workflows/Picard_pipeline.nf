@@ -16,7 +16,7 @@ include { Processed_bedGraph } from '../modules/Picard_modules/Processed_bedGrap
 include { Samtools_stats } from '../modules/Picard_modules/Samtools_stats'
 include { DNAm_Matrix } from '../modules/Picard_modules/DNAm_Matrix'
 include { Multiqc } from '../modules/Picard_modules/Multiqc'
-include { Illumina_Matrix } from '../modules/Picard_modules/Methylation_Matrix'
+include { Illumina_Matrix } from '../modules/Picard_modules/Illumina_Matrix'
 include { Estimate_cell_counts } from '../modules/Picard_modules/Estimate_cell_counts'
 include { DNA_Methylation_Scores } from '../modules/Picard_modules/DNA_Methylation_Scores'
 
