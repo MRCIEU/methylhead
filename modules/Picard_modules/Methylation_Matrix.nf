@@ -1,4 +1,4 @@
-process Methylation_Matrix {
+process Illumina_Matrix {
       
     
     input:
@@ -13,7 +13,7 @@ process Methylation_Matrix {
     
     shell:   
     """
-    Rscript ${baseDir}/bin/Methylation_matrix.R ${full_matrix} Methylation_matrix.csv
+    Rscript ${baseDir}/bin/Methylation_matrix.R ${full_matrix} Illumina_matrix.csv
     """
 }
 
