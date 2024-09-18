@@ -54,8 +54,8 @@ workflow Picard_pipeline {
       files_ch= MethylKit.out.methylKit_CpG
           .map { file -> file.toString() }
           .collectFile(name:"files.csv",newLine:true)
-    DNAm_Full_Matrix(files_ch) 
-      full_matrix=DNAm_Full_Matrix.out.meth_matrix
+    DNAm_Matrix(files_ch) 
+      full_matrix=DNAm_Matrix.out.meth_matrix
     Illumina_Matrix(full_matrix)   
     Estimate_cell_counts(full_matrix) 
     DNA_Methylation_Scores(full_matrix)      
