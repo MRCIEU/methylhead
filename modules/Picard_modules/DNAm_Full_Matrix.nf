@@ -3,7 +3,7 @@ process DNAm_Full_Matrix {
     input:
     path(files)
 
-    publishDir "${params.outdir}/DNAm_Full_Matrix", mode: 'copy'
+    publishDir "${params.outdir}/DNAm_Matrix", mode: 'copy'
 
     output:
 
