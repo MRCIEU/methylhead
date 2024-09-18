@@ -16,7 +16,7 @@ include { Processed_bedGraph } from '../modules/Picard_modules/Processed_bedGrap
 include { Samtools_stats } from '../modules/Picard_modules/Samtools_stats'
 include { DNAm_Full_Matrix } from '../modules/Picard_modules/DNAm_Full_Matrix'
 include { Multiqc } from '../modules/Picard_modules/Multiqc'
-include { Methylation_Matrix } from '../modules/Picard_modules/Methylation_Matrix'
+include { Illumina_Matrix } from '../modules/Picard_modules/Methylation_Matrix'
 include { Estimate_cell_counts } from '../modules/Picard_modules/Estimate_cell_counts'
 include { DNA_Methylation_Scores } from '../modules/Picard_modules/DNA_Methylation_Scores'
 
@@ -56,7 +56,7 @@ workflow Picard_pipeline {
           .collectFile(name:"files.csv",newLine:true)
     DNAm_Full_Matrix(files_ch) 
       full_matrix=DNAm_Full_Matrix.out.meth_matrix
-    Methylation_Matrix(full_matrix)   
+    Illumina_Matrix(full_matrix)   
     Estimate_cell_counts(full_matrix) 
     DNA_Methylation_Scores(full_matrix)      
       Channel.empty()
