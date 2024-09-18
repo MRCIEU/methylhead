@@ -6,6 +6,7 @@ args <- commandArgs(trailingOnly = TRUE)
 pipeline <- args[1]
 samples <- args[2]
 output_file <- args[3]
+output_file2 <- args[4]
 
 file <-read.csv(samples,header=F)
 file<-data.frame(file)
@@ -60,5 +61,10 @@ pm <- percMethylation(meth)
 pm <- pm / 100
 meth_df <- data.frame(meth)
 meth_df <- cbind(meth_df, pm)
-DNAm_Full_Matrix <- meth_df
-write.csv(DNAm_Full_Matrix, file = output_file, row.names = FALSE)
+coverage_matrix <- meth_df[, grep("^(chr|start|end|coverage)", colnames(meth_df), value = TRUE)]
+sample.ids <- grep("^(coverage|numCs|numTs|strand)", colnames(meth_df), invert = TRUE, value = TRUE)
+coverage_matrix <-setNames(coverage_matrix, sample.ids)
+columns_to_remove <- grep("^(coverage|numCs|numTs|strand)", colnames(meth_df), value = TRUE)
+Metyhlation_matrix <- meth_df[, setdiff(colnames(meth_df), columns_to_remove)]
+write.csv(coverage_matrix,file = output_file2,row.names = FALSE)
+write.csv(Metyhlation_matrix, file = output_file, row.names = FALSE)
