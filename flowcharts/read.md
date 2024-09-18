@@ -74,12 +74,12 @@ This file contains flowcharts to visualize and understand the workflow of both t
 **Input**: bam files  
 **Output**: methylKit files  
 
-### Methylation Matrix
-**Description**: Creating a matrix of methylation values for each sample.  
+### Illumina (Methylation) Matrix
+**Description**: Creating a matrix of methylation values for each sample and CpGs sites. 
 **Input**: methylKit files  
 **Output**: csv and pdf files  
 
-### DNAm Full Matrix
+### DNAm Matrix
 **Description**: Generating a comprehensive DNA methylation matrix.  
 **Input**: methylKit files  
 **Output**: csv files  
