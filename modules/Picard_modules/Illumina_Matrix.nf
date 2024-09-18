@@ -9,7 +9,7 @@ process Illumina_Matrix {
    
 
     output:
-    path 'Methylation_matrix.csv', emit: meth_matrix    
+    path 'Illumina_matrix.csv', emit: Illumina_matrix    
     
     shell:   
     """
