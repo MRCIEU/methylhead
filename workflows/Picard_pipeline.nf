@@ -55,7 +55,7 @@ workflow Picard_pipeline {
           .map { file -> file.toString() }
           .collectFile(name:"files.csv",newLine:true)
     DNAm_Full_Matrix(files_ch) 
-      full_matrix=DNAm_Full_Matrix.out
+      full_matrix=DNAm_Full_Matrix.out.meth_matrix
     Methylation_Matrix(full_matrix)   
     Estimate_cell_counts(full_matrix) 
     DNA_Methylation_Scores(full_matrix)      
