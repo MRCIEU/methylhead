@@ -14,6 +14,6 @@ meth_df$loc <- paste(meth_df$chr, meth_df$end)
 merged_data <- merge(meth_df, ann450k, by = c("loc"))
 colnames(merged_data)[colnames(merged_data) == "chr.x"] <- "chr"
 methylation <- merged_data[, c("Name", grep("^(chr|start|end|X)", names(merged_data), value = TRUE))]
-Methylation_matrix <- methylation[, names(methylation) != "chr.y"]
-colnames(Methylation_matrix)[1] <- "CpGs"
-write.csv(Methylation_matrix, file = output_file)
+Illumina_matrix <- methylation[, names(methylation) != "chr.y"]
+colnames(Illumina_matrix)[1] <- "CpGs"
+write.csv(Illumina_matrix, file = output_file)
