@@ -1,4 +1,4 @@
-process DNAm_Full_Matrix {
+process DNAm_Matrix {
    
     input:
     path(files)
