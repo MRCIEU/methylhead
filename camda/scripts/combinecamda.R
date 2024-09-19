@@ -17,7 +17,7 @@ for (file in file_list) {
 sample_id <- gsub("_CpG_CAMDA.tsv", "", basename(file))
  data <- read.delim(file, header = TRUE) 
       data <- data %>%
-        filter((CI_upper - CI_lower) <  0.40) 
+        filter((CI_upper - CI_lower) <  0.3343) 
   methylkit_data <- data %>%
     mutate(
       chrBase = paste0(chr, ".", pos),
