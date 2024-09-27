@@ -5,6 +5,7 @@ include { Trim_galore } from '../modules/Bismark_modules/Trim_galore'
 include { Alignment } from '../modules/Bismark_modules/Alignment'
 include { Deduplication } from '../modules/Bismark_modules/Deduplication'
 include { Methylation_extraction } from '../modules/Bismark_modules/Methylation_extraction'
+include { Concordance } from '../modules/Bismark_modules/Concordance'
 include { BSmap_Aligment } from '../modules/Bismark_modules/BSmap_Aligment'
 include { CAMDA } from '../modules/Bismark_modules/CAMDA'
 include { DNAm_Matrix } from '../modules/Bismark_modules/DNAm_Matrix'
@@ -13,6 +14,7 @@ include { Estimate_cell_counts } from '../modules/Bismark_modules/Estimate_cell_
 include { DNA_Methylation_Scores } from '../modules/Bismark_modules/DNA_Methylation_Scores'
 include { Camda_matrix } from '../modules/Bismark_modules/Camda_matrix'
 include { Reports } from '../modules/Bismark_modules/Reports'
+include { Nucleotide_coverage_report } from '../modules/Bismark_modules/Nucleotide_coverage_report'
 include { Multiqc } from '../modules/Bismark_modules/Multiqc'
 
 workflow Bismark_pipeline {
@@ -21,11 +23,12 @@ workflow Bismark_pipeline {
     outdir 
     
     main:
+    
      read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)
      clean_files_ch = read_pairs_ch.filter { sample_id, reads -> 
         def fileSize = reads.collect { it.size() / (1024 * 1024) } 
         fileSize[0] >= 100 && fileSize[1] >= 100  }
-     Fastqc(clean_files_ch)
+     Fastqc(clean_files_ch) 
          cores=params.cores
      Trim_galore(clean_files_ch,cores)
          trim_ch=Trim_galore.out.fq         
@@ -37,6 +40,7 @@ workflow Bismark_pipeline {
      Deduplication(ch_bam) 
          dedup_bam=Deduplication.out.dedup_bam
      Methylation_extraction(dedup_bam)
+     Concordance(dedup_bam)
      BSmap_Aligment(trim_ch, genome_folder)
          bam_camda = BSmap_Aligment.out.bam
      CAMDA(bam_camda) 
@@ -70,5 +74,6 @@ workflow Bismark_pipeline {
              .map { sample_id, files -> files }
              .collect()
              .set { multiqc_files }  
+     Nucleotide_coverage_report(dedup_bam)
      Multiqc(multiqc_files)
 }
