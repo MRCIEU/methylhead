@@ -2,23 +2,26 @@
 
 include { Fastqc } from '../modules/Picard_modules/Fastqc'
 include { Trim_galore } from '../modules/Picard_modules/Trim_galore'
+include { Interval_file } from '../modules/Picard_modules/Interval_file'
 include { Alignment } from '../modules/Picard_modules/Alignment'
 include { Sambamba } from '../modules/Picard_modules/Sambamba' 
 include { Sorted_Bam_Files } from '../modules/Picard_modules/Sorted_Bam_Files' 
 include { Mark_duplicated } from '../modules/Picard_modules/Mark_duplicated' 
-include { Interval_file } from '../modules/Picard_modules/Interval_file'
 include { Collect_HS_Metrics } from '../modules/Picard_modules/Collect_HS_Metrics' 
 include { Collect_MM_Metrics } from '../modules/Picard_modules/Collect_MM_Metrics' 
 include { MethylDackel } from '../modules/Picard_modules/MethylDackel'
 include { bedGraph } from '../modules/Picard_modules/bedGraph'
-include { MethylKit } from '../modules/Picard_modules/MethylKit'
 include { Processed_bedGraph } from '../modules/Picard_modules/Processed_bedGraph'
 include { Samtools_stats } from '../modules/Picard_modules/Samtools_stats'
+include { MethylKit } from '../modules/Picard_modules/MethylKit'
+include { BSmap_Aligment } from '../modules/Picard_modules/BSmap_Aligment'
+include { CAMDA } from '../modules/Picard_modules/CAMDA'
 include { DNAm_Matrix } from '../modules/Picard_modules/DNAm_Matrix'
-include { Multiqc } from '../modules/Picard_modules/Multiqc'
 include { Illumina_Matrix } from '../modules/Picard_modules/Illumina_Matrix'
 include { Estimate_cell_counts } from '../modules/Picard_modules/Estimate_cell_counts'
 include { DNA_Methylation_Scores } from '../modules/Picard_modules/DNA_Methylation_Scores'
+include { Camda_matrix } from '../modules/Picard_modules/Camda_matrix'
+include { Multiqc } from '../modules/Picard_modules/Multiqc'
 
 workflow Picard_pipeline {
 
@@ -30,7 +33,8 @@ workflow Picard_pipeline {
     
     read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)
     Fastqc(read_pairs_ch)
-    Trim_galore(read_pairs_ch)   
+    Trim_galore(read_pairs_ch)  
+    Interval_file(params.panel,params.genome_folder) 
        genome_folder=params.genome_folder
     Alignment(Trim_galore.out.fq, genome_folder)
        myBamSample = Alignment.out.bam
@@ -40,8 +44,7 @@ workflow Picard_pipeline {
        sorted_ch = Sorted_Bam_Files.out.sorted_bam
     Mark_duplicated(sorted_ch)
        sorted_mark = Mark_duplicated.out.markdup 
-       reference   = params.genome_folder 
-    Interval_file(params.panel,params.genome_folder)
+       reference   = params.genome_folder   
        interval_file = Interval_file.out
     Collect_HS_Metrics(sorted_mark, params.genome_folder,interval_file)
     Collect_MM_Metrics(sorted_mark, reference)
@@ -50,16 +53,23 @@ workflow Picard_pipeline {
     bedGraph2 = bedGraph.out
     Processed_bedGraph(bedGraph2)
     Samtools_stats(myBamSample,sorted_mark)   
-    MethylKit(Mark_duplicated.out.markdup, genome_folder)              
-      files_ch= MethylKit.out.methylKit_CpG
+    MethylKit(Mark_duplicated.out.markdup, genome_folder)
+    BSmap_Aligment(Trim_galore.out.fq, genome_folder) 
+       bam_camda = BSmap_Aligment.out.bam  
+    CAMDA(bam_camda)              
+       files_ch= MethylKit.out.methylKit_CpG
           .map { file -> file.toString() }
           .collectFile(name:"files.csv",newLine:true)
     DNAm_Matrix(files_ch) 
-      full_matrix=DNAm_Matrix.out.meth_matrix
+       full_matrix=DNAm_Matrix.out.meth_matrix
     Illumina_Matrix(full_matrix)   
     Estimate_cell_counts(full_matrix) 
-    DNA_Methylation_Scores(full_matrix)      
-      Channel.empty()
+    DNA_Methylation_Scores(full_matrix)                  
+       files_ch= CAMDA.out.camda
+          .map { file -> file.toString() }
+          .collectFile(name:"files.csv",newLine:true)
+    Camda_matrix(files_ch)               
+       Channel.empty()
           .mix( Fastqc.out )             
           .mix( Trim_galore.out )        
           .mix( Mark_duplicated.out )    
