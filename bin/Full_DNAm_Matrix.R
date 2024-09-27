@@ -48,15 +48,14 @@ if (pipeline == "bismark") {
                       assembly = "hg19",
                       treatment = c(rep(0, length(sample.ids))),
                       mincov = 10)
-} else {dos
-    stop("Unknown pipeline")
-}
+} 
 myobj.filt <- filterByCoverage(myobj,
                                lo.count = 10,
                                lo.perc = NULL,
                                hi.count = NULL,
                                hi.perc = 99.9)
-meth <- unite(myobj.filt, destrand = TRUE,min.per.group=as.integer(length(sample.ids)*0.50))
+destrand_value <- if (pipeline == "picard") TRUE else FALSE
+meth <- unite(myobj.filt, destrand = destrand_value,min.per.group=as.integer(length(sample.ids)*0.50))
 pm <- percMethylation(meth)
 pm <- pm / 100
 meth_df <- data.frame(meth)
