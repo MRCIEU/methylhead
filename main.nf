@@ -21,20 +21,20 @@ if (params.pipeline == 'bismark') {
           - Deduplication: Removing PCR duplicates  
           - Methylation_extraction: Extracting methylation information  
           - BSmap_Aligment: Aligning bisulfite sequencing data  
-       3. **Methylation Matrix**  
-          - Methylation_Matrix: Creating methylation matrix  
-       4. **Concordance**  
+       3. **Concordance**  
+          - Concordance score from Bismark tool
           - CAMDA: Processing CAMDA dataset  
-       5. **DNAm Full Matrix**  
+       4. **DNAm Full Matrix**  
           - DNAm_Matrix: Creating full DNA methylation matrix  
           - Illumina_Matrix: Creating Illumina-based matrix  
-       6. **Estimation of cell counts**  
+       5. **Estimation of cell counts**  
           - Estimate_cell_counts: Estimating cell counts using methylation data  
-       7. **DNA Methylation Score**  
+       6. **DNA Methylation Score**  
           - DNA_Methylation_Scores: Generating methylation scores using R  
-       8. **Bismark Reports**  
+       7. **Bismark Reports**  
+          - Nucleotide coverage report from Bismark tool
           - Reports: Generating reports for alignment and methylation steps  
-       9. **MultiQC**  
+       8. **MultiQC**  
           - Multiqc: Aggregating and summarizing results into a final MultiQC report  
     """
 } else if (params.pipeline == 'picard') {
