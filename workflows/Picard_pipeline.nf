@@ -30,7 +30,10 @@ workflow Picard_pipeline {
    outdir 
        
    main:
-    
+   read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)
+   clean_files_ch = read_pairs_ch.filter { sample_id, reads -> 
+        def fileSize = reads.collect { it.size() / (1024 * 1024) } 
+        fileSize[0] >= 100 && fileSize[1] >= 100  }
     read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)
     Fastqc(read_pairs_ch)
     Trim_galore(read_pairs_ch)  
