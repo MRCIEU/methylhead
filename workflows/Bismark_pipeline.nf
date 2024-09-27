@@ -25,7 +25,6 @@ workflow Bismark_pipeline {
      clean_files_ch = read_pairs_ch.filter { sample_id, reads -> 
         def fileSize = reads.collect { it.size() / (1024 * 1024) } 
         fileSize[0] >= 100 && fileSize[1] >= 100  }
-     Fatqc_Files = Channel.fromFilePairs(params.reads, checkIfExists: true)    
      Fastqc(clean_files_ch)
          cores=params.cores
      Trim_galore(clean_files_ch,cores)
