@@ -21,10 +21,14 @@ workflow Bismark_pipeline {
     outdir 
     
     main:
+     read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)
+     clean_files_ch = read_pairs_ch.filter { sample_id, reads -> 
+        def fileSize = reads.collect { it.size() / (1024 * 1024) } 
+        fileSize[0] >= 100 && fileSize[1] >= 100  }
      Fatqc_Files = Channel.fromFilePairs(params.reads, checkIfExists: true)    
-     Fastqc(Fatqc_Files)
+     Fastqc(clean_files_ch)
          cores=params.cores
-     Trim_galore(Fatqc_Files,cores)
+     Trim_galore(clean_files_ch,cores)
          trim_ch=Trim_galore.out.fq         
          u_param= params.u_param 
          multicore= params.multicore
