@@ -64,6 +64,7 @@ workflow Bismark_pipeline {
   	         .map { sample_id, files -> files}
              .collect()
              .set { Report_files }
+     Nucleotide_coverage_report(dedup_bam)
      Reports(Report_files)             
           Channel.empty()
              .mix( Fastqc.out )
@@ -71,9 +72,10 @@ workflow Bismark_pipeline {
              .mix( Alignment.out )
              .mix( Deduplication.out )
              .mix( Methylation_extraction.out ) 
+             .mix( Concordance.out )
+             .mix( Nucleotide_coverage_report.out ) 
              .map { sample_id, files -> files }
              .collect()
-             .set { multiqc_files }  
-     Nucleotide_coverage_report(dedup_bam)
+             .set { multiqc_files }     
      Multiqc(multiqc_files)
 }
