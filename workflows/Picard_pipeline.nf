@@ -33,7 +33,7 @@ workflow Picard_pipeline {
     read_pairs_ch = Channel.fromFilePairs(params.reads, checkIfExists: true)
     clean_files_ch = read_pairs_ch.filter { sample_id, reads -> 
         def fileSize = reads.collect { it.size() / (1024 * 1024) } 
-        fileSize[0] >= 100 && fileSize[1] >= 100  }
+        fileSize[0] >= 0.500 && fileSize[1] >= 0.500 }
     Fastqc(clean_files_ch) 
     Trim_galore(clean_files_ch) 
     Interval_file(params.panel,params.genome_folder) 
