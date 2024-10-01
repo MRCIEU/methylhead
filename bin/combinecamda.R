@@ -20,8 +20,6 @@ ci_list <- list()
 for (file in file_list) {
   sample_id <- gsub("_CpG_CAMDA.tsv", "", basename(file))
   data <- read.delim(file, header = TRUE)
-
-  # CI verilerini olusturuyoruz ve ci_list'e ekliyoruz
   ci_data <- data %>%
     mutate(loc = paste(chr, pos, sep = "_")) %>%
     dplyr::select(loc, CI_lower, CI_upper) %>%
