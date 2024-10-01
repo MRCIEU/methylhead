@@ -53,19 +53,6 @@ nextflow main.nf --pipeline picard \
 -N [The email address for the report is]
 ```
 
-*Camda Pipeline*
-
-```
-SAMTOOLS_DIR=/bin/
-
-nextflow main.nf \
---data $DATA_DIR \ 
---genome_folder $GENOME_INDEX \
---samtools_path $SAMTOOLS_DIR \
--resume \
--N [The email address for the report is]
-```
-
 ## To do
 
 * Genome indexing should be a process that runs only if the genome index needs to be created.
