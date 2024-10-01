@@ -37,8 +37,6 @@ for (file in file_list) {
       loc = paste(chr, pos, sep = "_")
     ) %>%
     dplyr::select(chrBase, chr, pos, strand, coverage, freqC, freqT, loc)  
-
-  # Islenmis dosyayi geçici bir dizine kaydediyoruz
   processed_file <- paste0(tempdir(), "/", sample_id, "_processed.tsv")
   write.table(methylkit_data, processed_file, sep = "\t", row.names = FALSE, quote = FALSE) 
   processed_files <- c(processed_files, processed_file)
