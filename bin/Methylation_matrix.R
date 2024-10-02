@@ -16,4 +16,4 @@ colnames(merged_data)[colnames(merged_data) == "chr.x"] <- "chr"
 methylation <- merged_data[, c("Name", grep("^(chr|start|end|X)", names(merged_data), value = TRUE))]
 Illumina_matrix <- methylation[, names(methylation) != "chr.y"]
 colnames(Illumina_matrix)[1] <- "CpGs"
-write.csv(Illumina_matrix, file = output_file)
+write.csv(Illumina_matrix, file = output_file,row.names=F)
