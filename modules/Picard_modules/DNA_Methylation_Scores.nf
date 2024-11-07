@@ -8,9 +8,10 @@ process DNA_Methylation_Scores {
       
     output:
     path ("DNA_Methylation_Scores.csv"), emit : Picard_scores 
+    path ("DNA_Methylation_Sites.csv"), emit : Picard_scores
  
     shell:
     """
-    Rscript ${baseDir}/bin/DNA_Methylation_Scores.R ${full_matrix}  DNA_Methylation_Scores.csv
+    Rscript ${baseDir}/bin/DNA_Methylation_Scores.R ${full_matrix}  DNA_Methylation_Scores.csv DNA_Methylation_Sites.csv
     """
 }
