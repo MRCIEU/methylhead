@@ -8,7 +8,7 @@ process DNA_Methylation_Scores {
       
     output:
     path ("DNA_Methylation_Scores.csv"), emit : Picard_scores 
-    path ("DNA_Methylation_Sites.csv"), emit : Picard_scores
+    path ("DNA_Methylation_Sites.csv"), emit : Picard_scores_sites
  
     shell:
     """
