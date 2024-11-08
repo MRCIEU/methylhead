@@ -10,7 +10,7 @@ To download the required Docker container for the pipeline:
 
 ```bash
 
-singularity pull docker://onuroztornaci/dnam_cancer_pipeline:latest
+singularity pull docker://onuroztornaci/dnam_cancer_pipeline:081124
 
 ```
 
