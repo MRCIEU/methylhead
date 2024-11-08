@@ -47,10 +47,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install R packages
-RUN Rscript -e 'install.packages("BiocManager", repos="https://cran.rstudio.com/");    BiocManager::install(c("methylKit","IlluminaHumanMethylation450kanno.ilmn12.hg19","IlluminaHumanMethylation450kmanifest"),dependencies=TRUE, ask=FALSE)' && \
-    Rscript -e "install.packages(c('ggplot2', 'remotes', 'dplyr', 'tidyr', 'data.table'), repos='https://cran.rstudio.com/')" && \
+RUN Rscript -e 'install.packages("BiocManager", repos="https://cran.rstudio.com/"); BiocManager::install(c("methylKit","IlluminaHumanMethylation450kanno.ilmn12.hg19"),dependencies=TRUE, ask=FALSE)' && \
+    Rscript -e "install.packages(c('remotes', 'dplyr', 'data.table'), repos='https://cran.rstudio.com/')" && \
     Rscript -e "remotes::install_github('perishky/meffonym')"
-
 # Install FastQC
 RUN wget -q http://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.9.zip && \
     unzip fastqc_v0.11.9.zip && \
@@ -181,6 +180,12 @@ RUN pip3 install cutadapt
 
 # Install MultiQC
 RUN pip3 install multiqc
+
+# Install numpy, pandas, and pysam
+RUN pip3 install numpy
+RUN pip3 install pandas
+RUN pip3 install pysam
+
 
 # Install Nextflow
 RUN wget -O /usr/local/bin/nextflow https://get.nextflow.io && \
