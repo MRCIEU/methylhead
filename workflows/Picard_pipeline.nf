@@ -102,7 +102,7 @@ workflow Picard_pipeline {
             .map { file -> file.toAbsolutePath().toString() }
             .collectFile(name: "qc_files.csv", newLine: true)
     QC_Report(qc_files_ch)
-   Association_test(qc_files_ch,params.phenotype, params.models)
+    Association_test(qc_files_ch,params.phenotype, params.models)
 }
 
 
