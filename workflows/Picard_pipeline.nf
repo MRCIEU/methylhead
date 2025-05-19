@@ -22,6 +22,9 @@ include { Estimate_cell_counts } from '../modules/Picard_modules/Estimate_cell_c
 include { DNA_Methylation_Scores } from '../modules/Picard_modules/DNA_Methylation_Scores'
 include { Camda_matrix } from '../modules/Picard_modules/Camda_matrix'
 include { Multiqc } from '../modules/Picard_modules/Multiqc'
+include { QC_Report } from '../modules/Picard_modules/QC_Report'
+include { Association_test } from '../modules/Picard_modules/Association_test' 
+ 
 
 workflow Picard_pipeline {
 
@@ -71,7 +74,7 @@ workflow Picard_pipeline {
           .map { file -> file.toString() }
           .collectFile(name:"files.csv",newLine:true)
     Camda_matrix(files_ch)               
-       Channel.empty()
+          Channel.empty()
           .mix( Fastqc.out )             
           .mix( Trim_galore.out )        
           .mix( Mark_duplicated.out )    
@@ -81,5 +84,26 @@ workflow Picard_pipeline {
           .map { sample_id, files -> files }
           .collect()
           .set { multiqc_files }  
-    Multiqc(multiqc_files)      
+    Multiqc(multiqc_files)   
+          reads_ch = Multiqc.out.reads
+          estimate_cell_counts_ch = Estimate_cell_counts.out.estimate_cell_counts
+          coverage_matrix_ch = DNAm_Matrix.out.coverage_matrix
+          methylation_matrix_ch = DNAm_Matrix.out.meth_matrix
+          Illumina_Matrix_ch = Illumina_Matrix.out.Illumina_matrix  
+          camda_ch = Camda_matrix.out.camda_matrix
+          dna_methylation_scores_ch = DNA_Methylation_Scores.out.dna_methylation_scores
+            qc_files_ch = reads_ch
+            .concat(estimate_cell_counts_ch)
+            .concat(coverage_matrix_ch)
+            .concat(methylation_matrix_ch)
+            .concat(Illumina_Matrix_ch)
+            .concat(camda_ch)
+            .concat(dna_methylation_scores_ch)
+            .map { file -> file.toAbsolutePath().toString() }
+            .collectFile(name: "qc_files.csv", newLine: true)
+    QC_Report(qc_files_ch)
+   Association_test(qc_files_ch,params.phenotype, params.models)
 }
+
+
+
