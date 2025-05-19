@@ -1,5 +1,5 @@
-
 process MethylDackel {
+   
     input:
      tuple val(sample_id), path (sorted_mark)
      path reference 

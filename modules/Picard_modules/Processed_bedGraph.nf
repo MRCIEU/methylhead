@@ -1,12 +1,12 @@
 process Processed_bedGraph {
       
     input:
-     tuple val(sample_id), path (bedGraph)
+    tuple val(sample_id), path (bedGraph)
 
     publishDir "${params.outdir}/Processed_bedGraph/", mode: 'copy'
 
     output:
-     tuple val(sample_id), path ("${sample_id}_processed.bedgraph"), emit: Processed_bedGraph
+    tuple val(sample_id), path ("${sample_id}_processed.bedgraph"), emit: Processed_bedGraph
 
     script:
     """

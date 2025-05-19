@@ -1,7 +1,5 @@
 process BSmap_Aligment {
 
-      errorStrategy 'ignore'
-   
       input:
       tuple val(sample_id), path(fq)
       path  genome_folder

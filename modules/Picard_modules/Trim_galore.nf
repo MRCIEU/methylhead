@@ -1,9 +1,7 @@
 process Trim_galore {
   input:
-
+           
     tuple val(sample_id), path(reads)
-
-   
 
     output:
     tuple val(sample_id), path("*_{1,2}.fq.gz") , emit: fq
@@ -12,12 +10,9 @@ process Trim_galore {
 
     publishDir "${params.outdir}/Trimmed/" , mode: 'copy'
 
-
     script:
     def trim_galore_cmd = "trim_galore --paired ${reads[0]} ${reads[1]} --gzip"
     "${trim_galore_cmd}"
-
 }
-
 
 

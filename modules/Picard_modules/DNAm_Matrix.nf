@@ -8,7 +8,7 @@ process DNAm_Matrix {
     output:
 
     path ("Methylation_matrix.csv") , emit: meth_matrix
-    path ("coverage_matrix.csv"), emit: covarage_matrix
+    path ("coverage_matrix.csv")    , emit: coverage_matrix
    
     shell:
     """

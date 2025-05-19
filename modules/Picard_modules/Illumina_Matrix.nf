@@ -1,10 +1,8 @@
 process Illumina_Matrix {
-      
-    
+          
     input:
-    
-    path full_matrix         
 
+    path full_matrix         
     publishDir "${params.outdir}/Illumina_Matrix/" , mode: 'copy' , pattern: '*.csv'
    
 
