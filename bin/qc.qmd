@@ -1,0 +1,380 @@
+---
+title: "DNA Methylation: Bisulfite Sequencing Report"
+author: "."
+date: "`r Sys.Date()`"
+params:
+  dataset: "."      
+  panel_data: NULL      # CSV path when dataset = "panel"
+  file_list: "qc_files.csv"
+format:
+  html:
+    fig-cap-location: bottom
+    df-print: paged
+    fig-width: 10
+    fig-height: 8
+    embed-resources: true
+    toc: true
+    cache: false
+    warning: false
+---
+
+```{r, include=FALSE}
+library(data.table)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(gridExtra)
+library(reshape2)
+library(RColorBrewer)
+
+files_path <- fread(params$file_list, header = FALSE)
+
+label_map <- list(
+  "coverage_matrix.csv"            = "coverage_matrix",
+  "estimate_cell_counts.csv"       = "estimate_cell_count",
+  "Methylation_matrix.csv"         = "full_matrix",
+  "cutadapt_filtered_reads_plot.txt" = "reads"
+)
+
+for (path in files_path$V1) {
+  filename <- basename(path)
+  if (filename %in% names(label_map)) {
+    var_name <- label_map[[filename]]
+    assign(var_name, data.frame(fread(path)), envir = .GlobalEnv)
+  }
+}
+
+reads$Sample <- paste0("X", gsub("-", ".", reads$Sample))
+colnames(reads)[colnames(reads) == "Reads.passing.filters"] <- "Reads"
+reads <- reads %>% mutate(Sample = gsub("_R[12]", "", Sample)) %>% distinct(Sample, .keep_all = TRUE)
+coverage_matrix$loc <- paste(coverage_matrix$chr, coverage_matrix$start)
+coverage_matrix <- coverage_matrix %>% select(-matches("chr|start|end"))
+full_matrix$loc <- paste(full_matrix$chr, full_matrix$start)
+
+rownames(full_matrix) <- full_matrix$loc
+rownames(coverage_matrix) <- coverage_matrix$loc
+rownames(reads) <- reads$Sample
+colnames(estimate_cell_count)[1] <- "cell_type"
+estimate_cell_count <- estimate_cell_count[, c("cell_type", reads$Sample)]
+
+if (params$dataset == "panel") {
+  
+  panel <- data.frame(fread(params$panel_data))
+  panel$chr <- paste0("chr", panel$chr)
+  panel$loc <- paste(panel$chr, panel$start)
+  panel <- merge(panel, full_matrix, by = "loc")
+  panel <- panel %>% select(-matches("source|details|chr|start|end"))
+  panel <- panel[!duplicated(panel$loc), ]
+  rownames(panel) <- panel$loc
+  input.data <- panel[, reads$Sample]
+} else {
+  input.data <- full_matrix[, reads$Sample] 
+}
+
+input.coverage <- coverage_matrix[rownames(input.data), reads$Sample]
+
+rm(coverage_matrix,full_matrix)
+```
+
+## <sup>Methylation Distribution Plot</sup>
+```{r}
+#| echo: false
+#| label: Density Plot of Methylation
+#| code-fold: false
+#| fig-cap: "**Figure 1**: Density Plot of Beadchip Methylation for Samples. This plot shows the distribution of DNA methylation levels across multiple samples from beadchip arrays. The x-axis represents methylation values from 0 (unmethylated) to 1 (fully methylated), while the y-axis shows the density of CpG sites. Each line corresponds to a sample, with color shading indicating overlapping densities. The bimodal pattern, with peaks near 0 and 1, is typical for methylation data, highlighting unmethylated and highly methylated CpG regions. This plot captures methylation variability across samples."
+
+methylation_data_long <- input.data %>%
+  pivot_longer(cols = everything(), names_to = "Sample", values_to = "Methylation")
+
+n_cpg_sites <- nrow(input.data )
+n_samples <- ncol(input.data )
+cat("Number of CpG sites:", n_cpg_sites, "\n")
+cat("Number of samples:", n_samples, "\n")
+
+ggplot(methylation_data_long, aes(x = Methylation, fill = Sample)) +
+  geom_density(alpha = 0.4) + 
+  labs(title = "Density Plot of Beadchip Methylation for Samples", 
+       x = "Methylation", y = "Density") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+## <sup>Estimate cell counts</sup>
+```{r}  
+#| echo: false
+#| code-fold: false
+#| label: Violin Plot
+#| fig-cap: "**Figure 2**: The violin plot displays the distribution of estimated cell counts across cell types. The plot shows data density with labels for Q1, median, and Q3."
+
+getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
+data <- estimate_cell_count %>%
+  pivot_longer(cols = -cell_type, names_to = "Sample", values_to = "Value") %>%
+  rename(CellType = cell_type)
+
+iqr_data <- data %>%
+  group_by(CellType) %>%
+  summarize(
+    Q1 = quantile(Value, 0.25),
+    Median = median(Value),
+    Q3 = quantile(Value, 0.75))
+violin_plot <- ggplot(data, aes(x = CellType, y = Value, fill = CellType)) +
+  geom_violin(alpha = 0.5, position = position_dodge(width = 0.8)) + 
+  scale_fill_manual(values = getPalette(length(unique(data$CellType)))) +  
+  geom_text(data = iqr_data, aes(x = CellType, y = Q3, label = paste0("Q3: ", round(Q3, 2))), 
+            position = position_nudge(x = 0.2), size = 3) + 
+  geom_text(data = iqr_data, aes(x = CellType, y = Median, label = paste0("Median: ", round(Median, 2))), 
+            position = position_nudge(x = 0.2), size = 3) +  
+  geom_text(data = iqr_data, aes(x = CellType, y = Q1, label = paste0("Q1: ", round(Q1, 2))), 
+            position = position_nudge(x = 0.2), size = 3) +  
+  theme_minimal(base_size = 15) +  
+  labs(
+    title = "Violin Plot: Distribution of Cell Types",
+    x = "Cell Type",
+    y = "Value"
+  ) +
+  theme(
+    axis.text.x = element_text(size = 8),
+    axis.text.y = element_text(size = 8),
+    axis.title = element_text(size = 10),
+    plot.title = element_text(size = 12, hjust = 0.5),
+    legend.position = "none"  
+  )
+print(violin_plot)
+```
+```{r}
+#| echo: false 
+#| label: boxplot
+#| code-fold: false
+#| fig-cap: "**Figure 3**: The boxplot displays the distribution of estimated cell counts across cell types. The boxplot highlights the median, interquartile range, and overall data spread."
+
+boxplot_plot <- ggplot(data, aes(x = CellType, y = Value, fill = CellType)) +
+  geom_boxplot(width = 0.1, position = position_dodge(width = 0.8), outlier.shape = NA) + 
+  scale_fill_manual(values = getPalette(length(unique(data$CellType)))) +  
+  theme_minimal(base_size = 15) +  
+  labs(
+    title = "Boxplot: Distribution of Cell Types",
+    x = "Cell Type",
+    y = "Value"
+  ) +
+  theme(
+    axis.text.x = element_text(size = 8),
+    axis.text.y = element_text(size = 8),
+    axis.title = element_text(size = 10),
+    plot.title = element_text(size = 12, hjust = 0.5),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8))
+print(boxplot_plot)
+```
+## <sup>Coverage Distribution</sup>
+```{r}
+#| echo: false
+#| label: Coverage Distribution (density plot)
+#| code-fold: false
+#| fig-cap: "**Figure 4**: Density Plot of Coverage for Samples.This plot illustrates the distribution of coverage, with CpG sites represented along the x-axis. The y-axis shows the density of coverage values. The sharp peak at low coverage values indicates that a large proportion of CpG sites have low coverage."
+
+n_cpg_sites <- nrow(input.coverage)
+n_samples <- ncol(input.coverage)
+coverage_data_long <- input.coverage %>%
+  pivot_longer(cols = everything(),  
+               names_to = "Sample",  
+               values_to = "Coverage")  
+cat("Number of CpG sites:", n_cpg_sites, "\n")
+cat("Number of samples:", n_samples, "\n")
+ggplot(coverage_data_long, aes(x = Coverage, fill = Sample)) +
+  geom_density(alpha = 1) + 
+  labs(title = "Density Plot of Coverage for Samples", 
+       x = "Coverage", 
+       y = "Density") +
+  theme_minimal() +
+  xlim(0, 600) +
+  theme(legend.position = "none")
+
+sample_median_coverage <- coverage_data_long  %>%
+    group_by(Sample) %>%
+    summarize(median_coverage = median(Coverage, na.rm = TRUE)) %>%
+    arrange(desc(median_coverage))
+  long_data_sorted <- coverage_data_long %>%
+    mutate(sample = factor(Sample, levels = sample_median_coverage$Sample))
+```
+```{r}
+#| echo: false
+#| label: Coverage Distribution (Boxplot)
+#| code-fold: false
+#| fig-cap: "**Figure 5**: Boxplot of Coverage for Samples. This plot illustrates the distribution of coverage for each sample, with CpG sites represented along the x-axis and coverage values on the y-axis."
+
+ggplot(long_data_sorted, aes(x = sample, y = Coverage, fill = sample)) +
+    geom_boxplot() +
+    labs(title = "Coverage Distribution (Sorted by Median Coverage)", 
+         x = "Sample", 
+         y = "Coverage") +
+    ylim(0, 600) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 6), 
+          legend.position = "none") +
+    scale_x_discrete(labels = function(x) sub(".*_(S\\d+)", "\\1", x))
+```
+## <sup>PCA for Methylation</sup>
+```{r, include=FALSE}
+#| echo: false
+#| label: PCA Scaled functions
+#| code-fold: false
+#| error: true
+
+impute.matrix <- function(x, margin = 1, fun = function(x) mean(x, na.rm = TRUE)) {
+    if (margin == 2) x <- t(x)
+    idx <- which(is.na(x) | !is.finite(x), arr.ind = TRUE)
+    if (length(idx) > 0) {
+        na.idx <- unique(idx[,"row"])
+        v <- apply(x[na.idx, , drop = FALSE], 1, fun)
+        v[which(is.na(v))] <- fun(v)
+        x[idx] <- v[match(idx[,"row"], na.idx)]
+        stopifnot(all(!is.na(x)))
+    }
+    if (margin == 2) x <- t(x)
+    x
+}
+
+# Function to perform PCA and generate scree plot and scatter plots
+generate_pca_plots <- function(data, scale_data=TRUE, dataset_name = "Scaled Data") { 
+  # Perform PCA
+  pca_result <- prcomp(t(data), scale. = scale_data)
+  
+  # Calculate explained variance
+  eigenvalues <- (pca_result$sdev)^2
+  explained_variance <- eigenvalues / sum(eigenvalues)
+  
+  # Create Scree Plot
+  scree_plot <- ggplot(data = data.frame(PC = 1:length(explained_variance), Variance = explained_variance), 
+                       aes(x = PC, y = Variance)) +
+    geom_bar(stat = "identity", fill = "steelblue") +
+    labs(title = paste("Scree Plot -", dataset_name), x = "Principal Components", y = "Explained Variance") +
+    theme_minimal()
+  
+  # Create PCA scores data frame
+  pca_scores <- as.data.frame(pca_result$x)
+  pca_scores$Sample <- rownames(pca_scores)
+  
+  # Merge with reads data
+  pca_scores <- merge(pca_scores, reads, by.x = "Sample", by.y = "Sample", all.x = TRUE)
+  
+  # Create PCA scatter plots
+  pcs <- list(c("PC1","PC2"),c("PC1","PC3"),c("PC2","PC3"),c("PC3","PC4"))
+  scatter_plots <- lapply(pcs, function(pcs) {
+      ggplot(pca_scores, aes_string(x = pcs[1], y = pcs[2], color = "Reads")) +
+        geom_point() +
+        geom_text(aes(label = sub(".*_(S\\d+)", "\\1", Sample, "")), vjust = -0.5, hjust = 0.5, size = 3) + 
+        theme_minimal() +
+        labs(title = paste("PCA Scatterplot:", pcs[1] , "vs", pcs[2], dataset_name), color = "Reads") +
+        scale_color_gradient(low = "blue", high = "red")
+  })
+  
+  # Return scree plot and scatter plots
+  return(list(scree_plot = scree_plot, scatter_plots = scatter_plots))
+}
+```
+```{r}
+#| echo: false
+#| label: PCA Scaled
+#| code-fold: false
+#| error: true
+
+# Generate plots for Scaled data
+  meth <- impute.matrix(data.frame(input.data), 2)
+  # Generate PCA plots for scaled data
+  scaled_plots <- generate_pca_plots(meth, scale_data = TRUE, dataset_name = "Scaled Data")
+```
+```{r}
+#| echo: false
+#| label: Scree Plot Scaled
+#| error: true
+#| fig-cap: "**Figure 6**: Scree Plot for Scaled Data. This plot shows the proportion of variance explained by the principal components for the scaled data. The first few components explain most of the variance."
+print(scaled_plots$scree_plot)
+```
+```{r}
+#| echo: false
+#| label: Scatter Plot PC1 vs PC2 Scaled
+#| error: true
+#| fig-cap: "**Figure 7**: PCA Scatterplot of PC1 vs PC2 for Scaled Data. Each point represents a sample, color-coded based on the number of reads for the scaled dataset."
+print(scaled_plots$scatter_plots[[1]])
+```
+```{r}
+#| echo: false
+#| label: Scatter Plot PC1 vs PC3 Scaled
+#| error: true
+#| fig-cap: "**Figure 8**: PCA Scatterplot of PC1 vs PC3 for Scaled Data. This plot shows the relationship between PC1 and PC3 for the scaled data."
+print(scaled_plots$scatter_plots[[2]])
+```
+```{r}
+#| echo: false
+#| label: Scatter Plot PC2 vs PC3 Scaled
+#| error: true
+#| fig-cap: "**Figure 9**: PCA Scatterplot of PC2 vs PC3 for Scaled Data. This plot shows the relationship between PC2 and PC3 for the scaled data, with each point color-coded by read count."
+print(scaled_plots$scatter_plots[[3]])
+```
+```{r}
+#| echo: false
+#| label: Scatter Plot PC3 vs PC4 Scaled
+#| error: true
+#| fig-cap: "**Figure 10**: PCA Scatterplot of PC3 vs PC4 for Scaled Data. This plot shows the relationship between PC3 and PC4 for the scaled data, with each point color-coded by read count."
+print(scaled_plots$scatter_plots[[4]])
+```
+## <sup>Correlation for Methylation</sup>
+```{r}
+#| echo: false
+#| label: Correlation for Methylation Raw/Scaled
+#| error: true
+#| code-fold: false
+
+generate_correlation_plots <- function(data) {  
+  # Calculate correlation matrices
+  cor_matrix_no_standardize <- cor(data, use = "pairwise.complete.obs")
+  meth_data_scaled_by_cpg <- t(scale(t(data)))  # Standardize CpG sites row-wise
+  cor_matrix_standardized <- cor(meth_data_scaled_by_cpg, use = "pairwise.complete.obs")
+  
+  # Melt correlation matrices for plotting
+  cor_melt_no_standardize <- melt(cor_matrix_no_standardize)
+  cor_melt_standardized <- melt(cor_matrix_standardized)
+  
+  # Plot density of correlations without standardization
+  p1 <- ggplot(cor_melt_no_standardize, aes(x = value)) +
+    geom_density(fill = "blue", alpha = 0.5) +
+    labs(title = paste("Density Plot Without Standardizing CpG Sites"), 
+         x = "Correlation", y = "Density") +
+    theme_minimal()
+  
+  # Plot density of correlations with standardization
+  p2 <- ggplot(cor_melt_standardized, aes(x = value)) +
+    geom_density(fill = "red", alpha = 0.5) +
+    labs(title = paste("Density Plot With Standardizing CpG Sites"), 
+         x = "Correlation", y = "Density") +
+    theme_minimal()
+  
+  # Print the plots
+   return(list(p1 = p1, p2 = p2))
+}
+  # Count the number of CpG sites and samples
+  n_cpg_sites <- nrow(input.data)
+  n_samples <- ncol(input.data) 
+  cat("Number of CpG sites:", n_cpg_sites, "\n")
+  cat("Number of samples:", n_samples, "\n")  
+  # Generate correlation plots for full dataset
+ plots <- generate_correlation_plots(input.data)
+
+```{r}
+#| echo: false
+#| label: Density Plot Without Standardizing
+#| error: true
+#| fig-cap: "**Figure 11**: Density Plot Without Standardizing CpG Sites. This plot shows the distribution of pairwise correlations between samples without standardizing the CpG sites. The plot provides an overview of the raw correlation data."
+
+# Print the density plot for correlations without standardization
+print(plots$p1)
+```
+```{r}
+#| echo: false
+#| label: Density Plot With Standardizing
+#| error: true
+#| fig-cap: "**Figure 12**: Density Plot With Standardizing CpG Sites. This plot shows the distribution of pairwise correlations between samples after standardizing the CpG sites. Standardization normalizes CpG sites across samples, offering a clearer view of relative variations in the data."
+
+# Print the density plot for correlations with standardization
+print(plots$p2)
+```
+
