@@ -1,0 +1,34 @@
+code Bootstrap: docker
+From: rocker/r-ver:4.4.1
+
+%labels
+    Author      Onur Oztornaci
+    Version     1.0
+    Description R 4.4.1 + Quarto + Essential R packages
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+
+    apt-get update && \
+    apt-get install -y libcurl4-openssl-dev curl wget
+
+    QUARTO_VERSION=1.6.42 # Ya da istediğiniz sürüm
+    QUARTO_URL=https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb
+    wget -O /tmp/quarto.deb "$QUARTO_URL" && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -f -y /tmp/quarto.deb && \
+    rm /tmp/quarto.deb
+
+    R -e "options(warn=2); install.packages(c(
+      'data.table', 'ggplot2', 'dplyr', 'tidyr', 'gridExtra', 'RColorBrewer', 'rmarkdown', 'knitr', 'reshape2'
+    ), repos='https://cloud.r-project.org/')"
+
+%environment
+    export LC_ALL=C
+    export PATH="/usr/local/bin:$PATH" 
+
+%runscript
+    echo "Arguments received: $*"
+    exec "$@"
+
+%help
+    Runs R scripts with Quarto and essential data analysis packages.  Includes R 4.4.1, Quarto (1.6.42), and the following R packages: data.table, ggplot2, dplyr, tidyr, gridExtra, RColorBrewer, rmarkdown, knitr, reshape2.

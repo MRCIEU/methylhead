@@ -1,0 +1,38 @@
+# File: wgbs_analysis.def
+Bootstrap: docker
+From: condaforge/mambaforge:latest
+
+%labels
+    Author Onur Oztornaci
+    Version 1.0
+    Description Whole-genome bisulfite sequencing analysis tools
+
+%post
+
+    apt-get update && apt-get install -y wget bzip2 && rm -rf /var/lib/apt/lists/*
+
+    mamba install -y -n base -c bioconda -c conda-forge \
+        picard \
+        bsmap \
+        bismark \
+        bowtie2 \
+        bwa \
+        bwameth \
+        fastqc \
+        hisat2 \
+        methyldackel \
+        multiqc \
+        sambamba \
+        samtools \
+        trimmomatic \
+        trim-galore && \
+    conda clean -afy
+
+%environment
+    export LC_ALL=C
+    export PATH=/opt/conda/bin:$PATH
+
+%runscript
+    echo "wgbs_analysis container"
+    echo "apptainer exec $APPTAINER_CONTAINER <tool> [options]"
+    exec "$@"
