@@ -10,6 +10,6 @@ process camda_matrix {
 
   shell:
    """
-    Rscript --vanilla ${projectDir}/scripts/combinecamda.r ${files} camda-matrix.csv
+    Rscript --vanilla ${projectDir}/scripts/combine-camda.r ${files} camda-matrix.csv
    """
 }
