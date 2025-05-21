@@ -1,10 +1,5 @@
 #!/usr/bin/env R
 
-### Usage ###
-# Rscript test-dnam-assocs.r <data_dir> <phenotypes.csv> [<output_dir>]
-# e.g.
-#   Rscript test-dnam-assocs.r data/ phenotypes.csv output
-
 library(data.table)
 library(dplyr)
 library(ewaff)
@@ -46,13 +41,6 @@ for (pth in files_path) {
 
 ### Read & check phenotype ###
 pheno <- data.frame(data.table::fread(phenotype.file))
-expected_cols <- c("Sex","Country.x","Age_Rerc","Cancer_status","BMI_C",
-                   "Smoke_status","Alc_Lifetime","Sample","batch")
-missing <- setdiff(expected_cols, colnames(pheno))
-if (length(missing) > 0) {
-  stop("Phenotype file ", files$phenotype, 
-       " is missing columns: ", paste(missing, collapse = ", "))
-}
 pheno$batch <- as.character(pheno$batch)
 
 ### Clean read counts ###
@@ -60,11 +48,9 @@ reads <- data.table::fread(files$reads)
 setnames(reads, "Reads passing filters", "reads")
 reads[, Sample := gsub("_R[12]$", "", Sample)]
 reads <- unique(reads, by="Sample")
-reads[, Lab_id := gsub(".*_(.+)", "\\1", Sample)]
-reads[, Sample := gsub("-", ".", gsub("_.*","", Sample))]
 
-pheno <- pheno %>% mutate(Sample=gsub("[_]+",".",Sample))
 pheno <- merge(pheno, reads, by = "Sample", all.x = TRUE)
+pheno <- pheno %>% mutate(Sample=gsub("[-]+",".",Sample))
 rownames(pheno) <- pheno$Sample
 
 ### Load cell counts and merge ###
@@ -73,7 +59,6 @@ cell_types <- ECC$V1
 ECC$V1 <- NULL
 ECC <- t(ECC)
 colnames(ECC) <- cell_types
-rownames(ECC) <- gsub("_.*", "", rownames(ECC))
 pheno <- cbind(pheno, ECC[pheno$Sample, , drop = FALSE])
 pheno$Sample <- NULL
 
