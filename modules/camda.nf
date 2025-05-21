@@ -1,4 +1,5 @@
 process camda {
+ 
   publishDir "${params.outdir}/camda-files" , mode: 'copy'
   
   input:
