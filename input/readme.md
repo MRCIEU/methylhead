@@ -1,6 +1,7 @@
-# DNAm Lung Cancer Screening Panel Analysis Pipeline
+# DNAm Target Panel Analysis Pipeline
 
-This pipeline enables the analysis of DNA methylation data generated using the [DNAm lung cancer screening panel](https://github.com/MRCIEU/dnam-lung-cancer-screening-panel).
+This pipeline enables the analysis of DNA methylation data generated from **any DNAm target panel**.  
+While the example provided here uses the [DNAm lung cancer screening panel](https://github.com/MRCIEU/dnam-lung-cancer-screening-panel), the pipeline can be easily adapted for other custom or published DNAm panels by providing an appropriate `panel.csv` file.
 
 ---
 
@@ -36,8 +37,8 @@ Ensure your phenotype file contains *more complete observations* (i.e., with no 
 
 ## 3. DNAm Panel Information (`panel.csv`)
 
-This file defines the CpG panel analyzed by the pipeline.  
-It should be a tabular file with the following columns:
+This file specifies the CpG sites included in the DNAm target panel used for your study.  
+The format must match the following structure:
 
 | source | details      | chr | start     | end       |
 |--------|-------------|-----|-----------|-----------|
@@ -49,15 +50,18 @@ It should be a tabular file with the following columns:
 | age    | cg10501210  | 1   | 207997020 | 207997020 |
 
 **Column descriptions:**
-- `source`: Group or biological context (e.g., "age", "smoking") for the CpG.
+- `source`: Biological context or group (e.g., "age", "smoking") for the CpG site.
 - `details`: CpG identifier.
 - `chr`: Chromosome number.
-- `start`, `end`: Genomic coordinates of the CpG site (these are typically identical for single-site methylation probes).
+- `start`, `end`: Genomic coordinates of the CpG site (usually identical for single-site probes).
 
 > **Note:**  
-> Every CpG in your methylation data matrix must have a corresponding entry in `panel.csv` for proper annotation and downstream analysis.
+> To use this pipeline for other panels, simply provide a `panel.csv` with the appropriate CpG list and annotation in the format above.
 
 ---
 
-**For further details and panel updates, refer to the original panel repository:**  
+**Example panel:**  
+[DNAm lung cancer screening panel](https://github.com/MRCIEU/dnam-lung-cancer-screening-panel) is provided as a template.
+
+**For further details and updates, see the original repository:**  
 👉 [https://github.com/MRCIEU/dnam-lung-cancer-screening-panel](https://github.com/MRCIEU/dnam-lung-cancer-screening-panel)
