@@ -13,8 +13,10 @@ ann450k$loc <- paste(ann450k$chr, ann450k$pos)
 meth_df$loc <- paste(meth_df$chr, meth_df$end)
 merged_data <- merge(meth_df, ann450k, by = c("loc"))
 colnames(merged_data)[colnames(merged_data) == "chr.x"] <- "chr"
-methylation <- merged_data[, c("Name", grep("^(chr|start|end|X)", names(merged_data), value = TRUE))]
+sample.ids<- colnames(meth_df)[!colnames(meth_df) %in% c("chr", "start", "end", "loc")]
+selected_cols <- c("Name","chr","start","end",sample.ids)
+methylation <- merged_data[, selected_cols]
 Illumina_matrix <- methylation[, names(methylation) != "chr.y"]
 colnames(Illumina_matrix)[1] <- "CpGs"
-colnames(Illumina_matrix) <- gsub("\\.", "-", colnames(Illumina_matrix))
+colnames(Illumina_matrix) <- gsub("\\.", "-", gsub("^X", "", colnames(Illumina_matrix)))
 write.csv(Illumina_matrix, file = output_file,row.names=FALSE)
