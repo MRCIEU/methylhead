@@ -18,7 +18,7 @@ cleaned_paths <- trimws(cleaned_paths)
     file.vector <- file.vector[sapply(file.vector, function(f) 
        {
        file.size <- file.info(f)$size
-       file.size >= 100 * 1024
+       file.size >= 1024 * 1024
            })]
 sample.ids <- gsub(".markdup_CpG.methylKit", "", basename(file.vector))
 sample.ids <- as.list(sample.ids)

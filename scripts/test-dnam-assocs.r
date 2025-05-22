@@ -50,7 +50,6 @@ reads[, Sample := gsub("_R[12]$", "", Sample)]
 reads <- unique(reads, by="Sample")
 
 pheno <- merge(pheno, reads, by = "Sample", all.x = TRUE)
-pheno <- pheno %>% mutate(Sample=gsub("[-]+",".",Sample))
 rownames(pheno) <- pheno$Sample
 
 ### Load cell counts and merge ###
@@ -78,7 +77,7 @@ models$model <- paste0(models$model, " + CD4T + CD8T + NK + Mono + Bcell + Granu
 
 ### Helper: run ewaff ###
 process_ewaff <- function(pheno, meth, out_folder, summary_folder=NULL, manifest=NULL, models) {
-  colnames(meth) <- gsub("_.*", "", gsub("^X","",colnames(meth)))
+  colnames(meth) <- gsub("\\.", "-", gsub("^X","",colnames(meth)))
   common <- intersect(rownames(pheno), colnames(meth))
   stopifnot(length(common) > 1)
   pheno <- pheno[common, , drop = FALSE]

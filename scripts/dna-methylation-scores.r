@@ -47,6 +47,7 @@ meth_scores_all <- as.data.frame(scores_list)
 rownames(meth_scores_all)<-colnames(meth_score)
 DNA_Methylation_Scores <- data.frame(t(meth_scores_all))
 names(DNA_Methylation_Scores) <- gsub("^X", "", names(DNA_Methylation_Scores))
+colnames(DNA_Methylation_Scores) <- gsub("\\.", "-", colnames(DNA_Methylation_Scores))
 write.csv(DNA_Methylation_Scores, file = output_file)                 
 
 site_stats <- as.data.frame(t(sapply(models, function(model) {
@@ -55,5 +56,6 @@ site_stats <- as.data.frame(t(sapply(models, function(model) {
     num_sites_model <- length(ret$vars)
     c(sites=num_sites_used, model=num_sites_model, pct=round(num_sites_used/num_sites_model*100))
 })))
+colnames(site_stats) <- gsub("\\.", "-", colnames(site_stats))
 write.csv(site_stats, file=sites_file)
         
