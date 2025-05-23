@@ -4,7 +4,7 @@ library(dplyr)
 library(methylKit)
 
 args <- commandArgs(trailingOnly = TRUE)
-samples <- args[1]
+samples <- args[1] 
 output_file <- args[2]
 
 file <- read.csv(samples, header = F)
@@ -13,32 +13,33 @@ file_paths <- file$V2
 cleaned_paths <- gsub("\\[|\\]", "", file_paths)
 file_list <- trimws(cleaned_paths)
 
-processed_files <- c()  
-sample.ids <- c()       
-ci_list <- list()  
+processed_files <- vector("character", length(file_list))
+sample.ids <- vector("character", length(file_list))
+ci_list <- vector("list", length(file_list))
+names(ci_list) <- basename(file_list)
 
-for (file in file_list) {
-  sample_id <- gsub("_CpG_CAMDA.tsv", "", basename(file))
-  data <- read.delim(file, header = TRUE)
-  ci_data <- data %>%
-    mutate(loc = paste(chr, pos, sep = "_")) %>%
-    dplyr::select(loc, CI_lower, CI_upper) %>%
-    mutate(sample_id = sample_id)
-  ci_list[[sample_id]] <- ci_data  
-  methylkit_data <- data %>%
-    mutate(
-      chrBase = paste0(chr, ".", pos),
-      coverage = rep(11, nrow(data)), 
-      freqC = ratio * 100,  
-      freqT = 100 - freqC,  
-      strand = ifelse(strand == "+", "F", "R"),
-      loc = paste(chr, pos, sep = "_")
-    ) %>%
-    dplyr::select(chrBase, chr, pos, strand, coverage, freqC, freqT, loc)  
-  processed_file <- paste0(tempdir(), "/", sample_id, "_processed.tsv")
-  write.table(methylkit_data, processed_file, sep = "\t", row.names = FALSE, quote = FALSE) 
-  processed_files <- c(processed_files, processed_file)
-  sample.ids <- c(sample.ids, sample_id)
+for (i in seq_along(file_list)) {
+  file_path <- file_list[i]
+  sample_id <- gsub("_CpG_CAMDA.tsv", "", basename(file_path))
+  data <- data.table::fread(file_path)
+  data[, loc := paste(chr, pos, sep = "_")]
+  ci_data <- data[, .(loc, CI_lower, CI_upper)]
+  ci_data[, sample_id := sample_id]
+  ci_list[[sample_id]] <- ci_data
+  methylkit_data <- data[, .(
+    chrBase = paste0(chr, ".", pos),
+    chr,
+    pos,
+    strand = ifelse(strand == "+", "F", "R"),
+    coverage = 11L,
+    freqC = ratio * 100,
+    freqT = 100 - (ratio * 100),
+    loc
+  )]
+  processed_file <- file.path(tempdir(), paste0(sample_id, "_processed.tsv"))
+  data.table::fwrite(methylkit_data, processed_file, sep = "\t", quote = FALSE)
+  processed_files[i] <- processed_file
+  sample.ids[i] <- sample_id
 }
 
 file.list <- as.list(processed_files)
