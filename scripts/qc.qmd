@@ -44,9 +44,8 @@ for (path in files_path$V1) {
   }
 }
 
-reads$Sample <- paste0("X", gsub("-", ".", reads$Sample))
 colnames(reads)[colnames(reads) == "Reads.passing.filters"] <- "Reads"
-reads <- reads %>% mutate(Sample = gsub("_R[12]", "", Sample)) %>% distinct(Sample, .keep_all = TRUE)
+reads<- reads %>% mutate(Sample = gsub("(_R[12]|_[12])$", "", Sample)) %>% distinct(Sample, .keep_all = TRUE)
 coverage_matrix$loc <- paste(coverage_matrix$chr, coverage_matrix$start)
 coverage_matrix <- coverage_matrix %>% select(-matches("chr|start|end"))
 methylation_matrix$loc <- paste(methylation_matrix$chr, methylation_matrix$start)
