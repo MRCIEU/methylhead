@@ -254,6 +254,7 @@ generate_pca_plots <- function(data, scale_data=TRUE, dataset_name = "Scaled Dat
   
   # Create PCA scores data frame
   pca_scores <- as.data.frame(pca_result$x)
+  rownames(pca_scores) <- sub("\\.", "-", gsub("^X", "",rownames(pca_scores)))
   pca_scores$Sample <- rownames(pca_scores)
   
   # Merge with reads data
