@@ -46,7 +46,7 @@ pheno$batch <- as.character(pheno$batch)
 ### Clean read counts ###
 reads <- data.table::fread(files$reads)
 setnames(reads, "Reads passing filters", "reads")
-reads[, Sample := gsub("_R[12]$", "", Sample)]
+reads <- reads %>% mutate(Sample = gsub("(_R[12]|_[12])$", "", Sample)) %>% distinct(Sample, .keep_all = TRUE)
 reads <- unique(reads, by="Sample")
 
 pheno <- merge(pheno, reads, by = "Sample", all.x = TRUE)
