@@ -54,6 +54,7 @@ rownames(methylation_matrix) <- methylation_matrix$loc
 rownames(coverage_matrix) <- coverage_matrix$loc
 rownames(reads) <- reads$Sample
 colnames(estimate_cell_count)[1] <- "cell_type"
+colnames(estimate_cell_count) <- sub("\\.", "-", gsub("^X", "", colnames(estimate_cell_count)))
 estimate_cell_count <- estimate_cell_count[, c("cell_type", reads$Sample)]
 
 if (params$dataset == "panel") {
@@ -65,11 +66,13 @@ if (params$dataset == "panel") {
   panel <- panel %>% select(-matches("source|details|chr|start|end"))
   panel <- panel[!duplicated(panel$loc), ]
   rownames(panel) <- panel$loc
+  colnames(panel) <- sub("\\.", "-", gsub("^X", "", colnames(panel)))
   input.data <- panel[, reads$Sample]
 } else {
   input.data <- methylation_matrix[, reads$Sample] 
 }
 
+colnames(coverage_matrix) <- sub("\\.", "-", gsub("^X", "", colnames(coverage_matrix)))
 input.coverage <- coverage_matrix[rownames(input.data), reads$Sample]
 
 rm(coverage_matrix,methylation_matrix)
