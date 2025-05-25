@@ -24,7 +24,7 @@ apptainer pull "$SIF_NAME" "$SIF_ORAS"
 [ -s "$FA.fai" ] || apptainer exec "$SIF_NAME" samtools faidx "$FA"
 
 # 3) Create sequence dictionary (.dict) with Picard (if absent)
-DICT="${FA%.fa}.dict"
+DICT="${FA}.dict"
 [ -s "$DICT" ] || apptainer exec "$SIF_NAME" picard CreateSequenceDictionary \
     REFERENCE="$FA" OUTPUT="$DICT"
 
