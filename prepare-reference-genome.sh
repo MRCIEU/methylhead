@@ -40,7 +40,7 @@ URL="https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/${FA}.gz"
 SIF_NAME="methylhead-pipeline_wgbs_analysis.sif"
 SIF_ORAS="oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis"
 
-LOGFILE="$(basename "$0").log"
+LOGFILE="$(pwd)/$(basename "$0").log" 
 SECONDS=0                            # built-in timer for elapsed seconds
 
 # -----------------------------------------------------------------------------
