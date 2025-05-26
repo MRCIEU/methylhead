@@ -26,8 +26,9 @@ conda activate methylhead
 ## 2 · Prepare reference genome (one‑off)
 
 ```bash
-bash prepare-reference-genome.sh   # ▸ writes to reference/
+bash prepare-reference-genome.sh -N you@example.com  # ▸ writes to reference/ 
 ```
+>-N Address for auto‑emailed report (optional)
 
 ---
 
