@@ -102,3 +102,24 @@ A pre‑generated pipeline graph [`workflow.png`](https://github.com/MRCIEU/dnam
 ```bash
 nextflow run main.nf -C … --resume -with-dag flow.svg
 ```
+
+## 7 · Container images (automatic)
+
+This workflow is shipped with three pre-built OCI/Apptainer images.  
+When you launch the pipeline **Nextflow pulls them on-demand** (via
+`oras://`) and attaches the right image to each process, so you don’t
+have to install any tool chain manually.
+
+| Logical image | Default URI                                                                                 | What it contains                              |
+| ------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `wgbs_image`  | `oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis`                          | WGBS aligners + core QC tools                 |
+| `meth_image`  | `oras://docker.io/onuroztornaci/methylhead-pipeline:meth_analysis`                          | R 4.4.3 + Python + Bioconductor methylation   |
+| `qc_image`    | `oras://docker.io/onuroztornaci/methylhead-pipeline:qc_container`                           | R 4.4.1 + Quarto for report generation        |
+
+Override them on the CLI (e.g. `--wgbs_image my.registry/wgbs:1.2`) or in
+a config file.
+
+> **Prefer to build your own images?**  
+> The repo also ships Apptainer definitions that reproduce the three
+> images one-to-one.  
+> See [`container-def-files`](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/tree/main/container-def-files) for the full recipes.
