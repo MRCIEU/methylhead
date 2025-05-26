@@ -38,7 +38,7 @@ bash prepare-reference-genome.sh -N you@example.com  # ▸ writes to reference/
 
 Follow the steps below to fetch the demo data, execute the workflow, and review the results.
 
-1. **Download data** – 20 real paired‑end FASTQ files from ENA study [PRJNA730913](https://www.ebi.ac.uk/ena/browser/view/PRJNA730913) are placed in `test-data/`.
+1. **Download data** – 20 real paired‑end FASTQ files from ENA [study](https://rdcu.be/enNYN) [PRJNA730913](https://www.ebi.ac.uk/ena/browser/view/PRJNA730913) are placed in `test-data/`.
 
    ```bash
    bash test-data.sh
