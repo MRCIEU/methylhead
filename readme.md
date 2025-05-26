@@ -1,7 +1,6 @@
-# **Methylhead** – DNAm Lung‑Cancer‑Screening Pipeline
+# **Methylhead** – DNAm Lung‑Cancer‑Screening Pipeline
 
-
-**Methylhead** is a modular **Nextflow** workflow that turns raw FASTQ files from the DNAm lung‑cancer‑screening panel into QC‑checked methylation matrices, cell‑composition estimates and model‑based risk scores – ready for downstream statistics or reporting.
+**Methylhead** is a modular **Nextflow** workflow that turns raw FASTQ files from the DNAm lung‑cancer‑screening panel into QC‑checked methylation matrices, cell‑composition estimates, and model‑based risk scores—ready for downstream statistics or reporting.
 
 > **Default reference files** for the panel are already shipped with the repo:
 >
@@ -17,39 +16,45 @@ Panel manifest and documentation: [https://github.com/MRCIEU/dnam-lung-cancer-sc
 ## 1 · Install
 
 ```bash
-# 1. Conda env with Nextflow & Java ≥ 11
+# Conda env with Nextflow & Java ≥ 11
 conda create -n methylhead nextflow -c bioconda
 conda activate methylhead
 ```
 
-# 2. (one‑off) grab and index hg19
+---
+
+## 2 · Prepare reference genome (one‑off)
+
 ```bash
 bash prepare-reference-genome.sh   # ▸ writes to reference/
 ```
+
 ---
 
-## 2 · Quick start (with public FASTQ + simulated phenotypes)
+## 3 · Quick start (public FASTQ + simulated phenotypes)
 
-Follow the steps below to fetch the demo data, execute the workflow, and review the results:
+Follow the steps below to fetch the demo data, execute the workflow, and review the results.
 
-* **Download data** – 20 real paired-end FASTQ files from ENA study [PRJNA730913] are placed in `test-data/fastq/`.
+1. **Download data** – 20 real paired‑end FASTQ files from ENA study \[PRJNA730913] are placed in `test-data/fastq/`.
 
-```bash
-bash test-data.sh  
-```
-* Run the DNAm‑panel workflow
+   ```bash
+   bash test-data.sh
+   ```
+2. **Run the DNAm‑panel workflow**
 
-```bash
-nextflow run main.nf -C nextflow-test.config -N you@example.com --resume
-```
+   ```bash
+   nextflow run main.nf -C nextflow-test.config -N you@example.com --resume
+   ```
 
-## 3 · Run on your own samples
+---
+
+## 4 · Run on your own samples
 
 ```bash
 nextflow run main.nf \
     --data            path/to/fastqs/ \
     --genome_folder   reference/hg19.fa \
-    --panel           input/my_panel.bed \
+    --panel           input/panel.bed \
     --phenotype       input/phenotype.csv \
     --models          input/models.csv \
     --panel_qc        input/panel_qc.csv \
@@ -60,22 +65,24 @@ nextflow run main.nf \
 
 All CLI parameters can instead be written into a config and supplied with `-C myrun.config`.
 
+> **Note:** A demo models file (`input/models-test.csv`) lives in the `input/` folder. Edit this file—or point `--models` to your own CSV in `input/`—to run custom EWAS or risk‑prediction models.
+
 ### Key parameters
 
-| param           | purpose                                    | default (demo)                       |
+| Param           | Purpose                                    | Default (demo)                       |
 | --------------- | ------------------------------------------ | ------------------------------------ |
-| `data`          | folder (or glob) of paired‑end gz FASTQs   | `test-data/`                         |
-| `genome_folder` | indexed reference FASTA                    | `reference/hg19.fa`                  |
+| `data`          | Folder (or glob) of paired‑end gz FASTQs   | `test-data/`                         |
+| `genome_folder` | Indexed reference FASTA                    | `reference/hg19.fa`                  |
 | `panel`         | BED of CpG loci                            | `data/blood_cell_types_extended.bed` |
 | `panel_qc`      | CSV with per‑locus thresholds              | `input/panel.csv`                    |
-| `phenotype`     | sample metadata (CSV)                      | `input/phenotype-test.csv`           |
+| `phenotype`     | Sample metadata (CSV)                      | `input/phenotype-test.csv`           |
 | `models`        | EWAS / risk‑prediction models (CSV)        | `input/models-test.csv`              |
-| `outdir`        | where to write results                     | `results-test/`                      |
-| `email/-N`      | address for auto‑emailed report (optional) | *(none)*                             |
+| `outdir`        | Where to write results                     | `results-test/`                      |
+| `email` / `-N`  | Address for auto‑emailed report (optional) | *(none)*                             |
 
 ---
 
-## 4 · Outputs
+## 5 · Outputs
 
 ```
 results/
@@ -83,15 +90,15 @@ results/
 ├── methylation_calls/   # per‑sample BedGraphs & bigWigs
 ├── matrices/            # CpG, coverage & 450k matrices (TSV)
 ├── qc/                  # MultiQC + html/pdf report
-└── predictions/         # risk scores & association test results
+└── predictions/         # Risk scores & association test results
 ```
 
 ---
 
-## 5 · Reproducing the DAG
+## 6 · Reproducing the DAG
 
-A pre‑generated pipeline graph [`workflow.png`](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/blob/main/flowcharts/workflow.png) is already committed to the flowcharts/ directory of this repository, so you can inspect the workflow without running anything.
+A pre‑generated pipeline graph [`workflow.png`](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/blob/main/flowcharts/workflow.png) is committed to the `flowcharts/` directory, so you can inspect the workflow without running anything.
 
 ```bash
-nextflow run main.nf -C … -resume -with-dag flow.svg
+nextflow run main.nf -C … --resume -with-dag flow.svg
 ```
