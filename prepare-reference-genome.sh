@@ -27,5 +27,9 @@ apptainer pull "$SIF_NAME" "$SIF_ORAS"
 DICT="${FA}.dict"
 [ -s "$DICT" ] || apptainer exec "$SIF_NAME" picard CreateSequenceDictionary \
     REFERENCE="$FA" OUTPUT="$DICT"
+# 4) Create bwa reference files
+if [ ! -f "${FA}.c2t.sa" ] || [ "$FA" -nt "${FA}.c2t.sa" ]; then
+  apptainer exec "$SIF_NAME" bwameth.py index "$FA"
+fi
 
 echo "Reference genome prepared in $(pwd)"
