@@ -5,15 +5,15 @@ While the example provided here uses the [DNAm lung cancer screening panel](http
 
 ---
 
-## 1. Phenotype Matrix (`phenotype.csv`)
+## 1. Phenotype Matrix (`phenotype-test.csv`)
 
 - **Sample names** must *exactly* match the corresponding FASTQ file names.  
-  *(See the included `phenotype.csv` for an example.)*
+  *(See the included `phenotype-test.csv` for an example.)*
 - All phenotype variable names should be unique and descriptive.
 
 ---
 
-## 2. EWAF Model Matrix (`models.csv`)
+## 2. EWAF Model Matrix (`models-test.csv`)
 
 ### Essentials for Model Matrix Construction
 
@@ -29,7 +29,6 @@ While the example provided here uses the [DNAm lung cancer screening panel](http
 **Best practice:**  
 Ensure your phenotype file contains *more complete observations* (i.e., with no missing covariate values) than the total number of model parameters.
 
-- The `models.csv` file contains example/default model specifications.
 - **Important:**  
   Variable names in your model matrix *must* **exactly match** the variable names in your phenotype file.
 
