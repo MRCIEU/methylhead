@@ -20,25 +20,28 @@ Panel manifest and documentation: [https://github.com/MRCIEU/dnam-lung-cancer-sc
 # 1. Conda env with Nextflow & Java ≥ 11
 conda create -n methylhead nextflow -c bioconda
 conda activate methylhead
-
-# 2. (one‑off) grab and index hg19
-bash prepare-reference-genome.sh   # ▸ writes to reference/
 ```
 
+# 2. (one‑off) grab and index hg19
+```bash
+bash prepare-reference-genome.sh   # ▸ writes to reference/
+```
 ---
 
-## 2 · Quick start (public data)
+## 2 · Quick start (with public FASTQ + simulated phenotypes)
 
 Follow the steps below to fetch the demo data, execute the workflow, and review the results:
 
+* **Download data** – 20 real paired-end FASTQ files from ENA study [PRJNA730913] are placed in `test-data/fastq/`.
+
 ```bash
-# 1) Download the public demonstration dataset (20 paired‑end FASTQs → test-data/)
 bash test-data.sh  
-#   ↳ retrieves samples from ENA study [PRJNA730913](https://www.ebi.ac.uk/ena/browser/view/PRJNA730913) 
-# 2) Run the DNAm‑panel workflow on the demo data
+```
+* Run the DNAm‑panel workflow
+
+```bash
 nextflow run main.nf -C nextflow-test.config -N you@example.com --resume
 ```
-
 
 ## 3 · Run on your own samples
 
@@ -87,9 +90,8 @@ results/
 
 ## 5 · Reproducing the DAG
 
-A pre‑generated pipeline graph `workflow.png` is already committed to the flowcharts/ directory of this repository, so you can inspect the workflow without running anything.
+A pre‑generated pipeline graph [`workflow.png`](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/blob/main/flowcharts/workflow.png) is already committed to the flowcharts/ directory of this repository, so you can inspect the workflow without running anything.
 
 ```bash
 nextflow run main.nf -C … -resume -with-dag flow.svg
 ```
-
