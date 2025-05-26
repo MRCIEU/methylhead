@@ -1,7 +1,7 @@
 # **Methylhead** – DNAm Lung‑Cancer‑Screening Pipeline
 
 
-**Methylhead** is a modular **Nextflow DSL 2** workflow that turns raw FASTQ files from the DNAm lung‑cancer‑screening panel into QC‑checked methylation matrices, cell‑composition estimates and model‑based risk scores – ready for downstream statistics or reporting.
+**Methylhead** is a modular **Nextflow** workflow that turns raw FASTQ files from the DNAm lung‑cancer‑screening panel into QC‑checked methylation matrices, cell‑composition estimates and model‑based risk scores – ready for downstream statistics or reporting.
 
 > **Default reference files** for the wet‑lab panel are already shipped with the repo:
 >
@@ -27,18 +27,18 @@ bash prepare-reference-genome.sh   # ▸ writes to reference/
 
 ---
 
-## 2 · Quick start (public demo data) samples will be downloaded from the ENA study [PRJNA730913](https://www.ebi.ac.uk/ena/browser/view/PRJNA730913)
+## 2 · Quick start (public data)
+
+Follow the steps below to fetch the demo data, execute the workflow, and review the results:
 
 ```bash
-bash test-data.sh  # ▸ downloads 20 PE FASTQs to test-data/
-nextflow run main.nf -C nextflow-test.config \
-                 -N you@example.com \
-                 --resume
+# 1) Download the public demonstration dataset (20 paired‑end FASTQs → test-data/)
+bash test-data.sh  
+#   ↳ retrieves samples from ENA study [PRJNA730913](https://www.ebi.ac.uk/ena/browser/view/PRJNA730913) 
+# 2) Run the DNAm‑panel workflow on the demo data
+nextflow run main.nf -C nextflow-test.config -N you@example.com --resume
 ```
 
-Outputs land in `results-test/`; open `multiqc_report.html` and `qc_report.html` for an overview.
-
----
 
 ## 3 · Run on your own samples
 
