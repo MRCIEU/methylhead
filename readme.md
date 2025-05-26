@@ -115,9 +115,9 @@ have to install any tool chain manually.
 
 | Logical image | Default URI                                                                                 | What it contains                              |
 | ------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| `wgbs_image`  | `oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis`                          | WGBS aligners + core QC tools                 |
-| `meth_image`  | `oras://docker.io/onuroztornaci/methylhead-pipeline:meth_analysis`                          | R 4.4.3 + Python + Bioconductor methylation   |
-| `qc_image`    | `oras://docker.io/onuroztornaci/methylhead-pipeline:qc_container`                           | R 4.4.1 + Quarto for report generation        |
+| `wgbs_image`  | [`oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis`](https://hub.docker.com/layers/onuroztornaci/methylhead-pipeline/wgbs_analysis/images/sha256-1900a95d6abcc61ba5da8b45584beaddf2a58b4b2a7731f6460d1808891bfb0b)                          | WGBS aligners + core QC tools                 |
+| `meth_image`  | [`oras://docker.io/onuroztornaci/methylhead-pipeline:meth_analysis`](https://hub.docker.com/layers/onuroztornaci/methylhead-pipeline/meth_analysis/images/sha256-a7d0f4c19264a9d4ec170069a1287e4ec1ddb70dd833e5747ba8dbb8d77d8775)                          | R 4.4.3 + Python + Bioconductor methylation   |
+| `qc_image`    | [`oras://docker.io/onuroztornaci/methylhead-pipeline:qc_container`](https://hub.docker.com/layers/onuroztornaci/methylhead-pipeline/qc_container/images/sha256-e029785303330c6c1b2db461d6988276216b2195a3f37ba707a4b8afab85ab49)                           | R 4.4.1 + Quarto for report generation        |
 
 Override them on the CLI (e.g. `--wgbs_image my.registry/wgbs:1.2`) or in
 a config file.
