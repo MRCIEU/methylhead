@@ -29,6 +29,7 @@ conda activate methylhead
 bash prepare-reference-genome.sh -N you@example.com  # ▸ writes to reference/ 
 ```
 >-N Address for auto‑emailed report (optional)
+>It takes approximately 2h 15m 28s.
 
 ---
 
@@ -46,7 +47,7 @@ Follow the steps below to fetch the demo data, execute the workflow, and review 
    ```bash
    nextflow run main.nf -C nextflow-test.config -N you@example.com --resume
    ```
-
+>It takes approximately 1h 45m 15s. 
 ---
 
 ## 4 · Run on your own samples
