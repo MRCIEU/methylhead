@@ -4,7 +4,7 @@ This folder contains Apptainer/Singularity definition files for DNA methylation 
 
 ---
 
-## 1. meth_analysis.def
+## 1. meth-analysis.def
 
 - **Base image:** rocker/r-ver:4.4.3  
 - **Purpose:** DNA methylation analysis with R 4.4.3 and Python integration.  
@@ -12,7 +12,7 @@ This folder contains Apptainer/Singularity definition files for DNA methylation 
 
 ---
 
-## 2. wgbs_analysis.def
+## 2. wgbs-analysis.def
 
 - **Base image:** condaforge/mambaforge:latest  
 - **Purpose:** Tools for Whole-Genome Bisulfite Sequencing (WGBS) analysis.  
@@ -20,7 +20,7 @@ This folder contains Apptainer/Singularity definition files for DNA methylation 
 
 ---
 
-## 3. quarto_analysis.def
+## 3. qc-container.def
 
 - **Base image:** rocker/r-ver:4.4.1  
 - **Purpose:** R 4.4.1 environment with Quarto and essential data analysis packages.  
