@@ -53,17 +53,17 @@ Follow the steps below to fetch the demo data, execute the workflow, and review 
 ```bash
 nextflow run main.nf \
     --data            path/to/fastqs/ \
-    --genome_folder   reference/hg19.fa \
-    --panel           input/panel.bed \
-    --phenotype       input/phenotype.csv \
-    --models          input/models.csv \
-    --panel_qc        input/panel_qc.csv \
+    --genome_folder   path/to/hg19.fa \
+    --panel           path/to/panel.bed \
+    --panel_qc        path/to/panel_qc.csv \
+    --phenotype       path/to/phenotype.csv \
+    --models          path/to/models.csv \
     --outdir          results/ \
     -N you@example.com \
     --resume
 ```
 
-All CLI parameters can instead be written into a config and supplied with `-C myrun.config`.
+All CLI parameters can instead be written into a config and supplied with `-C nextflow.config`.
 
 > **Note:** A demo models file (`input/models-test.csv`) lives in the `input/` folder. Edit this file—or point `--models` to your own CSV in `input/`—to run custom EWAS or risk‑prediction models.
 
