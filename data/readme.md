@@ -1,18 +1,16 @@
 
-## How `blood_cell_types_extended.bed` was built
+## blood_cell_types_extended.bed
 
-* For a full, reproducible recipe see **[`make-blood-cell-bed.r`](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/tree/main/scripts/make-blood-cell-bed.r)**. It walks through:
+**How this file was built:**
 
-    1. Downloading & filtering the panel manifest (`panel-reduced.csv`).
-    2. Extracting WGBS signal from public blood datasets with [`wgbs_tools`](https://github.com/nloyfer/wgbs_tools).
-    3. Formatting to BED + β‑matrix for use with the Houseman cell‑count algorithm.
+For a full, reproducible recipe, see [`make-blood-cell-bed.r`](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/tree/main/scripts/make-blood-cell-bed.r). This script walks through:
 
-* You can use the same workflow as a template to generate reference files for other tissues or custom panels.
+- Downloading and filtering the panel manifest (`panel-reduced.csv`)
+- Extracting WGBS signal from public blood datasets using [`wgbs_tools`](https://github.com/nloyfer/wgbs_tools)
+- Formatting to BED + β‑matrix for use with the Houseman cell count algorithm
 
-- Blood cell types extended download from [loyfer's paper](https://www.nature.com/articles/s41586-022-05580-6): Supplementary Tables 1–17. Supplementary Table S4C.
-- List of 50286 cell type-specific unmethylated markers (top 1000, hg19) was used.
+You can use the same workflow as a template to generate reference files for other tissues or custom panels.
 
-
-
-
-
+**Source:**  
+Blood cell types extended list was downloaded from Loyfer et al., 2021 ([Supplementary Table S4C](https://www.nature.com/articles/s41586-021-03532-9)), which includes a list of 50,286 cell type-specific unmethylated markers.  
+For this pipeline, the top 1,000 markers (hg19 coordinates) were used.
