@@ -3,7 +3,7 @@
 
 **Methylhead** is a modular **Nextflow** workflow that turns raw FASTQ files from the DNAm lung‑cancer‑screening panel into QC‑checked methylation matrices, cell‑composition estimates and model‑based risk scores – ready for downstream statistics or reporting.
 
-> **Default reference files** for the wet‑lab panel are already shipped with the repo:
+> **Default reference files** for the panel are already shipped with the repo:
 >
 > * `data/blood_cell_types_extended.bed` – CpG coordinates extended with blood‑cell reference loci used for **cell‑composition estimation**
 > * `input/panel.csv` – per‑locus metadata & QC thresholds
