@@ -11,7 +11,7 @@ While the example provided here uses the [DNAm lung cancer screening panel](http
 
 ## 1. Phenotype Matrix (`phenotype-test.csv`)
 
-* **Simulated data:** `phenotype-test.csv` contains *synthetic* phenotype records that mimic the required file structure, matched to **20** publicly available DNAm samples downloaded from the ENA study [PRJNA730913](https://www.ebi.ac.uk/ena/browser/view/PRJNA730913). 
+* **Simulated data:** `phenotype-test.csv` contains *synthetic* phenotype records that mimic the required file structure, matched to **20** publicly available DNAm samples downloaded from the ENA [study](https://rdcu.be/enNYN) [PRJNA730913](https://www.ebi.ac.uk/ena/browser/view/PRJNA730913). 
 * Feel free to replace it with your own real‑world phenotype data once you are ready to analyse an actual study cohort.
 * **Sample names** must *exactly* match the corresponding FASTQ file names.
   *(See the included `phenotype-test.csv` for an example.)*
