@@ -68,5 +68,6 @@ estimate.cell.counts <- function(beta, beta.cell.types) {
 
 estimate_cell_counts          <- estimate.cell.counts(beta, beta.cell.types)
 estimate_cell_counts_norm     <- estimate_cell_counts / colSums(estimate_cell_counts)
+estimate_cell_counts_norm[estimate_cell_counts_norm < 0] <- 1e-9
 colnames(estimate_cell_counts_norm) <- gsub("\\.", "-", colnames(estimate_cell_counts_norm))
 write.csv(estimate_cell_counts_norm, file = output_file)
