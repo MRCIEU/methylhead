@@ -75,41 +75,7 @@ pheno$Smoke_current_never[pheno$Smoke_status=="Former"] <- NA
 models <- read.csv(models.file, stringsAsFactors = FALSE)
 models$model <- paste0(models$model, " + CD4T + CD8T + NK + Mono + Bcell + Granulocytes + reads")
 
-### Helper: run ewaff ###
-process_ewaff <- function(pheno, meth, out_folder, summary_folder=NULL, manifest=NULL, models) {
-  colnames(meth) <- gsub("\\.", "-", gsub("^X","",colnames(meth)))
-  common <- intersect(rownames(pheno), colnames(meth))
-  stopifnot(length(common) > 1)
-  pheno <- pheno[common, , drop = FALSE]
-  meth  <- as.matrix(meth[, common])
-  results <- list()
-  for (i in seq_len(nrow(models))) {
-    var     <- models$var[i]
-    mdl     <- models$model[i]
-    nm      <- models$name[i]
-    cat(Sys.time(), " — running model:", var, "\n")
-    sites.ret <- ewaff::ewaff.sites(as.formula(mdl), variable.of.interest = var,
-                                    methylation = meth, data = pheno, method = "glm")
-    # summary + report if manifest provided
-    if (!is.null(manifest)) {
-      sum.ret <- ewaff::ewaff.summary(sites.ret, manifest$chr, manifest$start, meth)
-      ewaff::ewaff.report(sum.ret, output.file = file.path(out_folder, paste0("report_", var, ".html")))
-      results[[var]]$summary <- sum.ret
-    }
-    # write table
-    if (!is.null(summary_folder)) dir.create(summary_folder, showWarnings=FALSE, recursive=TRUE)
-    out_csv <- if (!is.null(summary_folder))
-                   file.path(summary_folder, paste0("summary_statistics_", nm, ".csv"))
-               else
-                   file.path(out_folder, paste0("sites_ret_", nm, ".csv"))
-    data.table::fwrite(cbind(features = rownames(sites.ret$table), sites.ret$table),
-                       file = out_csv, row.names = FALSE)
-    results[[nm]]$sites <- sites.ret
-  }
-  return(results)
-}
-
-### Helper: load matrices ###
+### Prepare data for ewaff ###
 prepare_data <- function(file, id_col=NULL, manifest_cols=NULL) {
   dt <- data.frame(data.table::fread(file))
   if (is.null(manifest_cols)) {
@@ -125,7 +91,50 @@ prepare_data <- function(file, id_col=NULL, manifest_cols=NULL) {
   list(data = dt, manifest = manifest)
 }
 
-### Run on each dataset ###
+process_ewaff <- function(pheno, meth, out_folder, summary_folder=NULL, manifest=NULL, models) {
+  colnames(meth) <- gsub("\\.", "-", gsub("^X","",colnames(meth)))
+  common <- intersect(rownames(pheno), colnames(meth))
+  stopifnot(length(common) > 1)
+  pheno <- pheno[common, , drop = FALSE]
+  meth  <- as.matrix(meth[, common])
+  results <- list()
+  for (i in seq_len(nrow(models))) {
+    var     <- models$var[i]
+    mdl     <- models$model[i]
+    nm      <- models$name[i]
+    cat(Sys.time(), " — running model:", var, "\n")
+    model_out_dir <- file.path(out_folder, nm)
+    dir.create(model_out_dir, showWarnings=FALSE, recursive=TRUE)
+    # Try-Catch for each model
+    tryCatch({
+      sites.ret <- ewaff::ewaff.sites(as.formula(mdl), variable.of.interest = var,
+                                      methylation = meth, data = pheno, method = "glm")
+      # summary + report if manifest provided
+      if (!is.null(manifest)) {
+        sum.ret <- ewaff::ewaff.summary(sites.ret, manifest$chr, manifest$start, meth)
+        ewaff::ewaff.report(sum.ret, output.file = file.path(model_out_dir, paste0("report_", var, ".html")))
+        results[[nm]]$summary <- sum.ret
+      }
+      # write table
+      if (!is.null(summary_folder)) dir.create(summary_folder, showWarnings=FALSE, recursive=TRUE)
+      out_csv <- if (!is.null(summary_folder))
+                     file.path(summary_folder, paste0("summary_statistics_", nm, ".csv"))
+                 else
+                     file.path(model_out_dir, paste0("sites_ret_", nm, ".csv"))
+      data.table::fwrite(cbind(features = rownames(sites.ret$table), sites.ret$table),
+                         file = out_csv, row.names = FALSE)
+      results[[nm]]$sites <- sites.ret
+    }, error = function(e) {
+      # Hata durumunda: ilgili model klasörüne txt bırak
+      errfile <- file.path(model_out_dir, paste0("error_", nm, ".txt"))
+      cat("ERROR in ewaff for model:", nm, "\n", conditionMessage(e), "\n", file = errfile)
+      results[[nm]] <- NULL  # veya NA; sana kalmış
+    })
+  }
+  return(results)
+}
+
+# Define datasets with their files and manifest columns
 datasets <- list(
   Methylation_matrix = list(file = files$Methylation_matrix, manifest_cols = c("chr","start","end")),
   Illumina_matrix    = list(file = files$Illumina_matrix,    id_col="CpGs", manifest_cols = c("chr","start","end")),
@@ -133,23 +142,28 @@ datasets <- list(
   camda_score        = list(file = files$camda_score,        manifest_cols = c("chr","start","end"))
 )
 
+# Process each dataset
+
 results <- lapply(names(datasets), function(name) {
   cat(Sys.time(), " — processing:", name, "\n")
   ds   <- datasets[[name]]
   outf <- file.path(output.dir, name)
   sumf <- file.path(outf, paste0("summary_statistics_", name))
   dir.create(outf, showWarnings=FALSE, recursive=TRUE)
-
-  prep <- prepare_data(ds$file, ds$id_col, ds$manifest_cols)
-  res  <- process_ewaff(pheno = pheno,
-                        meth = prep$data,
-                        out_folder = outf,
-                        summary_folder = sumf,
-                        manifest = prep$manifest,
-                        models = models)
-
-  save(res, file = file.path(outf, paste0("results_", name, ".rda")))
-  return(res)
+  tryCatch({
+    prep <- prepare_data(ds$file, ds$id_col, ds$manifest_cols)
+    res  <- process_ewaff(pheno = pheno,
+                          meth = prep$data,
+                          out_folder = outf,
+                          summary_folder = sumf,
+                          manifest = prep$manifest,
+                          models = models)
+    save(res, file = file.path(outf, paste0("results_", name, ".rda")))
+    return(res)
+  }, error = function(e) {
+    errfile <- file.path(outf, paste0("dataset_error_", name, ".txt"))
+    cat("ERROR in dataset:", name, "\n", conditionMessage(e), "\n", file = errfile)
+    return(NULL)
+  })
 })
-
 names(results) <- names(datasets)
