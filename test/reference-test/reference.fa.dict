@@ -1,0 +1,25 @@
+@HD	VN:1.0	SO:unsorted
+@SQ	SN:chr1	LN:1984787	M5:abf0c69c1f14dd0affffd023c2c939a5	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr10	LN:1029515	M5:870907ddea9660b9186f54a8fcbd41c7	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr11	LN:1074605	M5:34c3e9b88722156831a2cd7dbc970acb	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr12	LN:1072174	M5:5dc474d3c03ef448b55c322a0c61b3dd	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr13	LN:472584	M5:6b6f16ae63b431d6dcabe517e46c85a9	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr14	LN:716329	M5:be9a5b504e8779a745c8734e2dd1dd83	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr15	LN:660789	M5:aa62ee26cb3738b84b8b18bb1c7b7756	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr16	LN:1177458	M5:c4e3124732bea2e4adeaa104baf4dc60	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr17	LN:1409163	M5:69f2b71668acaaba36fe0021533dd309	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr18	LN:447217	M5:578e9109f87e82997a60c61ba9fada6a	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr19	LN:1182680	M5:27b41c34954608c73a39e0791aea8ff3	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr2	LN:1605088	M5:8e20506d9a9913e97f818277f4f11e8a	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr20	LN:752878	M5:280fec5da168a8bf4171282b08fb6da7	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr21	LN:399610	M5:b8aed39ddabf537f0388c8516827c86f	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr22	LN:615954	M5:0c4020582ba446381327cff4922f090a	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr3	LN:986074	M5:4bf7624a08e818292a32cc695a5a908e	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr4	LN:797024	M5:7089fc23fb6e2caf8c8a70c487a20cb8	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr5	LN:909969	M5:56fa3e2de8273970f5c7ee05765c3976	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr6	LN:998143	M5:b8875cd57ccd2c7563652df52813465a	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr7	LN:1214793	M5:d78621ae747da9a7c0d09aef6687f6fd	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr8	LN:817720	M5:020647c27f839a6329ee00db2c445fcf	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chr9	LN:977086	M5:4174f62ef4f93349377475fc7358d007	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chrX	LN:152892	M5:eee0616a3f44f747d702c44ecfad53d0	UR:file:///home/ag24712/ref-file/reference.fa
+@SQ	SN:chrY	LN:16497	M5:4b42758d0b14a5b537690c980af749c8	UR:file:///home/ag24712/ref-file/reference.fa
