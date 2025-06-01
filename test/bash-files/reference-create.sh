@@ -2,7 +2,11 @@
 set -euo pipefail
 
 #######################################################################
-#  build_reference_from_regions.sh
+#  reference-create.sh
+#
+#  Note: All steps described below must be performed using the full, 
+#  unfiltered data set (i.e., before any subsetting or region selection), 
+#  because the methylation matrix and Illumina matrix regions must be identified from the complete data.
 #
 #  What does it do?
 #  1. Takes a BED file that represents the *combined* genomic loci from:
@@ -17,8 +21,8 @@ set -euo pipefail
 #
 #  Inputs
 #  ──────
-#    BED   = final_regions.bed   (union described above)
-#    REF   = hg19.fa             (full hg19 genome FASTA)
+#    BED   = reference-regions.bed   (union described above)
+#    REF   = hg19.fa                 (full hg19 genome FASTA)
 #
 #  Outputs
 #  ───────
@@ -32,9 +36,9 @@ set -euo pipefail
 #  • bwameth.py  (https://github.com/brentp/bwa-meth)
 #######################################################################
 
-BED="final_regions.bed"   # union BED (Illumina-450 K + blood cell-type)
-REF="hg19.fa"             # full reference genome
-OUTFA="reference.fa"      # trimmed reference to be created
+BED="reference-regions.bed"   # union BED (Illumina-450 K + blood cell-type)
+REF="hg19.fa"                 # full reference genome
+OUTFA="reference.fa"          # trimmed reference to be created
 
 ############################################################################
 # 1. Make sure coordinates are non-negative and write a temporary BED
@@ -93,9 +97,10 @@ samtools dict    "$OUTFA"            > reference.fa.dict
 ############################################################################
 # 5. (Optional) quick demo BED: take chromosome lengths from .fai
 #    and build tiny –100 bp/–10 bp windows.  Replace or remove as needed.
+#    Generates a BED file with small windows matching this reference, for testing purposes.
 ############################################################################
 awk 'NR>1 { print $1 "\t" ($2-100) "\t" ($2-10) }' reference.fa.fai \
-  > example.bed
+  > test.bed
 
 ############################################################################
 # 6. Build BWA-Meth index
