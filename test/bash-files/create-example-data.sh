@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# All processing is performed based on the regions defined in the provided BED file (e.g., blood_cell_types_extended.bed).
+
 ############################################
 #  ARGUMENTS & DEFAULTS
 ############################################
