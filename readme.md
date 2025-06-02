@@ -26,7 +26,7 @@ cd methylhead
 
 ---
 
-## 2 · Quick start (≈ 5 min)
+## 2 · Quick start (≈ 5-10 min)
 
 ```bash
 # Install & activate Nextflow if you haven’t yet
@@ -120,28 +120,23 @@ results/
 
 ## 7 · Workflow overview
 
-[`flowchart/`](flowchart/) contains both an auto‑generated Nextflow DAG and a hand‑annotated flowchart.
+This directory contains a single file:
 
-| File                       | Description                     |
-| -------------------------- | ------------------------------- |
-| `methylhead_dag.png`       | Task‑level DAG (`nextflow dag`) |
-| `methylhead_flowchart.svg` | High‑level overview             |
+| File           | Description                   |
+| -------------- | ---------------------------- |
+| workflow.png   | Auto-generated Nextflow DAG   |
 
-Embed the DAG in slides:
-
-```markdown
-![Methylhead workflow DAG](flowchart/workflow.png)
-```
-
+The `workflow.png` file visualizes the task-level dependencies in the pipeline, as produced by `nextflow dag`.
+> **See [`/flowchart/readme.md`](/flowchart/readme.md) for file formats step by step.**
 ---
 
 ## 8 · Containers in use
 
-| Flag           | Default URI                                                        | Includes                        |
-| -------------- | ------------------------------------------------------------------ | ------------------------------- |
-| `--wgbs_image` | `oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis` | WGBS aligners & QC              |
-| `--meth_image` | `oras://docker.io/onuroztornaci/methylhead-pipeline:meth_analysis` | R 4.4.3, Python 3, Bioconductor |
-| `--qc_image`   | `oras://docker.io/onuroztornaci/methylhead-pipeline:qc_container`  | R 4.4.1, Quarto                 |
+| Flag         | Default URI                                                        | Includes                        |
+| ------------ | ------------------------------------------------------------------ | ------------------------------- |
+| `wgbs_image` | `oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis` | WGBS aligners & QC              |
+| `meth_image` | `oras://docker.io/onuroztornaci/methylhead-pipeline:meth_analysis` | R 4.4.3, Python 3, Bioconductor |
+| `qc_image`   | `oras://docker.io/onuroztornaci/methylhead-pipeline:qc_container`  | R 4.4.1, Quarto                 |
 
 Build your own images → see `container-def-files/`.
 
