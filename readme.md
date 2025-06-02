@@ -37,7 +37,7 @@ conda activate methylhead
 nextflow run main.nf -C nextflow-test.config --resume
 ```
 * -C <file> tells Nextflow to **merge** the specified config file with the default nextflow.config. More: [Nextflow docs › configuration](https://www.nextflow.io/docs/latest/config.html)
-* The demo dataset is documented inside the test/ folder—see [test/README.md](test/README.md) for details.
+* The demo dataset is documented inside the test/ folder—see [test/readme.md](test/readme.md) for details.
 * Leave out -N if you do **not** want an email summary.
 * --resume lets Nextflow **pick up from where a previous run left off**—it will skip any steps that already finished successfully. More: [Nextflow docs › resume](https://nextflow.io/docs/latest/cache-and-resume.html)
 
@@ -93,7 +93,7 @@ nextflow run main.nf \
 | `--phenotype`     | Sample‑level metadata                          | `pheno.csv`         |
 | `--models`        | EWAS / risk‑prediction model definitions       | `models.csv`        |
 
-> **See [`input/README.md`](input/README.md) for file formats & examples.**
+> **See [`input/readme.md`](input/readme.md) for file formats & examples.**
 
 Optional flags:
 
