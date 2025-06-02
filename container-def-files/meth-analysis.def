@@ -9,15 +9,19 @@ From: rocker/r-ver:4.4.3
 %post
 
     export DEBIAN_FRONTEND=noninteractive
-    echo "tzdata tzdata/Areas select Etc"    | debconf-set-selections
+    echo "tzdata tzdata/Areas select Etc"     | debconf-set-selections
     echo "tzdata tzdata/Zones/Etc select UTC" | debconf-set-selections
-
+    
+    # ---- Core OS & language runtimes ----
     apt-get update && apt-get install -y \
       tzdata \
       libxml2-dev libssl-dev libcurl4-openssl-dev \
-      python3 python3-pip python3-pandas python3-numpy \
+      python3 python-is-python3 python3-pip \
       r-base r-base-dev && \
     rm -rf /var/lib/apt/lists/*
+
+    pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir "numpy<2" "pandas<3" numexpr bottleneck
 
     Rscript --no-save -e "install.packages('BiocManager', repos='https://cloud.r-project.org/'); \
       BiocManager::install(c( \
@@ -25,7 +29,7 @@ From: rocker/r-ver:4.4.3
         'data.table', 'dplyr', 'methylKit' \
       ), ask=FALSE, update=FALSE)"
 
-    Rscript --no-save -e "install.packages('remotes', repos='https://cloud.r-project.org/'); \
+    Rscript --no-save -e "install.packages('remotes', repos='https://clsinoud.r-project.org/'); \
       remotes::install_github('perishky/meffonym'); \
       remotes::install_github('perishky/ewaff')"
 
@@ -34,7 +38,7 @@ From: rocker/r-ver:4.4.3
     export PATH=/usr/local/bin:$PATH
 
 %runscript
-    echo "=== meth_analysis (R 4.4.3 + Python via apt) ready ==="
+    echo "=== meth_analysis (R 4.4.3 + Python) ready ==="
     echo ""
     echo "Test R & Bioconductor packages:"
     echo "  apptainer exec \$SINGULARITY_CONTAINER Rscript -e \"library(methylKit); sessionInfo()\""
@@ -43,9 +47,7 @@ From: rocker/r-ver:4.4.3
     echo "  apptainer exec \$SINGULARITY_CONTAINER Rscript -e \"library(meffonym); library(ewaff); print('OK')\""
     echo ""
     echo "Test Python libraries:"
-    echo "  apptainer exec \$SINGULARITY_CONTAINER python3 - << 'EOF'"
-    echo "import pandas as pd, numpy as np"
-    echo "print('pandas', pd.__version__)"
-    echo "print('numpy', np.__version__)"
+    echo "  apptainer exec \$SINGULARITY_CONTAINER python - << 'EOF'"
+    echo "import sys, numpy as np, pandas as pd; print('Python', sys.version); print('NumPy', np.__version__); print('pandas', pd.__version__)"
     echo "EOF"
     exec "\$@"
