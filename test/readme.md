@@ -8,7 +8,7 @@
 - **test-data/**: Mini paired-end FASTQ files (subsampled from ENA [PRJNA730913](https://www.ebi.ac.uk/ena/browser/view/PRJNA730913), filtered for selected regions).
 - **test-reference/**: Mini hg19 reference FASTA, containing only test regions.
 - **test.bed**: BED file for target regions.
-- **test-panel.csv**: Design file listing loci and regions.
+- **test-panel.csv**: Example design file listing loci and regions.
 - **test-phenotype.csv**: Example phenotype data for test samples.
 - **test-models.csv**: Example model parameters.
 - **bash-files/**: All-in-one scripts to (re)generate test data and reference from public resources.
