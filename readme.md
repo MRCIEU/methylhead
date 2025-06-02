@@ -10,7 +10,7 @@
 | End‑to‑end panel‑WGBS     |  From raw FASTQ to sample‑level risk scores with a single command |
 | Cell‑composition inference|  Blood‑cell deconvolution using bundled reference libraries       |
 | Model‑based predictions   |  Runs arbitrary EWAS/age/risk models defined in a CSV            |
-| Reproducible & portable   |  Fully containerised (Apptainer); no system installs beyond Java 11 |
+| Reproducible & portable   |  Fully containerised (Apptainer); no system installs             |
 | Modular Nextflow core     |  Parallel execution, --resume, profile support                   |
 | Rich QC out‑of‑the‑box    |  Per‑sample & per‑locus thresholds, MultiQC and Quarto HTML/PDF reports |
 
