@@ -33,11 +33,11 @@ conda activate methylhead
 # Run the built‑in demo (downloads containers on first run)
 nextflow run main.nf -C nextflow-test.config --resume
 ```
-> -C <file> tells Nextflow to **merge** the specified config file with the default nextflow.config.
-> Full options: [Nextflow docs › configuration](https://www.nextflow.io/docs/latest/config.html)
-> The demo dataset is documented inside the test/ folder—see [test/README.md](test/README.md) for details.
-> Leave out -N if you do **not** want an email summary.
-> --resume lets Nextflow **pick up from where a previous run left off**—it will skip any steps that already finished successfully. More: [Nextflow docs › resume](https://nextflow.io/docs/latest/cache-and-resume.html)
+* -C <file> tells Nextflow to **merge** the specified config file with the default nextflow.config.
+* Full options: [Nextflow docs › configuration](https://www.nextflow.io/docs/latest/config.html)
+* The demo dataset is documented inside the test/ folder—see [test/README.md](test/README.md) for details.
+* Leave out -N if you do **not** want an email summary.
+* --resume lets Nextflow **pick up from where a previous run left off**—it will skip any steps that already finished successfully. More: [Nextflow docs › resume](https://nextflow.io/docs/latest/cache-and-resume.html)
 
 ---
 
@@ -49,8 +49,8 @@ nextflow run main.nf -C nextflow-test.config --resume
 | **Conda**     |  ≥ 23.x        | `conda -V`            |
 | Internet      | outbound HTTPS | —                     |
 
-> **Apptainer ≥ 1.1** ([install guide](https://apptainer.org/docs/))
-> **Conda ≥ 23.x** ([install guide](https://docs.conda.io/en/latest/miniconda.html))
+* **Apptainer ≥ 1.1** ([install guide](https://apptainer.org/docs/))
+* **Conda ≥ 23.x** ([install guide](https://docs.conda.io/en/latest/miniconda.html))
 
 ---
 
