@@ -36,8 +36,7 @@ conda activate methylhead
 # Run the built‑in demo (downloads containers on first run)
 nextflow run main.nf -C nextflow-test.config --resume
 ```
-* -C <file> tells Nextflow to **merge** the specified config file with the default nextflow.config.
-* Full options: [Nextflow docs › configuration](https://www.nextflow.io/docs/latest/config.html)
+* -C <file> tells Nextflow to **merge** the specified config file with the default nextflow.config. More: [Nextflow docs › configuration](https://www.nextflow.io/docs/latest/config.html)
 * The demo dataset is documented inside the test/ folder—see [test/README.md](test/README.md) for details.
 * Leave out -N if you do **not** want an email summary.
 * --resume lets Nextflow **pick up from where a previous run left off**—it will skip any steps that already finished successfully. More: [Nextflow docs › resume](https://nextflow.io/docs/latest/cache-and-resume.html)
