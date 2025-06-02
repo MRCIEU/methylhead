@@ -126,7 +126,7 @@ This directory contains a single file:
 | -------------- | ---------------------------- |
 | workflow.png   | Auto-generated Nextflow DAG   |
 
-The `workflow.png`(/flowchart/workflow.png) file visualizes the task-level dependencies in the pipeline, as produced by `nextflow dag`.
+The [`workflow.png`](/flowchart/workflow.png) file visualizes the task-level dependencies in the pipeline, as produced by `nextflow dag`.
 > **See [`/flowchart/readme.md`](/flowchart/readme.md) for file formats step by step.**
 ---
 
