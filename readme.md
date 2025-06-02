@@ -20,8 +20,8 @@
 
 ```bash
 # Pick any folder you like
-git clone https://github.com/onuroztornaci/methylhead.git
-cd methylhead
+git clone git@github.com:MRCIEU/dnam-lung-cancer-pipeline.git
+cd dnam-lung-cancer-pipeline
 ```
 
 ---
