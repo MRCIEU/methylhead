@@ -15,6 +15,20 @@
 | Rich QC out‑of‑the‑box    |  Per‑sample & per‑locus thresholds, MultiQC and Quarto HTML/PDF reports |
 
 ---
+---
+
+## · Prerequisites
+
+| Requirement   | Tested version | Check with            |
+| ------------- | -------------- | --------------------- |
+| **Apptainer** |  ≥ 1.1.0       | `apptainer --version` |
+| **Conda**     |  ≥ 23.x        | `conda -V`            |
+| Internet      | outbound HTTPS | —                     |
+
+* **Apptainer ≥ 1.1** ([install guide](https://apptainer.org/docs/))
+* **Conda ≥ 23.x** ([install guide](https://docs.conda.io/en/latest/miniconda.html))
+
+---
 
 ## 1 · Clone the repository
 
@@ -39,22 +53,8 @@ nextflow -C nextflow-test.config run main.nf
 * -C <file> tells Nextflow to **merge** the specified config file with the default nextflow.config. More: [Nextflow docs › configuration](https://www.nextflow.io/docs/latest/config.html)
 * The demo dataset is documented inside the test/ folder—see [test/readme.md](test/readme.md) for details.
 
----
 
-## 3 · Prerequisites
-
-| Requirement   | Tested version | Check with            |
-| ------------- | -------------- | --------------------- |
-| **Apptainer** |  ≥ 1.1.0       | `apptainer --version` |
-| **Conda**     |  ≥ 23.x        | `conda -V`            |
-| Internet      | outbound HTTPS | —                     |
-
-* **Apptainer ≥ 1.1** ([install guide](https://apptainer.org/docs/))
-* **Conda ≥ 23.x** ([install guide](https://docs.conda.io/en/latest/miniconda.html))
-
----
-
-## 4 · (One‑off) Build the reference genome (≈ 2 h)
+## 3 · (One‑off) Build the reference genome (≈ 2 h)
 
 ```bash
 bash scripts/prepare-reference-genome.sh -N you@example.com
@@ -65,7 +65,7 @@ Skip this step if you already have an indexed hg19 reference.
 
 ---
 
-## 5 · Run on your own samples
+## 4 · Run on your own samples
 
 ```bash
 nextflow run main.nf \
@@ -105,7 +105,7 @@ Optional flags:
 
 ---
 
-## 6 · Outputs at a glance
+## 5 · Outputs at a glance
 
 ```
 results/
@@ -118,7 +118,7 @@ results/
 
 ---
 
-## 7 · Workflow overview
+## 6 · Workflow overview
 
 This directory contains a single file:
 
@@ -130,7 +130,7 @@ The [`workflow.png`](/flowchart/workflow.png) file visualizes the task-level dep
 > **See [`/flowchart/readme.md`](/flowchart/readme.md) for file formats step by step.**
 ---
 
-## 8 · Containers in use
+## 7 · Containers in use
 
 | Flag         | Default URI                                                        | Includes                        |
 | ------------ | ------------------------------------------------------------------ | ------------------------------- |
@@ -142,7 +142,7 @@ Build your own images → see `container-def-files/`.
 
 ---
 
-## 9 · Bundled panel files
+## 8 · Bundled panel files
 
 * `data/blood_cell_types_extended.bed` — CpG coordinates
 * `input/panel.csv` — per‑locus metadata & QC
@@ -151,7 +151,7 @@ Override with `--panel` and `--panel_qc` if you have a different panel.
 
 ---
 
-## 10 · Troubleshooting cheatsheet
+## 9 · Troubleshooting cheatsheet
 
 | Symptom                       | Likely cause & fix                                                        |
 | ----------------------------- | ------------------------------------------------------------------------- |
