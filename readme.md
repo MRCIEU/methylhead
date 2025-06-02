@@ -5,6 +5,7 @@
 ---
 ## 🌟 Why Methylhead? — Feature highlights
 
+| Feature                   |  Description                                                       |
 |---------------------------|--------------------------------------------------------------------|
 | End‑to‑end panel‑WGBS     |  From raw FASTQ to sample‑level risk scores with a single command |
 | Cell‑composition inference|  Blood‑cell deconvolution using bundled reference libraries       |
