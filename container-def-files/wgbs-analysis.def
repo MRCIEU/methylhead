@@ -7,9 +7,12 @@ From: condaforge/mambaforge:latest
     Description Whole-genome bisulfite sequencing analysis tools
 
 %post
+    # Sistem paketleri
+    apt-get update && \
+        apt-get install -y wget bzip2 && \
+        rm -rf /var/lib/apt/lists/*
 
-    apt-get update && apt-get install -y wget bzip2 && rm -rf /var/lib/apt/lists/*
-
+    # Conda paketleri (bioinfo ve Python)
     mamba install -y -n base -c bioconda -c conda-forge \
         picard \
         bsmap \
@@ -24,8 +27,13 @@ From: condaforge/mambaforge:latest
         sambamba \
         samtools \
         trimmomatic \
-        trim-galore && \
+        trim-galore \
+        pandas \
+        numpy && \
     conda clean -afy
+
+    # Eğer başka Python paketleri lazımsa buraya ekle:
+    # mamba install -y -n base -c conda-forge <paket>
 
 %environment
     export LC_ALL=C
