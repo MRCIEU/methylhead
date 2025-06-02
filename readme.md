@@ -1,128 +1,168 @@
-# **Methylhead** – DNAm Lung‑Cancer‑Screening Pipeline
+# Methylhead · Panel‑WGBS Analysis Pipeline
 
-**Methylhead** is a modular **Nextflow** workflow that turns raw FASTQ files from the DNAm lung‑cancer‑screening panel into QC‑checked methylation matrices, cell‑composition estimates, and model‑based risk scores—ready for downstream statistics or reporting.
+**Methylhead** is a modular **Nextflow** workflow that turns raw targeted‑bisulfite FASTQ files into QC‑checked methylation matrices, cell‑composition estimates and model‑based risk scores—ready for statistics or reporting.
 
-> **Default reference files** for the panel are already shipped with the repo:
->
-> * `data/blood_cell_types_extended.bed` – CpG coordinates extended with blood‑cell reference loci used for **cell‑composition estimation**
-> * `input/panel.csv` – per‑locus metadata & QC thresholds
->
-> Supply your own via `--panel` / `--panel_qc` if you work with a different panel.
+---
+## 🌟 Why Methylhead? — Feature highlights
 
-Panel manifest and documentation: [https://github.com/MRCIEU/dnam-lung-cancer-screening-panel](https://github.com/MRCIEU/dnam-lung-cancer-screening-panel)
+* **End‑to‑end panel‑WGBS**  ▶︎  From raw FASTQ to sample‑level risk scores with a single command.
+* **Reproducible & portable**  ▶︎ Fully containerised (Apptainer) and Conda‑pinned; no system installs beyond Java 11.
+* **Modular Nextflow core**  ▶︎ Parallel execution, --resume, profile support.
+* **Rich QC out‑of‑the‑box**  ▶︎ Per‑sample & per‑locus thresholds, MultiQC and Quarto HTML/PDF reports.
+* **Cell‑composition inference**  ▶︎ Blood‑cell deconvolution using bundled reference libraries.
+* **Model‑based predictions**  ▶︎ Runs arbitrary EWAS/age/risk models defined in a CSV.
+---
+
+## 1 · Clone the repository
+
+```bash
+# Pick any folder you like
+git clone https://github.com/onuroztornaci/methylhead.git
+cd methylhead
+```
 
 ---
 
-## 1 · Install
+## 2 · Quick start (≈ 5 min)
 
 ```bash
-# Conda env with Nextflow & Java ≥ 11
-conda create -n methylhead nextflow -c bioconda
+# Install & activate Nextflow if you haven’t yet
+conda create -y -n methylhead nextflow -c bioconda
 conda activate methylhead
+
+# Run the built‑in demo (downloads containers on first run)
+nextflow run main.nf -C nextflow-test.config --resume
 ```
+> -C <file> tells Nextflow to **merge** the specified config file with the default nextflow.config.
+> Full options: [Nextflow docs › configuration](https://www.nextflow.io/docs/latest/config.html)
+> The demo dataset is documented inside the test/ folder—see [test/README.md](test/README.md) for details.
+> Leave out -N if you do **not** want an email summary.
+> --resume lets Nextflow **pick up from where a previous run left off**—it will skip any steps that already finished successfully. More: [Nextflow docs › resume](https://nextflow.io/docs/latest/cache-and-resume.html)
 
 ---
 
-## 2 · Prepare reference genome (one‑off)
+## 3 · Prerequisites
+
+| Requirement   | Tested version | Check with            |
+| ------------- | -------------- | --------------------- |
+| **Apptainer** |  ≥ 1.1.0       | `apptainer --version` |
+| **Conda**     |  ≥ 23.x        | `conda -V`            |
+| Internet      | outbound HTTPS | —                     |
+
+> **Apptainer ≥ 1.1** ([install guide](https://apptainer.org/docs/))
+> **Conda ≥ 23.x** ([install guide](https://docs.conda.io/en/latest/miniconda.html))
+
+---
+
+## 4 · (One‑off) Build the reference genome (≈ 2 h)
 
 ```bash
-bash prepare-reference-genome.sh -N you@example.com  # ▸ writes to reference/ 
+bash scripts/prepare-reference-genome.sh -N you@example.com
 ```
-> -N Address for auto‑emailed report (optional).
 
-> It takes approximately 2h 15m 28s.
+*Creates `reference/hg19/` with all **bwameth** indices.*
+Skip this step if you already have an indexed hg19 reference.
 
 ---
 
-## 3 · Quick start (public FASTQ + simulated phenotypes)
-
-Follow the steps below to fetch the demo data, execute the workflow, and review the results.
-
-1. **Download data** – 20 real paired‑end FASTQ files from ENA [study](https://rdcu.be/enNYN) [PRJNA730913](https://www.ebi.ac.uk/ena/browser/view/PRJNA730913) are placed in `test-data/`.
-
-   ```bash
-   bash test-data.sh
-   ```
-2. **Run the DNAm‑panel workflow**
-
-   ```bash
-   nextflow run main.nf -C nextflow-test.config -N you@example.com --resume
-   ```
-> It takes approximately 1h 45m 15s. 
----
-
-## 4 · Run on your own samples
+## 5 · Run on your own samples
 
 ```bash
 nextflow run main.nf \
-    --data            path/to/fastqs/ \
-    --genome_folder   path/to/hg19.fa \
-    --panel           path/to/panel.bed \
-    --panel_qc        path/to/panel_qc.csv \
-    --phenotype       path/to/phenotype.csv \
-    --models          path/to/models.csv \
-    --outdir          results/ \
-    -N you@example.com \
-    --resume
+  --data            path/to/fastqs/*.fastq.gz \
+  --genome_folder   path/to/hg19.fa \
+  --panel           path/to/panel.bed \
+  --panel_qc        path/to/panel_qc.csv \
+  --phenotype       path/to/phenotype.csv \
+  --models          path/to/models.csv \
+  --outdir          results/ \
+  -N you@example.com \
+  --resume
 ```
 
-All CLI parameters can instead be written into a config and supplied with `-C nextflow.config`.
+### Mandatory parameters
 
-> **Note:** A demo models file (`input/models-test.csv`) lives in the `input/` folder. Edit this file—or point `--models` to your own CSV in `input/`—to run custom EWAS or risk‑prediction models.
+| Flag              | Description                                    | Example             |
+| ----------------- | ---------------------------------------------- | ------------------- |
+| `--data`          | Glob of **gz‑compressed FASTQ** files          | `mydata/*.fastq.gz` |
+| `--genome_folder` | *Indexed* hg19 FASTA (`.fa` + `.bwt/.amb/...`) | `reference/hg19.fa` |
+| `--panel`         | BED with CpG loci in your capture panel        | `data/panel.bed`    |
+| `--panel_qc`      | CSV with per‑locus QC thresholds               | `data/panel_qc.csv` |
+| `--phenotype`     | Sample‑level metadata                          | `pheno.csv`         |
+| `--models`        | EWAS / risk‑prediction model definitions       | `models.csv`        |
 
-### Key parameters
+> **See [`input/README.md`](input/README.md) for file formats & examples.**
 
-| Param           | Purpose                                    | Default (demo)                       |
-| --------------- | ------------------------------------------ | ------------------------------------ |
-| `data`          | Folder (or glob) of paired‑end gz FASTQs   | `test-data/`                         |
-| `genome_folder` | Indexed reference FASTA                    | `reference/hg19.fa`                  |
-| `panel`         | BED of CpG loci                            | `data/blood_cell_types_extended.bed` |
-| `panel_qc`      | CSV with per‑locus thresholds              | `input/panel.csv`                    |
-| `phenotype`     | Sample metadata (CSV)                      | `input/phenotype-test.csv`           |
-| `models`        | EWAS / risk‑prediction models (CSV)        | `input/models-test.csv`              |
-| `outdir`        | Where to write results                     | `results-test/`                      |
-| `email` / `-N`  | Address for auto‑emailed report (optional) | *(none)*                             |
+Optional flags:
+
+| Flag                | Purpose                 | Default    |
+| ------------------- | ----------------------- | ---------- |
+| `--outdir`          | Where results go        | `results/` |
+| `-N`                | Email run summary       | off        |
+| `--wgbs_image` etc. | Override container URIs | built‑ins  |
 
 ---
 
-## 5 · Outputs
+## 6 · Outputs at a glance
 
 ```
 results/
-├── alignments/          # dedup BAM + stats
-├── methylation_calls/   # per‑sample BedGraphs & bigWigs
-├── matrices/            # CpG, coverage & 450k matrices (TSV)
-├── qc/                  # MultiQC + html/pdf report
-└── predictions/         # Risk scores & association test results
+├── alignments/          # deduplicated BAM + stats
+├── methylation_calls/   # BedGraphs per sample
+├── matrices/            # CpG, coverage & 450k matrices
+├── qc/                  # MultiQC + HTML/PDF report
+└── predictions/         # Risk scores & association tests
 ```
 
 ---
 
-## 6 · Reproducing the DAG
+## 7 · Workflow overview
 
-A pre‑generated pipeline graph [`workflow.png`](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/blob/main/flowcharts/workflow.png) is committed to the `flowcharts/` directory, so you can inspect the workflow without running anything.
+[`flowchart/`](flowchart/) contains both an auto‑generated Nextflow DAG and a hand‑annotated flowchart.
 
-```bash
-nextflow run main.nf -C … --resume -with-dag flow.svg
+| File                       | Description                     |
+| -------------------------- | ------------------------------- |
+| `methylhead_dag.png`       | Task‑level DAG (`nextflow dag`) |
+| `methylhead_flowchart.svg` | High‑level overview             |
+
+Embed the DAG in slides:
+
+```markdown
+![Methylhead workflow DAG](flowchart/workflow.png)
 ```
 
-## 7 · Container images (automatic)
+---
 
-This workflow is shipped with three pre-built OCI/Apptainer images.  
-When you launch the pipeline **Nextflow pulls them on-demand** (via
-`oras://`) and attaches the right image to each process, so you don’t
-have to install any tool chain manually.
+## 8 · Containers in use
 
-| Logical image | Default URI                                                                                 | What it contains                              |
-| ------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| `wgbs_image`  | [`oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis`](https://hub.docker.com/layers/onuroztornaci/methylhead-pipeline/wgbs_analysis/images/sha256-1900a95d6abcc61ba5da8b45584beaddf2a58b4b2a7731f6460d1808891bfb0b)                          | WGBS aligners + core QC tools                 |
-| `meth_image`  | [`oras://docker.io/onuroztornaci/methylhead-pipeline:meth_analysis`](https://hub.docker.com/layers/onuroztornaci/methylhead-pipeline/meth_analysis/images/sha256-a7d0f4c19264a9d4ec170069a1287e4ec1ddb70dd833e5747ba8dbb8d77d8775)                          | R 4.4.3 + Python + Bioconductor methylation   |
-| `qc_image`    | [`oras://docker.io/onuroztornaci/methylhead-pipeline:qc_container`](https://hub.docker.com/layers/onuroztornaci/methylhead-pipeline/qc_container/images/sha256-e029785303330c6c1b2db461d6988276216b2195a3f37ba707a4b8afab85ab49)                           | R 4.4.1 + Quarto for report generation        |
+| Flag           | Default URI                                                        | Includes                        |
+| -------------- | ------------------------------------------------------------------ | ------------------------------- |
+| `--wgbs_image` | `oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis` | WGBS aligners & QC              |
+| `--meth_image` | `oras://docker.io/onuroztornaci/methylhead-pipeline:meth_analysis` | R 4.4.3, Python 3, Bioconductor |
+| `--qc_image`   | `oras://docker.io/onuroztornaci/methylhead-pipeline:qc_container`  | R 4.4.1, Quarto                 |
 
-Override them on the CLI (e.g. `--wgbs_image my.registry/wgbs:1.2`) or in
-a config file.
+Build your own images → see `container-def-files/`.
 
-> **Prefer to build your own images?**  
-> The repo also ships Apptainer definitions that reproduce the three
-> images one-to-one.  
-> See [`container-def-files`](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/tree/main/container-def-files) for the full recipes.
+---
+
+## 9 · Bundled panel files
+
+* `data/blood_cell_types_extended.bed` — CpG coordinates
+* `input/panel.csv` — per‑locus metadata & QC
+
+Override with `--panel` and `--panel_qc` if you have a different panel.
+
+---
+
+## 10 · Troubleshooting cheatsheet
+
+| Symptom                       | Likely cause & fix                                                        |
+| ----------------------------- | ------------------------------------------------------------------------- |
+| `ERROR: Apptainer not found`  | Install Apptainer ≥ 1.1 and add it to `$PATH`.                            |
+| Java `<11` warning            | Forgot to `conda activate methylhead`.                                    |
+| `No FASTQ files`              | Check your `--data` glob – must end in `.fastq.gz`.                       |
+| `Index not found for hg19.fa` | Run **4 · reference build** or point `--genome_folder` to an indexed ref. |
+
+---
+
+Happy methylating 🧬🚀
