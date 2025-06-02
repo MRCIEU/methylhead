@@ -34,7 +34,7 @@ conda create -y -n methylhead nextflow -c bioconda
 conda activate methylhead
 
 # Run the built‑in demo (downloads containers on first run)
-nextflow run main.nf -C nextflow-test.config 
+nextflow -C nextflow-test.config run main.nf 
 ```
 * -C <file> tells Nextflow to **merge** the specified config file with the default nextflow.config. More: [Nextflow docs › configuration](https://www.nextflow.io/docs/latest/config.html)
 * The demo dataset is documented inside the test/ folder—see [test/readme.md](test/readme.md) for details.
