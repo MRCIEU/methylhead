@@ -71,8 +71,8 @@ Skip this step if you already have an indexed hg19 reference.
 nextflow run main.nf \
   --data            path/to/fastqs/*.fastq.gz \
   --genome_folder   path/to/hg19.fa \
-  --panel           path/to/panel.bed \
-  --panel_qc        path/to/panel_qc.csv \
+  --target_regions  path/to/target-regions.bed \
+  --panel           path/to/panel.csv \
   --phenotype       path/to/phenotype.csv \
   --models          path/to/models.csv \
   --outdir          results/ \
@@ -84,14 +84,14 @@ nextflow run main.nf \
 
 ### Mandatory parameters
 
-| Flag              | Description                                    | Example             |
-| ----------------- | ---------------------------------------------- | ------------------- |
-| `--data`          | Glob of **gz‑compressed FASTQ** files          | `mydata/*.fastq.gz` |
-| `--genome_folder` | *Indexed* hg19 FASTA (`.fa` + `.bwt/.amb/...`) | `reference/hg19.fa` |
-| `--panel`         | BED with CpG loci in your capture panel        | `data/panel.bed`    |
-| `--panel_qc`      | CSV with per‑locus QC thresholds               | `data/panel_qc.csv` |
-| `--phenotype`     | Sample‑level metadata                          | `pheno.csv`         |
-| `--models`        | EWAS / risk‑prediction model definitions       | `models.csv`        |
+| Flag              | Description                                    | Example                  |
+| ----------------- | ---------------------------------------------- | ------------------------ |
+| `--data`          | Glob of **gz‑compressed FASTQ** files          | `mydata/*.fastq.gz`      |
+| `--genome_folder` | *Indexed* hg19 FASTA (`.fa` + `.bwt/.amb/...`) | `reference/hg19.fa`      |
+| `--target_regions`| BED with CpG loci in your capture targeted     | `data/target_regions.bed`|
+| `--panel   `      | CSV with per‑locus QC thresholds               | `data/panel.csv`         |
+| `--phenotype`     | Sample‑level metadata                          | `pheno.csv`              |
+| `--models`        | EWAS / risk‑prediction model definitions       | `models.csv`             |
 
 > **See [`input/readme.md`](input/readme.md) for file formats & examples.**
 
@@ -142,12 +142,12 @@ Build your own images → see [`/container-def-files`](/container-def-files/read
 
 ---
 
-## 8 · Bundled panel files
+## 8 · Bundled panel and target files
 
-* `data/blood_cell_types_extended.bed` — CpG coordinates
+* `data/blood-cell-types-regions.bed` — Targeted CpG coordinates
 * `input/panel.csv` — per‑locus metadata & QC
 
-Override with `--panel` and `--panel_qc` if you have a different panel.
+Override with `--target_regions` and `--panel` if you have a different panel.
 
 ---
 
