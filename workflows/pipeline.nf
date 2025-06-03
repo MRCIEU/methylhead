@@ -38,7 +38,7 @@ workflow pipeline {
         fileSize[0] >= 0.500 && fileSize[1] >= 0.500 }
     fastqc(clean_files_ch) 
     trim_galore(clean_files_ch) 
-    interval_file(params.panel,params.genome_folder) 
+    interval_file(params.target_regions,params.genome_folder) 
        genome_folder=params.genome_folder
     alignment(trim_galore.out.fq, genome_folder)
        mybamsample = alignment.out.bam
