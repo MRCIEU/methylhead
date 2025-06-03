@@ -34,8 +34,8 @@
 
 ```bash
 # Pick any folder you like
-git clone git@github.com:MRCIEU/dnam-lung-cancer-pipeline.git
-cd dnam-lung-cancer-pipeline
+git clone git@github.com:MRCIEU/methylhead.git
+cd methylhead
 ```
 
 ---
