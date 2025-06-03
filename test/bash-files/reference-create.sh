@@ -1,44 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-#######################################################################
-#  reference-create.sh
-#
-#  Note: All steps described below must be performed using the full, 
-#  unfiltered data set (i.e., before any subsetting or region selection), 
-#  because the methylation matrix and Illumina matrix regions must be identified from the complete data.
-#
-#  What does it do?
-#  1. Takes a BED file that represents the *combined* genomic loci from:
-#       • the Illumina-450 K methylation-matrix, and
-#       • the blood_cell_type.bed panel,
-#     then extracts those sequences from the hg19 reference.
-#
-#  2. Collapses multi-line FASTA entries so each chromosome/contig is on
-#     a single line (many aligners and some QC tools prefer this).
-#
-#  3. Builds samtools and BWA-Meth indices for the trimmed reference.
-#
-#  Inputs
-#  ──────
-#    BED   = reference-regions.bed   (union described above)
-#    REF   = hg19.fa                 (full hg19 genome FASTA)
-#
-#  Outputs
-#  ───────
-#    reference.fa        – FASTA of only the requested regions
-#    reference.fa.fai    – samtools fasta index
-#    reference.fa.dict   – Picard sequence dictionary
-#    example.bed         – tiny ±-window demo BED built from .fai
-#
-#  Requirements
-#  • awk, bedtools, samtools
-#  • bwameth.py  (https://github.com/brentp/bwa-meth)
-#######################################################################
+# Usage: bash reference-create.sh hg19.fa regions.bed output.fa
 
-BED="reference-regions.bed"   # union BED (Illumina-450 K + blood cell-type)
-REF="hg19.fa"                 # full reference genome
-OUTFA="reference.fa"          # trimmed reference to be created
+if [[ $# -ne 3 ]]; then
+    echo "Usage: $0 <reference_fasta> <regions_bed> <output_fasta>"
+    exit 1
+fi
+
+REF="$1"            # e.g., hg19.fa
+BED="$2"            # e.g., regions.bed
+OUTFA="$3"          # e.g., reference.fa
 
 ############################################################################
 # 1. Make sure coordinates are non-negative and write a temporary BED
@@ -52,29 +24,25 @@ awk '
 }' "$BED" > bed_extended.bed
 
 ############################################################################
-# 2. Extract those regions from hg19 and create a multi-line FASTA
+# 2. Extract those regions from reference FASTA and create a multi-line FASTA
 ############################################################################
 bedtools getfasta -fi "$REF" -bed bed_extended.bed -fo regions_tmp.fa
 
 ############################################################################
-# 3. Flatten each chromosome’s sequence to a single line
-#    (makes downstream indexing slightly faster / simpler)
+# 3. Flatten each chromosome’s sequence to a single line (for BWA-meth)
 ############################################################################
 awk '
-# Header line: >chr:start-end
 /^>/ {
   split($0, arr, "[:]")
-  chr = substr(arr[1], 2)         # remove leading ">"
-  if (!seq[chr]) order[++n] = chr # remember original order
+  chr = substr(arr[1], 2)
+  if (!seq[chr]) order[++n] = chr
   curr_chr = chr
   next
 }
-# Sequence lines
 {
   seq[curr_chr] = seq[curr_chr] $0
 }
 END {
-  # Print in original chromosome order, 60-bp wrapped
   for (i = 1; i <= n; i++) {
     print ">" order[i]
     s = seq[order[i]]
@@ -84,23 +52,19 @@ END {
 }
 ' regions_tmp.fa > "$OUTFA"
 
-# House-keeping
-rm regions_tmp.fa
-rm bed_extended.bed
+# Clean up
+rm regions_tmp.fa bed_extended.bed
 
 ############################################################################
 # 4. Create samtools index (.fai) and Picard dictionary (.dict)
 ############################################################################
-samtools faidx   "$OUTFA"            > /dev/null
-samtools dict    "$OUTFA"            > reference.fa.dict
+samtools faidx "$OUTFA"           > /dev/null
+samtools dict "$OUTFA"            > "${OUTFA%.fa}.dict"
 
 ############################################################################
-# 5. (Optional) quick demo BED: take chromosome lengths from .fai
-#    and build tiny –100 bp/–10 bp windows.  Replace or remove as needed.
-#    Generates a BED file with small windows matching this reference, for testing purposes.
+# 5. (Optional) quick demo BED: chromosome lengths from .fai, 100bp-10bp windows
 ############################################################################
-awk 'NR>1 { print $1 "\t" ($2-100) "\t" ($2-10) }' reference.fa.fai \
-  > test.bed
+awk 'NR>1 { print $1 "\t" ($2-100) "\t" ($2-10) }' "${OUTFA}.fai" > test-target.bed
 
 ############################################################################
 # 6. Build BWA-Meth index
@@ -108,3 +72,4 @@ awk 'NR>1 { print $1 "\t" ($2-100) "\t" ($2-10) }' reference.fa.fai \
 bwameth.py index "$OUTFA"
 
 echo "Reference built and indexed: $OUTFA"
+echo "Index files created: ${OUTFA}.fai, ${OUTFA%.fa}.dict"
