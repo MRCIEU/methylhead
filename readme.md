@@ -138,7 +138,7 @@ The [`workflow.png`](/flowchart/workflow.png) file visualizes the task-level dep
 | `meth_image` | `oras://docker.io/onuroztornaci/methylhead-pipeline:meth_analysis` | R 4.4.3, Python 3, Bioconductor |
 | `qc_image`   | `oras://docker.io/onuroztornaci/methylhead-pipeline:qc_container`  | R 4.4.1, Quarto                 |
 
-Build your own images → see `container-def-files/`.
+Build your own images → see [`/container-def-files`](/container-def-files/readme.md).
 
 ---
 
