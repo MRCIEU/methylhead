@@ -15,7 +15,7 @@ BED_ORIG=$(readlink -f "$1")        # user-supplied BED
 OUT_DIR=$(readlink -f "$2")         # where all results will live
 FASTQ_DIR=$(pwd)                    # the directory containing *.fastq.gz pairs
 THREADS=8                           # CPU cores for bwa / samtools
-EXPAND=100                          # ±bp to expand BED intervals
+EXPAND=1000                          # ±bp to expand BED intervals
 REF_DIR="${OUT_DIR}/reference"
 REF_FASTA="${REF_DIR}/hg19.fa"
 
