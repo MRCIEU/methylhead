@@ -14,7 +14,7 @@ process qc_report {
   script:
     """
     qc_files_path=\$(realpath ${qc_files_ch})
-    panel_csv=\$(realpath ${params.panel_qc})
+    panel_csv=\$(realpath ${params.panel})
       ln -s ${baseDir}/scripts/qc.qmd qc.qmd
     quarto render qc.qmd \
         --execute-dir . \
@@ -23,7 +23,7 @@ process qc_report {
         --output-dir . \
         -P file_list="\${qc_files_path}" \
         -P dataset="full"
-    # panel_csv = ${params.panel_qc} 
+    # panel_csv = ${params.panel} 
     quarto render qc.qmd \
         --execute-dir . \
         --to html \
