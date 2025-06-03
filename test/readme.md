@@ -25,7 +25,7 @@ Follow these steps to generate all required files for a minimal methylation anal
    Download public test FASTQ files:  
    `bash bash-files/fastq-files-download.sh`
 
-2. **Align FASTQ files with BWAmeth**  
+2. **Align FASTQ files with BWAmeth and extract region-specific paired-end FASTQ files**  
    - Align all downloaded FASTQ files to the reference genome (`hg19.fa`) using BWAmeth  
    - Generate small, region-specific (blood-cell-types-regions.bed) paired-end FASTQ files in the `test-data` directory:   
    `bash bash-files/create-example-data.sh <bed-file> <output-dir>`
