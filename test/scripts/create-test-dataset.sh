@@ -1,7 +1,7 @@
 #!/bin/bash 
 
 GENOME=http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
-CELL_COUNT_REGIONS=../data/blood_cell_types_extended.bed
+CELL_COUNT_REGIONS=../data/blood-cell-types-regions.bed
 ORIGINAL_PANEL=../input/panel.csv
 TEST_PANEL=input/panel.csv
 TEST_REFERENCE=reference
