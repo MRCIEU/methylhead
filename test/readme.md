@@ -22,7 +22,7 @@
 Follow these steps to generate all required files for a minimal methylation analysis demo:
 
 1. **Download FASTQ files**  
-   Download public test FASTQ files:  
+   - Download public FASTQ files:  
    ```
    bash bash-files/fastq-files-download.sh
    ```
