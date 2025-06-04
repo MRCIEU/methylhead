@@ -22,7 +22,7 @@
 Follow these steps to generate all required files for a minimal methylation analysis demo:
 
 1. **Download FASTQ files**  
-   Download public test FASTQ files:  
+   - Download public test FASTQ files:  
    `bash bash-files/fastq-files-download.sh`
 
 2. **Align FASTQ files with BWAmeth and extract region-specific paired-end FASTQ files**  
@@ -31,16 +31,16 @@ Follow these steps to generate all required files for a minimal methylation anal
    `bash bash-files/create-example-data.sh <bed-file> <output-dir>`
 
 3. **Generate extended BED regions and subset FASTQs**  
-   Using the indexed `hg19.fa` and the new small FASTQ files as input, run the pipeline to generate:
-    - Sorted BAM files  
-    - CpG-level methylation matrix  
-    - Illumina-450k beta-value matrix  
-    - The main output, `methylation-illumina-regions.bed` (the union of all regions covered in the two matrices), is provided in this repository.
+   - Using the indexed `hg19.fa` and the new small FASTQ files as input, run the pipeline to generate:
+     - Sorted BAM files  
+     - CpG-level methylation matrix  
+     - Illumina-450k beta-value matrix  
+     - The main output, `methylation-illumina-regions.bed` (the union of all regions covered in the two matrices), is provided in this repository.
    `bash bash-files/create-regions.sh <bam-files/*.bam> <*.bed>`
 
 4. **Create minimal reference FASTA**  
-   Create `test-reference.fa`, a minimal reference FASTA file for the selected regions, and index it with BWAmeth.
-   Create `test-target.bed` file.
+   - Create a `test-reference.fa`, a minimal reference FASTA file for the selected regions, and index it with BWAmeth.
+   - Create a `test-target.bed` file.
    `bash bash-files/reference-create.sh`
 ---
 ## Scripts in bash-files/
