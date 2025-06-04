@@ -40,7 +40,7 @@ Follow these steps to generate all required files for a minimal methylation anal
      - The union of methylation matrix and Illumina-450k matrix regions as `methylation-illumina-regions.bed`
    - The main output, `reference-regions.bed` (the union of all regions covered in the two matrices), is provided in this repository.  
    ```
-   bash bash-files/create-regions.sh <bam-files/*.bam> <*.bed>
+   bash bash-files/create-regions.sh <bam-file> <bed-file>
    ```
 
 4. **Create minimal reference FASTA**  
