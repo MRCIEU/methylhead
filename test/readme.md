@@ -37,11 +37,10 @@ Follow these steps to generate all required files for a minimal methylation anal
 3. **Generate extended BED regions and subset FASTQs**  
    - Using the indexed `hg19.fa` and the new small FASTQ files as input, run the pipeline to generate:  
      - Sorted BAM files  
-     - CpG-level methylation matrix  
-     - Illumina-450k beta-value matrix  
-     - The main output, `methylation-illumina-regions.bed` (the union of all regions covered in the two matrices), is provided in this repository.  
+     - The union of methylation matrix and Illumina-450k matrix regions as `methylation-illumina-regions.bed`
+   - The main output, `reference-regions.bed` (the union of all regions covered in the two matrices), is provided in this repository.  
    ```
-   bash bash-files/create-regions.sh <bam-files/*.bam> <*.bed>
+   bash bash-files/create-regions.sh <bam-files/*.bam> <methylation-illumina-regions.bed>
    ```
 
 4. **Create minimal reference FASTA**  
@@ -50,6 +49,7 @@ Follow these steps to generate all required files for a minimal methylation anal
    ```
    bash bash-files/reference-create.sh
    ```
+
 ---
 ## Scripts in bash-files/
 
@@ -58,7 +58,7 @@ Follow these steps to generate all required files for a minimal methylation anal
 - `create-example-data.sh`  
   Aligns all FASTQ files to the reference genome (`hg19.fa`) with BWAmeth and generates small, region-specific paired-end FASTQ files (step 2).
 - `create-regions.sh`  
-  Using the indexed `hg19.fa` and the new small FASTQ files as input, generates sorted BAM files, CpG-level methylation matrix, Illumina-450k beta-value matrix, and outputs `methylation-illumina-regions.bed` (step 3).
+  Takes `methylation-illumina-regions.bed` (produced from the previous step or provided in this repository) as input and generates `reference-regions.bed` as output (step 3).
 - `reference-create.sh`  
   Creates a minimal reference FASTA (`test-reference.fa`) and its index, and also generates `test-target.bed` for the selected regions (step 4).
 
@@ -71,6 +71,7 @@ Follow these steps to generate all required files for a minimal methylation anal
 - **Python 3**
 - **hg19 reference genome** (indexed for BWAmeth and Samtools)
 - Standard UNIX tools: `bash`, `awk`
+
 ---
 ## Notes
 
