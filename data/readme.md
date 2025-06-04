@@ -1,15 +1,15 @@
+## Target Regions: blood-cell-types-regions.bed
 
-## blood_cell_types_extended.bed
+- This BED file contains the original **cell type-specific CpG marker regions**, directly downloaded from Loyfer et al., 2021 (Supplementary Table S4C). 
+- No additional processing was performed on these regions.
 
-**How this file was built:**
+- The `blood-cell-types-regions.bed` file is primarily used for **cell count estimation** (e.g., Houseman method) and related quality control (QC) steps in the pipeline.
+- The file `blood_cell_types_extended.zip` is specifically generated for cell count estimation by processing Loyfer’s data and the regions in `blood-cell-types-regions.bed` using the [`make-blood-cell-bed.r`](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/tree/main/scripts/make-blood-cell-bed.r) script.
+- The script provides a reproducible way to generate the extended region set required for cell count estimation.
 
-For a full, reproducible recipe, see [`make-blood-cell-bed.r`](https://github.com/MRCIEU/dnam-lung-cancer-pipeline/tree/main/scripts/make-blood-cell-bed.r). This script walks through:
-
-- Extracting WGBS signal from public blood datasets using [`wgbs_tools`](https://github.com/nloyfer/wgbs_tools)
-- Formatting to BED + β‑matrix for use with the Houseman cell count algorithm
-
-You can use the same workflow as a template to generate reference files for other tissues or custom panels.
+---
 
 **Source:**  
+
 Blood cell types extended list was downloaded from Loyfer et al., 2021 `Supplementary Table S4C`, which includes a list of 50,286 cell type-specific unmethylated markers.  
 For this pipeline, the top 1,000 markers (hg19 coordinates) were used.
