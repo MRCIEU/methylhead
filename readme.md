@@ -57,7 +57,7 @@ nextflow -C nextflow-test.config run main.nf
 ## 3 · (One‑off) Build the reference genome (≈ 2 h)
 
 ```bash
-bash scripts/prepare-reference-genome.sh -N you@example.com
+bash scripts/create-reference.sh -N you@example.com
 ```
 
 *Creates `reference/hg19/` with all **bwameth** indices.*
