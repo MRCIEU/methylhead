@@ -9,26 +9,26 @@
 ### Contents
 
 - [input/](input): files for test dataset analysis
-    - [input/panel.csv](input/panel.csv): panel of capture regions for the test dataset (created by src/select-test-panel.sh)
+    - [input/panel.csv](input/panel.csv): panel of capture regions for the test dataset (created by scripts/select-test-panel.sh)
     - [input/models.csv](input/models.csv): models for testing associations in the test dataset
     - [input/phenotypes.csv](input/phenotypes.csv): phenotype data for testing associations in the test dataset
-- [reference/](reference): genome reference for aligning the test dataset (created by src/create-test-reference.sh)
-- [dataset/](dataset): fastq files for the test dataset (created by src/create-test-fastq-files.sh)
-- [src/](src): scripts to recreate the test dataset
-    - [src/create-test-dataset.sh](src/create-test-dataset.sh): script to recreate the test dataset, uses the scripts listed below
-    - [src/download-dataset.sh](src/download-dataset.sh): downloads the dataset
-    - [src/create-reference.sh](src/create-reference.sh): creates reference for the full genome
-	- [src/align-dataset.sh](src/align-dataset.sh): aligns reads from the original dataset to the genome (hg19) with BWAmeth 
-    - [src/select-test-panel.sh](src/select-test-panel.sh): creates panel of regions for test dataset
-    - [src/create-test-fastq-files.sh](src/create-test-fastq-files.sh): creates fastq files for test dataset
-    - [src/create-test-reference.sh](src/create-test-reference.sh): creates reference for the test genome
+- [reference/](reference): genome reference for aligning the test dataset (created by scripts/create-test-reference.sh)
+- [dataset/](dataset): fastq files for the test dataset (created by scripts/create-test-fastq-files.sh)
+- [scripts/](src): scripts to recreate the test dataset
+    - [scripts/create-test-dataset.sh](scripts/create-test-dataset.sh): script to recreate the test dataset, uses the scripts listed below
+    - [scripts/download-dataset.sh](scripts/download-dataset.sh): downloads the dataset
+    - [scripts/create-reference.sh](scripts/create-reference.sh): creates reference for the full genome
+	- [scripts/align-dataset.sh](scripts/align-dataset.sh): aligns reads from the original dataset to the genome (hg19) with BWAmeth 
+    - [scripts/select-test-panel.sh](scripts/select-test-panel.sh): creates panel of regions for test dataset
+    - [scripts/create-test-fastq-files.sh](scripts/create-test-fastq-files.sh): creates fastq files for test dataset
+    - [scripts/create-test-reference.sh](scripts/create-test-reference.sh): creates reference for the test genome
 
 ---
 
 ## Recreate the test dataset
 
 ```
-bash src/create-test-dataset.sh
+bash scripts/create-test-dataset.sh
 ```
 
 **Requirements**
