@@ -14,6 +14,6 @@ process interval_file {
     picard BedToIntervalList \
     I=${params.target_regions} \
     O=interval_file \
-    SD=${params.genome_folder}.dict
+    SD=${params.genome_folder}
     """
 }
