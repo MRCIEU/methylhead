@@ -119,4 +119,19 @@ for BAM in "$BAM_DIR"/*.bam; do
 done
 shopt -u nullglob
 
+do_cleanup() {
+  echo -e "\n[*] Final cleanup…"
+
+  # 1. Delete CpG bedGraphs (keep .txt summary if you like)
+  find "$OUT_DIR" -type f -name '*_methylation_CpG.bedGraph' -print -delete
+
+  # 2. Remove padded BED if you don’t care to reuse
+  rm -f "$PAD_BED"
+
+  # 3. Purge container images (comment out to keep cache)
+  rm -f "$WGBS_SIF" "$BED_SIF"
+}
+
+# run even if script exits early
+trap do_cleanup EXIT
 echo -e "\n🎉  Pipeline finished — results in $OUT_DIR"
