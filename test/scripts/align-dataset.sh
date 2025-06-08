@@ -6,27 +6,18 @@ set -euo pipefail
 ###############################################################################
 APPTAINER_BIN=apptainer
 
-# -- main WGBS toolchain (unchanged) -----------------------------------------
 PIPELINE_REMOTE="oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis"
 PIPE_SIF=$(mktemp -u --suffix .sif)
 
-# -- Bedtools container ------------------------------------------------------
-BEDTOOLS_REMOTE="docker://quay.io/biocontainers/bedtools:2.31.0--h468198e_0"
-
-BEDTOOLS_SIF=$(mktemp -u --suffix .sif)
-
 echo "[*] Pulling WGBS container:   $PIPELINE_REMOTE"
 "$APPTAINER_BIN" pull "$PIPE_SIF" "$PIPELINE_REMOTE"
-
-echo "[*] Pulling Bedtools container: $BEDTOOLS_REMOTE"
-"$APPTAINER_BIN" pull "$BEDTOOLS_SIF" "$BEDTOOLS_REMOTE"
 
 ###############################################################################
 # ARGUMENTS
 ###############################################################################
 if [[ $# -lt 3 ]]; then
   echo "Usage: $0 <REF_FASTA> <RAW_FASTQ_DIR> <OUT_DIR> [THREADS]" >&2
-  rm -f "$PIPE_SIF" "$BEDTOOLS_SIF"; exit 1
+  rm -f "$PIPE_SIF"; exit 1
 fi
 
 REF_FASTA=$(readlink -f "$1")
@@ -39,7 +30,7 @@ BAM_DIR="${OUT_DIR}/bam"
 mkdir -p "$TRIM_DIR" "$BAM_DIR"
 
 ###############################################################################
-# Helper wrappers
+# Helper wrapper
 ###############################################################################
 pipe_exec() {
   "$APPTAINER_BIN" exec \
@@ -48,13 +39,6 @@ pipe_exec() {
     --bind "$TRIM_DIR":"$TRIM_DIR" \
     --bind "$BAM_DIR":"$BAM_DIR" \
     "$PIPE_SIF" "$@"
-}
-
-bedtools_exec() {
-  "$APPTAINER_BIN" exec \
-    --bind "$BAM_DIR":"$BAM_DIR" \
-    --bind "$TRIM_DIR":"$TRIM_DIR" \
-    "$BEDTOOLS_SIF" bedtools "$@"
 }
 
 ###############################################################################
@@ -68,7 +52,7 @@ else
 fi
 
 ###############################################################################
-# 2) FASTQ ➜ Trim ➜ BWAmeth ➜ BAM ➜ Bedtools QC (optional)
+# 2) FASTQ ➜ Trim ➜ BWAmeth ➜ BAM
 ###############################################################################
 mapfile -t raw_r1_list < <(find "$RAW_DIR" -type f \( \
       -name '*_R1*.fastq.gz' -o -name '*_R1*.fq.gz' \
@@ -78,7 +62,6 @@ mapfile -t raw_r1_list < <(find "$RAW_DIR" -type f \( \
 [[ ${#raw_r1_list[@]} -eq 0 ]] && { echo "(!) No FASTQs found"; exit 1; }
 
 for r1 in "${raw_r1_list[@]}"; do
-  # -------- derive mate & sample name --------
   if [[ "$r1" =~ _R1 ]]; then
     r2="${r1/_R1/_R2}"; sample=$(basename "$r1" | sed -E 's/_R1[^.]*\.f(ast)?q\.gz//')
   else
@@ -89,7 +72,6 @@ for r1 in "${raw_r1_list[@]}"; do
   trimmed_r1="${TRIM_DIR}/${sample}_val_1.fq.gz"
   trimmed_r2="${TRIM_DIR}/${sample}_val_2.fq.gz"
 
-  # -------- Trim Galore! --------
   if [[ -s "$trimmed_r1" && -s "$trimmed_r2" ]]; then
     echo "[·] $sample already trimmed."
   else
@@ -98,7 +80,6 @@ for r1 in "${raw_r1_list[@]}"; do
         --basename "$sample" --output_dir "$TRIM_DIR" "$r1" "$r2"
   fi
 
-  # -------- BWAmeth ➜ BAM --------
   bam_out="${BAM_DIR}/${sample}.sorted.bam"
   if [[ -f "$bam_out" ]]; then
     echo "[·] BAM exists for $sample."
@@ -112,20 +93,13 @@ for r1 in "${raw_r1_list[@]}"; do
       samtools index '$bam_out'
     "
   fi
-
-  # -------- Bedtools example (optional) --------
-  cov_out="${BAM_DIR}/${sample}.cov.bedgraph"
-  if [[ ! -f "$cov_out" ]]; then
-    echo "[*] Bedtools genomecov for $sample"
-    bedtools_exec genomecov -ibam "$bam_out" -bga > "$cov_out"
-  fi
 done
 
 echo '======================================'
-echo 'All samples trimmed, aligned, indexed, and Bedtools step completed!'
+echo 'All samples trimmed, aligned, indexed!'
 
 ###############################################################################
 # Cleanup
 ###############################################################################
-echo "[*] Removing temporary container files"
-rm -f "$PIPE_SIF" "$BEDTOOLS_SIF"
+echo "[*] Removing temporary container file"
+rm -f "$PIPE_SIF"
