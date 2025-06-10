@@ -2,9 +2,13 @@
 
 set -euo pipefail
 
-# Directory to store downloaded FASTQ files
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $0 <output-dir>"
+  exit 1
+fi
 
-TARGET_DIR="fastq-files"
+
+TARGET_DIR="$1"
 mkdir -p "$TARGET_DIR"
 cd "$TARGET_DIR"
 
