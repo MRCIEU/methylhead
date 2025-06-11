@@ -23,50 +23,50 @@ if [[ $# -lt 2 ]]; then
     exit 1
 fi
 
-GENOME="$1"
-OUTDIR="$2"
+GENOME=$(readlink -f "$1")
+OUTDIR=$(readlink -f "$2")
 EMAIL=""
 
-# Validate genome name and set download URL
-case "$GENOME" in
-    hg19)
-        FA="hg19.fa"
-        URL="https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz"
-        ;;
-    hg38)
-        FA="hg38.fa"
-        URL="https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz"
-        ;;
-    mm10)
-        FA="mm10.fa"
-        URL="https://hgdownload.soe.ucsc.edu/goldenPath/mm10/bigZips/mm10.fa.gz"
-        ;;
-    *)
-        echo "Error: genome must be one of: hg19, hg38, mm10"
-        exit 2
-        ;;
-esac
+if ! [ -f ${GENOME} ]; then
+    URL_TEMPLATE="https://hgdownload.soe.ucsc.edu/goldenPath/ASSEMBLY/bigZips/ASSEMBLY.fa.gz"
+    URL=${URL_TEMPLATE/ASSEMBLY/$GENOME}
+    FA="${GENOME}.fa"
+else
+    FA=$GENOME
+fi
 
 # Optional: email notification
 if [[ $# -ge 4 && "$3" == "-N" ]]; then
     EMAIL="$4"
 fi
 
+##################################################
+## container config
+##################################################
 SIF_NAME="methylhead-pipeline_wgbs_analysis.sif"
 SIF_ORAS="oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis"
+
+# Download container image and reference genome
+rm -f "$SIF_NAME"
+apptainer pull "$SIF_NAME" "$SIF_ORAS"
+
+
+##################################################
+## logging config
+##################################################
 LOGFILE="$(pwd)/$(basename "$0").log"
 SECONDS=0
 
 # Log stdout and stderr to file and screen
 exec > >(tee -a "$LOGFILE") 2>&1
 
+##################################################
+## download and index genome
+#################################################
+
 # Create output directory and enter it
 mkdir -p "$OUTDIR"
 cd "$OUTDIR"
-
-# Download container image and reference genome
-rm -f "$SIF_NAME"
-apptainer pull "$SIF_NAME" "$SIF_ORAS"
 
 # Download and decompress reference genome if not present
 [ -s "$FA" ] || { wget -qO- "$URL" | gunzip -c > "$FA"; }
@@ -86,7 +86,9 @@ fi
 
 echo "Reference genome prepared in $(pwd)"
 
-# Cleanup function and optional email notification
+#################################################
+# cleanup
+#################################################
 cleanup() {
     STATUS=$?
     ELAPSED=$SECONDS

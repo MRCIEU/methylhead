@@ -1,7 +1,10 @@
 # Read blood panel data
 library(data.table) 
 
-blood_panel <- data.frame(fread("https://github.com/MRCIEU/dnam-lung-cancer-pipeline/blob/main/data/blood_cell_types_extended.bed")) 
+
+blood_panel <- data.frame(fread("https://github.com/MRCIEU/dnam-lung-cancer-pipeline/blob/main/data/blood_cell_types_extended.bed"))
+... this will fail now the the file no longer exists and the repository name has changed
+... this input should be an argument to the script to make it more flexible
 colnames(blood_panel) <- c("chr", "start", "end")
 
 # Iterate through each row of the panel to extract regions
@@ -17,3 +20,7 @@ awk 'BEGIN {FS="[:-]"; OFS="\t"} {start=$1+$2; end=$3+$4; print $1, start, end, 
 
 # Convert beta values to table format and save to CSV file
 ./wgbstools beta_to_table  blood-cell-sites.bed --betas *.beta | column -t > blood_cell_types.csv
+... output filename does not match the one we have: data/blood_cell_types_extended.zip
+... this should be an argument to the script to make it more flexible
+
+... panel-BS-sites.txt and blood-cell-sites.bed should be deleted at the end of the script
