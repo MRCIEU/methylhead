@@ -1,23 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-###############################################################################
-# CONFIG
-###############################################################################
-APPTAINER_BIN=apptainer
+#############################################################################
+# Align paired-end reads
+#
+# USAGE
+#   bash scripts/align-dataset.sh <REF_FASTA> <RAW_DIR> <OUT_DIR> [THREADS] 
+#############################################################################
 
-PIPELINE_REMOTE="oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis"
-PIPE_SIF=$(mktemp -u --suffix .sif)
-
-echo "[*] Pulling WGBS container:   $PIPELINE_REMOTE"
-"$APPTAINER_BIN" pull "$PIPE_SIF" "$PIPELINE_REMOTE"
-
-###############################################################################
-# ARGUMENTS
-###############################################################################
 if [[ $# -lt 3 ]]; then
   echo "Usage: $0 <REF_FASTA> <RAW_FASTQ_DIR> <OUT_DIR> [THREADS]" >&2
-  rm -f "$PIPE_SIF"; exit 1
+  exit 1
 fi
 
 REF_FASTA=$(readlink -f "$1")
@@ -29,77 +22,65 @@ TRIM_DIR="${OUT_DIR}/trimmed"
 BAM_DIR="${OUT_DIR}/bam"
 mkdir -p "$TRIM_DIR" "$BAM_DIR"
 
-###############################################################################
-# Helper wrapper
-###############################################################################
-pipe_exec() {
-  "$APPTAINER_BIN" exec \
-    --bind "$REF_FASTA":"$REF_FASTA" \
-    --bind "$RAW_DIR":"$RAW_DIR" \
-    --bind "$TRIM_DIR":"$TRIM_DIR" \
-    --bind "$BAM_DIR":"$BAM_DIR" \
-    "$PIPE_SIF" "$@"
-}
 
-###############################################################################
-# 1) BWAmeth index (one-off)
-###############################################################################
+## BWAmeth index (one-off)
 if ! ls "${REF_FASTA}".*bwameth.c2t* &>/dev/null; then
-  echo "[*] Building BWAmeth index"
-  pipe_exec bwameth.py index "$REF_FASTA"
+    echo "[*] Building BWAmeth index"
+    bwameth.py index "$REF_FASTA"
 else
-  echo "[·] BWAmeth index already present."
+    echo "[·] BWAmeth index already present."
 fi
 
-###############################################################################
-# 2) FASTQ ➜ Trim ➜ BWAmeth ➜ BAM
-###############################################################################
-mapfile -t raw_r1_list < <(find "$RAW_DIR" -type f \( \
+## FASTQ ➜ Trim ➜ BWAmeth ➜ BAM
+
+## make a list of first read files (wide variety of possible name schemes)
+mapfile -t RAW_R1_LIST < <(find "$RAW_DIR" -type f \( \
       -name '*_R1*.fastq.gz' -o -name '*_R1*.fq.gz' \
       -o -name '*_1*.fastq.gz'  -o -name '*_1*.fq.gz' \
     \) | sort)
 
-[[ ${#raw_r1_list[@]} -eq 0 ]] && { echo "(!) No FASTQs found"; exit 1; }
+## quit if there are no such files
+[[ ${#RAW_R1_LIST[@]} -eq 0 ]] && { echo "(!) No FASTQs found"; exit 1; }
 
-for r1 in "${raw_r1_list[@]}"; do
-  if [[ "$r1" =~ _R1 ]]; then
-    r2="${r1/_R1/_R2}"; sample=$(basename "$r1" | sed -E 's/_R1[^.]*\.f(ast)?q\.gz//')
-  else
-    r2="${r1/_1/_2}";   sample=$(basename "$r1" | sed -E 's/_1[^.]*\.f(ast)?q\.gz//')
-  fi
-  [[ -f "$r2" ]] || { echo "(!) R2 missing for $sample, skipping."; continue; }
+## for each first read file
+for RAW_R1 in "${RAW_R1_LIST[@]}"; do
+    ## identify the paired read file
+    if [[ "$RAW_R1" =~ _R1 ]]; then
+	RAW_R2="${RAW_R1/_R1/_R2}"; 
+	SAMPLE=$(basename "$RAW_R1" | sed -E 's/_R1[^.]*\.f(ast)?q\.gz//')
+    else
+	RAW_R2="${RAW_R1/_1/_2}";   
+	SAMPLE=$(basename "$RAW_R1" | sed -E 's/_1[^.]*\.f(ast)?q\.gz//')
+    fi
+    [[ -f "$RAW_R2" ]] || { 
+	echo "(!) R2 missing for $SAMPLE, skipping."; continue; 
+    }
 
-  trimmed_r1="${TRIM_DIR}/${sample}_val_1.fq.gz"
-  trimmed_r2="${TRIM_DIR}/${sample}_val_2.fq.gz"
+    ## trim read pairs
+    TRIMMED_R1="${TRIM_DIR}/${SAMPLE}_val_1.fq.gz"
+    TRIMMED_R2="${TRIM_DIR}/${SAMPLE}_val_2.fq.gz"
+    if [[ -s "$TRIMMED_R1" && -s "$TRIMMED_R2" ]]; then
+	echo "[·] $SAMPLE already trimmed."
+    else
+	echo "[*] Trimming $SAMPLE"
+	trim_galore --paired --gzip --cores "$THREADS" \
+            --basename "$SAMPLE" --output_dir "$TRIM_DIR" \
+	    "$RAW_R1" "$RAW_R2"
+    fi
 
-  if [[ -s "$trimmed_r1" && -s "$trimmed_r2" ]]; then
-    echo "[·] $sample already trimmed."
-  else
-    echo "[*] Trimming $sample"
-    pipe_exec trim_galore --paired --gzip --cores "$THREADS" \
-        --basename "$sample" --output_dir "$TRIM_DIR" "$r1" "$r2"
-  fi
-
-  bam_out="${BAM_DIR}/${sample}.sorted.bam"
-  if [[ -f "$bam_out" ]]; then
-    echo "[·] BAM exists for $sample."
-  else
-    echo "[*] Aligning $sample with BWAmeth"
-    pipe_exec bash -c "
-      set -eo pipefail
-      bwameth.py --reference '$REF_FASTA' --threads $THREADS \
-        '$trimmed_r1' '$trimmed_r2' | \
-      samtools sort -@ $THREADS -o '$bam_out' - && \
-      samtools index '$bam_out'
-    "
-  fi
+    ## align read pairs
+    BAM_FILE="${BAM_DIR}/${SAMPLE}.sorted.bam"
+    if [[ -f "$BAM_FILE" ]]; then
+	echo "[·] BAM exists for $SAMPLE."
+    else
+	echo "[*] Aligning $SAMPLE with BWAmeth"
+	bwameth.py --reference "$REF_FASTA" --threads $THREADS \
+            "$TRIMMED_R1" "$TRIMMED_R2" | \
+	    samtools sort -@ $THREADS -o "$BAM_FILE" - && \
+	    samtools index "$BAM_FILE"
+    fi
 done
 
 echo '======================================'
 echo 'All samples trimmed, aligned, indexed!'
 
-###############################################################################
-# Cleanup
-###############################################################################
-echo "[*] Removing temporary container file"
-rm -f "$PIPE_SIF"

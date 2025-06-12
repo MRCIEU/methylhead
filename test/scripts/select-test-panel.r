@@ -1,28 +1,36 @@
 #!/usr/bin/env Rscript
 args = commandArgs(trailingOnly=TRUE)
 
-input_panel_filename = args[1]
-coverage_filename = args[2]
-panel_filename = args[3]
-bed_filename = args[4]
+if (length(args) != 4) {
+    stop("Usage: Rscript select-test-panel.r original-panel.csv read-counts.bed panel.csv panel.bed")
+}
 
-## load cell count regions with coverage info
+## original lung cancer target panel (hg19 coords)
+original_panel_filename = args[1]
+## cell type regions with read counts (hg19 coords)
+cell_types_filename = args[2]
+## target panel csv for test dataset (new coords and hg19 coords)
+panel_filename = args[3]
+## target panel bed for test dataset (hg19 coords)
+bed_filename = args[4]            
+
+## load cell count regions with counts info
 ## (keep only regions with at least 5bp coverage)
-coverage = read.table(coverage_filename, sep="\t", header=F)
-cell_type_regions = coverage[,1:3]
-coverage = coverage[,-(1:3)]
+cell_type_regions = read.table(cell_types_filename, sep="\t", header=F)
+read_counts = cell_type_regions[,-(1:3)]
+cell_type_regions = cell_type_regions[,1:3]
 colnames(cell_type_regions) = c("chr","start","end")
-colnames(coverage) = paste0("s",1:ncol(coverage))
-coverage = coverage/(cell_type_regions$end-cell_type_regions$start)
+colnames(read_counts) = paste0("s",1:ncol(read_counts))
+coverage = read_counts/(cell_type_regions$end-cell_type_regions$start)
 mincov = apply(coverage, 1, min)
 cell_type_regions = cell_type_regions[mincov > 5,]
 
 ## load original lung cancer panel
-panel = read.csv(input_panel_filename)
-panel$chr = paste0("chr",panel$chr)
+original_panel = read.csv(original_panel_filename)
+original_panel$chr = paste0("chr",original_panel$chr)
 
 ## merge panel and filtered cell count regions
-targets = rbind(cell_type_regions, panel[,c("chr","start","end")])
+targets = rbind(cell_type_regions, original_panel[,c("chr","start","end")])
 targets = unique(targets)
 
 ## extend target regions by 100 bp

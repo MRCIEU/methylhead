@@ -1,7 +1,9 @@
 #!/usr/bin/env Rscript
 args = commandArgs(trailingOnly=TRUE)
 
-#args = c("../data/blood-cell-type-reference.csv.gz", "input/panel.csv", "data/blood-cell-type-reference.csv")
+if (length(args) != 3) {
+    stop("Usage: Rsript scripts/create-test-cell-type-reference.r original-blood-cell-type-reference.csv input/panel.csv data/blood-cell-type-reference.csv")
+}
 
 original_reference_filename = args[1]
 panel_filename = args[2]

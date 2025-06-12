@@ -8,7 +8,7 @@ set -euo pipefail
 #   bash create-test-genome.sh <original_fasta> <regions_bed> <genome_fasta>
 #
 #   <original_fasta>  : Original genome FASTA
-#   <regions_csv>     : Target regions BED
+#   <regions_bed>     : Target regions BED
 #   <genome_fasta>    : Test genome FASTA
 ################################################################################
 
@@ -17,35 +17,27 @@ if [[ $# -ne 3 ]]; then
   exit 1
 fi
 
-ORIGINAL_FASTA="$(readlink -f "$1")"
-REGIONS_BED="$(readlink -f "$2")"
-GENOME_FASTA="$(readlink -f "$3")"
+echo "here"
+
+ORIGINAL_FASTA="$1" 
+REGIONS_BED="$2"
+GENOME_FASTA="$3"
 
 GENOME_DIR=`dirname "$GENOME_FASTA"`
+
+echo "$GENOME_DIR"
+
 mkdir -p $GENOME_DIR
 
-###############################################################################
-# container config
-###############################################################################
+echo "$REGIONS_BED"
 
-SIF_NAME="methylhead-pipeline_bedtools.sif"
-SIF_ORAS="docker://quay.io/biocontainers/bedtools:2.30.0--hc088bd4_0"
-
-###############################################################################
 # generate fasta file for all target regions
-###############################################################################
+bedtools getfasta -fi "$ORIGINAL_FASTA" \
+    -bed "$REGIONS_BED" -fo "${GENOME_FASTA}.tmp"
 
-apptainer exec \
-    --bind "$ORIGINAL_FASTA":"$ORIGINAL_FASTA" \
-    --bind "$REGIONS_BED":"$REGIONS_BED" \
-    --bind "$GENOME_DIR":"$GENOME_DIR" \
-    "$SIF_NAME" \
-    bedtools getfasta -fi "$ORIGINAL_FASTA" -bed "$REGIONS_BED" -fo "${GENOME_FASTA}.tmp"
+echo "$GENOME_FASTA"
 
-###############################################################################
 # merge all segments from the same chromosome into a single FASTA entry
-###############################################################################
-
 awk '
 /^>/ {
   split($0, arr, "[:]");
@@ -67,13 +59,10 @@ END {
 
 echo "Fasta file generated: $GENOME_FASTA"
 
-##################################################
 ## cleanup
-##################################################
 do_cleanup() {
   echo -e "\n[*] Final cleanup…"
   rm -f "${GENOME_FASTA}.tmp"
-  rm -f "${SIF_NAME}"
 }
 
 trap do_cleanup EXIT
