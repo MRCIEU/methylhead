@@ -23,11 +23,16 @@
 ## Recreate the test dataset
 
 ```
-bash scripts/create-test-dataset.sh 
+bash scripts/create-test-dataset.sh PATH/TO/ORIGINAL/DATA PATH/TO/HG19/INDEX
 ```
 
-Scripts that depend on tools that are not part of a
-typical linux environment use apptainer containers.
-Consequently, the only dependency of this pipeline is apptainer.
+* `PATH/TO/ORIGINAL/DATA` The location where the original dataset should
+be (or has been) downloaded and aligned.
+* `PATH/TO/HG19/INDEX` The location where the human genome (hg19) should be (or has been) downloaded and indexed for sequence alignment.
+
+**Requirements**
+
+* [Apptainer](https://apptainer.org/): scripts that depend on tools that are not part of a typical linux environment are executed as apptainer containers.
+
 
 

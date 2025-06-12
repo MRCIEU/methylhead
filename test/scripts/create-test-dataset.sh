@@ -16,9 +16,6 @@ fi
 DATA_DIR=$(readlink -f "$1")
 GENOME_DIR=$(readlink -f "$2")
 
-#DATA_DIR=/projects/MRC-IEU/research/projects/icep2/wp3/004/working/data/pipeline-test-dataset/
-#GENOME_DIR=$(readlink -f "$DATA_DIR/../genome-references")
-
 REPO_BASE_DIR=$(readlink -f ..)
 
 ##################################################
