@@ -7,7 +7,7 @@ process interval_file {
     path params.genome_folder
 
   output:
-    path "interval_file", emit: panel_bed
+    path "interval_file", emit: interval_file
 
   script:
     """
