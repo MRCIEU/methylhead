@@ -33,9 +33,9 @@ original_panel$chr = paste0("chr",original_panel$chr)
 targets = rbind(cell_type_regions, original_panel[,c("chr","start","end")])
 targets = unique(targets)
 
-## extend target regions by 100 bp
-targets$start = targets$start - 100
-targets$end = targets$end + 100
+## extend target regions by 500 bp
+targets$start = targets$start - 500
+targets$end = targets$end + 500
 
 stopifnot(all(targets$start > 0))
 
@@ -72,9 +72,9 @@ converted_targets$original_start = targets$start
 converted_targets$original_end = targets$end
 for (chr in unique(targets$chr)) {
     idx = which(targets$chr == chr)
-    target_length = targets$end[idx]-targets$start[idx] + 1
+    target_length = targets$end[idx]-targets$start[idx]
     converted_targets$end[idx] = cumsum(target_length)
-    converted_targets$start[idx] = converted_targets$end[idx] - target_length + 1
+    converted_targets$start[idx] = converted_targets$end[idx]-target_length
 }
 
 ## save panel
