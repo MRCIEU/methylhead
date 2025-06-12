@@ -38,7 +38,7 @@ workflow pipeline {
         fileSize[0] >= 0.500 && fileSize[1] >= 0.500 }
     fastqc(clean_files_ch) 
     trim_galore(clean_files_ch) 
-    interval_file(params.target_regions,params.genome_folder) 
+    interval_file(params.panel,params.genome_folder) 
        genome_folder=params.genome_folder
     alignment(trim_galore.out.fq, genome_folder)
        mybamsample = alignment.out.bam
@@ -67,7 +67,7 @@ workflow pipeline {
     methylation_matrix_process(files_ch) 
        methylation_matrix=methylation_matrix_process.out.meth_matrix
     illumina_matrix_450k(methylation_matrix)   
-    estimate_cell_counts(methylation_matrix) 
+    estimate_cell_counts(methylation_matrix,params.cell_reference) 
     dna_methylation_scores(methylation_matrix)                  
        files_ch= camda.out.camda
           .map { file -> file.toString() }
