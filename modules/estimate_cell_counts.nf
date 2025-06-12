@@ -4,12 +4,13 @@ process estimate_cell_counts {
   
   input: 
     path methylation_matrix
+    path cell_reference
     
   output:
     path ("estimate-cell-counts.csv") , emit: estimate_cell_counts
       
   shell:
     """   
-    Rscript --vanilla ${projectDir}/scripts/estimate-cell-counts.r ${baseDir}/data/blood_cell_types_extended.zip ${methylation_matrix} estimate-cell-counts.csv
+    Rscript --vanilla ${projectDir}/scripts/estimate-cell-counts.r ${cell_reference} ${methylation_matrix} estimate-cell-counts.csv
     """
 }
