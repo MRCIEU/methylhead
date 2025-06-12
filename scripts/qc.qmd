@@ -60,7 +60,6 @@ estimate_cell_count <- estimate_cell_count[, c("cell_type", reads$Sample)]
 if (params$dataset == "panel") {
   
   panel <- data.frame(fread(params$panel_data))
-  panel$chr <- paste0("chr", panel$chr)
   panel$loc <- paste(panel$chr, panel$start)
   panel <- merge(panel, methylation_matrix, by = "loc")
   panel <- panel %>% select(-matches("source|details|chr|start|end"))
