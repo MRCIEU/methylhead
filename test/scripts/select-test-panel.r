@@ -14,6 +14,8 @@ panel_filename = args[3]
 ## target panel bed for test dataset (hg19 coords)
 bed_filename = args[4]            
 
+options(scipen=999)
+
 ## load cell count regions with counts info
 ## (keep only regions with at least 5bp coverage)
 cell_type_regions = read.table(cell_types_filename, sep="\t", header=F)
