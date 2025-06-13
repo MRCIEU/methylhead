@@ -11,9 +11,15 @@ process interval_file {
 
   script:
     """
-    awk -F, 'NR>1 && \$2!=\$3 {printf "%s\t%d\t%d\n",\$1,int(\$2),int(\$3)}' "${panel}" \
+    set -euo pipefail
+
+    awk -F, 'NR>1 && \$2!=\$3 {printf "%s\\t%d\\t%d\\n",\$1,int(\$2),int(\$3)}' "${panel}" \\
       | sort -k1,1 -k2,2n > panel.bed
 
+    if [[ ! -s panel.bed ]]; then
+        echo "panel.bed is empty or missing!"
+        exit 1
+    fi
     picard BedToIntervalList \
         I=panel.bed \
         O=interval_file \
