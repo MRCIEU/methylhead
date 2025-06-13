@@ -58,16 +58,20 @@ colnames(estimate_cell_count) <- sub("\\.", "-", gsub("^X", "", colnames(estimat
 estimate_cell_count <- estimate_cell_count[, c("cell_type", reads$Sample)]
 
 if (params$dataset == "panel") {
-  
-  panel <- data.frame(fread(params$panel_data))
-  panel$loc <- paste(panel$chr, panel$start)
-  panel <- merge(panel, methylation_matrix, by = "loc")
-  panel <- panel %>% select(-matches("source|details|chr|start|end"))
+  panel <- fread(params$panel_data)
+  setnames(panel, c("chr","start","end"), c("chr","start","end"))
+  setnames(setDT(methylation_matrix),  c("chr","start","end"), c("chr","start","end"))
+  setkey(panel, chr, start, end)
+  setkey(setDT(methylation_matrix) ,  chr, start, end)
+  panel <- foverlaps(methylation_matrix, panel, type = "within", nomatch = 0L)
+  panel <- panel %>% select(-matches("chr|start|end"))
   panel <- panel[!duplicated(panel$loc), ]
+  panel<-data.frame(panel)
   rownames(panel) <- panel$loc
   colnames(panel) <- sub("\\.", "-", gsub("^X", "", colnames(panel)))
   input.data <- panel[, reads$Sample]
 } else {
+  methylation_matrix<-data.frame(methylation_matrix)
   colnames(methylation_matrix) <- sub("\\.", "-", gsub("^X", "", colnames(methylation_matrix)))
   input.data <- methylation_matrix[, reads$Sample] 
 }
