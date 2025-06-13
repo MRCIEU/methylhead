@@ -7,9 +7,12 @@ Contains the **top 1,000** cell-type–specific unmethylated markers (hg19 coord
 * Requires [`wgbstools`](https://github.com/nloyfer/wgbs_tools).
 
 - Download the input <beta-files> with:
+[blood-cell-type-download.sh](https://github.com/MRCIEU/methylhead/blob/main/scripts/blood-cell-type-download.sh)
 ```
-bash script/blood-cell-type-download.sh
+bash ./scripts/blood-cell-type-download.sh <output-dir>
 ```
+
+
 - Convert beta files to table
 ```
 wgbstools beta_to_table blood-cell-type-reference.bed --betas <beta-files> \
