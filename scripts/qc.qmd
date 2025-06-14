@@ -441,9 +441,9 @@ ggplot(prop_roi,
 
 ```{r}
 #| echo: false
-#| label: distribution of read counts in regions 1
+#| label: distribution of read counts in regions 2
 #| error: true
-#| fig-cap: "**Figure 14**: Locus-level read depth across. A log10</sub>-scaled histogram shows how many target loci fall into each coverage bin. A tall bar at the left indicates that most loci are sequenced at low depth, while the sparsity of right-hand bins reveals that very few loci achieve high coverage."
+#| fig-cap: "**Figure 14**: Distribution of locus read depths per sample. Each horizontal box-and-whisker summarises the coverage spread within a single library. Medians (bold lines) reflect typical depth, box heights show inter-quartile ranges, and outlying points highlight loci that are substantially over-or under-represented. Consistent boxes imply balanced libraries; wide or low-lying boxes flag samples that may need re-sequencing or library optimisation."
 
 roi_label <- if (!exists("params") || is.null(params$dataset)) {
                "selected CpG loci"
@@ -462,22 +462,6 @@ cov_long <- pivot_longer(
     names_to  = "Sample",
     values_to = "Read_Count"
 )
-
-ggplot(cov_long, aes(x = Read_Count)) +
-  geom_histogram(binwidth = 1,
-                 colour = "grey30",
-                 fill   = "#69b3a2") +
-  scale_x_log10() +
-  labs(x = "Reads per locus (log10)",
-       y = "Count of loci") +
-  theme_minimal(base_size = 11)
-```
-
-```{r}
-#| echo: false
-#| label: distribution of read counts in regions 2
-#| error: true
-#| fig-cap: "**Figure 15**: Distribution of locus read depths per sample. Each horizontal box-and-whisker summarises the coverage spread within a single library. Medians (bold lines) reflect typical depth, box heights show inter-quartile ranges, and outlying points highlight loci that are substantially over-or under-represented. Consistent boxes imply balanced libraries; wide or low-lying boxes flag samples that may need re-sequencing or library optimisation."
 
 ## summary per sample 
 summ <- aggregate(Read_Count ~ Sample, cov_long, function(x)
