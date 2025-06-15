@@ -385,56 +385,61 @@ print(plots$p1)
 print(plots$p2)
 ```
 
-## <sup>Proportion of Reads Mapped Regions</sup>
+## <sup>Total Summed Read Depth</sup>
 
 ```{r}
 #| echo: false
-#| label: Proportion of reads mapped regions
+#| label: total-summed-read-depth
 #| error: true
-#| fig-cap: "**Figure 13**: Proportion of sequencing reads assigned to regions of interest for each sample."
+#| fig-cap: "**Figure 13**: Total summed read depth across all measured loci. This represents the total sequencing yield for each sample."
+
+# Step 1: Define a dynamic label based on the dataset parameter.
+# This makes the plot titles and labels general.
 
 roi_label <- if (!exists("params") || is.null(params$dataset)) {
-               "selected CpG loci"
-             } else if (params$dataset == "panel") {
-               "targeted panel regions"
-             } else {
-               paste(params$dataset, "regions")
-             }
-# Calculate proportion of reads in ROI 
-# Ensure input.coverage is a data frame with samples as columns
+             "selected CpG loci"
+           } else if (params$dataset == "panel") {
+             "targeted panel regions"
+           } else {
+             paste(params$dataset, "regions")
+           }
+
+# Step 2: Calculate the sum of coverage depths for each sample.
+
 reads_in_roi <- colSums(input.coverage, na.rm = TRUE)
 
-prop_roi <- 
-  tibble(Sample        = names(reads_in_roi),
-         Reads_in_ROI  = reads_in_roi) %>% 
-  left_join(reads %>% select(Sample, Reads), by = "Sample") %>% 
-  mutate(Proportion_ROI = Reads_in_ROI / Reads,
-         Prop_Label     = sprintf('%.1f%%', Proportion_ROI * 100)) %>% 
-  arrange(desc(Proportion_ROI))
+# Step 3: Create a clean data frame for plotting.
+total_cov <- tibble(
+    Sample = names(reads_in_roi),
+    Total_Coverage = reads_in_roi
+  ) %>%
+  arrange(desc(Total_Coverage))
 
-ggplot(prop_roi,
-       aes(x    = reorder(Sample, Proportion_ROI),
-           y    = Proportion_ROI,
-           fill = Proportion_ROI)) +
+# Step 4: Plot the total coverage using the dynamic labels.
+ggplot(total_cov,
+       aes(x    = reorder(Sample, Total_Coverage),
+           y    = Total_Coverage,
+           fill = Total_Coverage)) +
   geom_col(width = 0.8, colour = "grey20", linewidth = 0.15) +
-  geom_text(aes(label = Prop_Label),
+  geom_text(aes(label = format(Total_Coverage, big.mark = ",")),
             hjust = -0.05, size = 3.3) +
-  scale_fill_gradient(name = paste(roi_label, "read %"),
-                      low  = "#440154",  # deep purple
-                      high = "#FDE725") +# lime-yellow
+  scale_fill_gradient(name = "Total Depth",
+                      low  = "#440154", # deep purple
+                      high = "#FDE725", # lime-yellow
+                      labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
   scale_y_continuous(
-    labels  = function(x) sprintf('%.0f%%', x * 100),
-    expand  = expansion(mult = c(0, 0.02)),
-    limits  = c(0, max(prop_roi$Proportion_ROI) * 1.05)) +
+    labels = scales::label_number(scale_cut = scales::cut_short_scale()),
+    expand = expansion(mult = c(0, 0.18))) + # More space for labels
   coord_flip(clip = "off") +
-  labs(title    = paste("Proportion of reads mapping to", roi_label),
-       subtitle = "Higher bars indicate better on-target efficiency",
+  # Use the 'roi_label' to create a dynamic title
+  labs(title    = paste("Total Summed Read Depth Across", roi_label),
+       subtitle = "Higher bars indicate greater overall sequencing yield",
        x        = "Sample",
-       y        = paste("Reads in", roi_label, "(%)")) +
+       y        = "Total Coverage Depth") +
   theme_minimal(base_size = 11) +
   theme(panel.grid.major.y = element_blank(),
-        legend.position   = "top",
-        plot.margin       = margin(5.5, 30, 5.5, 5.5))
+        legend.position    = "top",
+        plot.margin        = margin(5.5, 30, 5.5, 5.5))
 ```
 
 ## <sup>Distribution of Read Counts in Regions</sup>
