@@ -8,7 +8,7 @@ This file contains all the data for each individual in your study.
 
 * The first column **must be `sample_id`**.
 * The names in the `sample_id` column **must exactly match** your FASTQ file names.
-* All column headers should be simple, without spaces (use `_` instead if needed).
+
 
 **Example `phenotype.csv`:**
 *(Based on your provided data)*
