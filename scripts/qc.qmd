@@ -385,13 +385,13 @@ print(plots$p1)
 print(plots$p2)
 ```
 
-## <sup>Total Summed Read Depth</sup>
+## <sup>Total Read Depth</sup>
 
 ```{r}
 #| echo: false
-#| label: total-summed-read-depth
+#| label: total-read-depth
 #| error: true
-#| fig-cap: "**Figure 13**: Total summed read depth across all measured loci. This represents the total sequencing yield for each sample."
+#| fig-cap: "**Figure 13**: Total read depth across all measured loci. This represents the total sequencing yield for each sample."
 
 # Step 1: Define a dynamic label based on the dataset parameter.
 # This makes the plot titles and labels general.
@@ -432,7 +432,7 @@ ggplot(total_cov,
     expand = expansion(mult = c(0, 0.18))) + # More space for labels
   coord_flip(clip = "off") +
   # Use the 'roi_label' to create a dynamic title
-  labs(title    = paste("Total Summed Read Depth Across", roi_label),
+  labs(title    = paste("Total Read Depth Across", roi_label),
        subtitle = "Higher bars indicate greater overall sequencing yield",
        x        = "Sample",
        y        = "Total Coverage Depth") +
