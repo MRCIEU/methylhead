@@ -71,7 +71,6 @@ if (params$dataset == "panel") {
   colnames(panel) <- sub("\\.", "-", gsub("^X", "", colnames(panel)))
   input.data <- panel[, reads$Sample]
 } else {
-  methylation_matrix<-data.frame(methylation_matrix)
   colnames(methylation_matrix) <- sub("\\.", "-", gsub("^X", "", colnames(methylation_matrix)))
   input.data <- methylation_matrix[, reads$Sample] 
 }
