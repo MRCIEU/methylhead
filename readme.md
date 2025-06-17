@@ -158,7 +158,7 @@ Override with `--cell_reference` and `--panel` if you have a different panel.
 | Java `<11` warning            | Forgot to `conda activate methylhead`.                                    |
 | `No FASTQ files`              | Check your `--data` glob – must end in `.fastq.gz`.                       |
 | `Index not found for hg19.fa` | Run **4 · reference build** or point `--genome_folder` to an indexed ref. |
-
+| Path not mounted: data/reference outside `$HOME` | Move data and reference folders inside `$HOME`, **or** start Apptainer with `-B /abs/path:/abs/path` to bind-mount them. |
 ---
 
 Happy methylating 🧬🚀
