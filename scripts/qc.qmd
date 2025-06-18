@@ -40,75 +40,71 @@ for (path in files_path$V1) {
   filename <- basename(path)
   if (filename %in% names(label_map)) {
     var_name <- label_map[[filename]]
-    assign(var_name, data.frame(fread(path)), envir = .GlobalEnv)
+    assign(var_name, fread(path), envir = .GlobalEnv)
   }
 }
 
 colnames(reads)[colnames(reads) == "Reads.passing.filters"] <- "Reads"
-reads<- reads %>% mutate(Sample = gsub("(_R[12]|_[12])$", "", Sample)) %>% distinct(Sample, .keep_all = TRUE)
-coverage_matrix$loc <- paste(coverage_matrix$chr, coverage_matrix$start)
-coverage_matrix <- coverage_matrix %>% select(-matches("chr|start|end"))
-methylation_matrix$loc <- paste(methylation_matrix$chr, methylation_matrix$start)
-
-rownames(methylation_matrix) <- methylation_matrix$loc
-rownames(coverage_matrix) <- coverage_matrix$loc
-rownames(reads) <- reads$Sample
+reads <- reads %>% mutate(Sample = gsub("(_R[12]|_[12])$", "", Sample)) %>% distinct(Sample, .keep_all = TRUE)
 colnames(estimate_cell_count)[1] <- "cell_type"
-colnames(estimate_cell_count) <- sub("\\.", "-", gsub("^X", "", colnames(estimate_cell_count)))
-estimate_cell_count <- estimate_cell_count[, c("cell_type", reads$Sample)]
+panel <- fread(params$panel_data)
+setkey(panel, chr, start, end)
+setkey(methylation_matrix ,  chr, start, end)
+input.data         <- foverlaps(methylation_matrix, panel, type = "within", nomatch = 0L)
+input.coverage     <- foverlaps(coverage_matrix, panel, type = "within", nomatch = 0L)
+input.data         <- input.data %>% select(-matches("chr|start|end|details|source"))
+methylation_matrix <-methylation_matrix %>% select(-matches("chr|start|end"))
+coverage_matrix    <- coverage_matrix %>% select(-matches("chr|start|end"))
+input.coverage     <- input.coverage  %>% select(-matches("chr|start|end|details|source|i.start|i.end"))
 
-if (params$dataset == "panel") {
-  panel <- fread(params$panel_data)
-  setnames(panel, c("chr","start","end"), c("chr","start","end"))
-  setnames(setDT(methylation_matrix),  c("chr","start","end"), c("chr","start","end"))
-  setkey(panel, chr, start, end)
-  setkey(setDT(methylation_matrix) ,  chr, start, end)
-  panel <- foverlaps(methylation_matrix, panel, type = "within", nomatch = 0L)
-  panel <- panel %>% select(-matches("chr|start|end"))
-  panel <- panel[!duplicated(panel$loc), ]
-  panel<-data.frame(panel)
-  rownames(panel) <- panel$loc
-  colnames(panel) <- sub("\\.", "-", gsub("^X", "", colnames(panel)))
-  input.data <- panel[, reads$Sample]
-} else {
-  colnames(methylation_matrix) <- sub("\\.", "-", gsub("^X", "", colnames(methylation_matrix)))
-  input.data <- methylation_matrix[, reads$Sample] 
-}
-
-colnames(coverage_matrix) <- sub("\\.", "-", gsub("^X", "", colnames(coverage_matrix)))
-input.coverage <- coverage_matrix[rownames(input.data), reads$Sample]
-
-rm(coverage_matrix,methylation_matrix)
 ```
-
 ## <sup>Methylation Distribution Plot</sup>
+
+* This plot shows the distribution of DNA methylation levels across multiple samples. 
+* The x-axis represents methylation values from 0 (unmethylated) to 1 (fully methylated), while the y-axis shows the density of CpG sites. 
+* Each line corresponds to a sample, with color shading indicating overlapping densities. 
+* The bimodal pattern, with peaks near 0 and 1, is typical for methylation data, highlighting unmethylated and highly methylated CpG regions. 
+* This plot captures methylation variability across samples.
+
 ```{r}
 #| echo: false
 #| label: Density Plot of Methylation
 #| code-fold: false
-#| fig-cap: "**Figure 1**: Density Plot of Beadchip Methylation for Samples. This plot shows the distribution of DNA methylation levels across multiple samples from beadchip arrays. The x-axis represents methylation values from 0 (unmethylated) to 1 (fully methylated), while the y-axis shows the density of CpG sites. Each line corresponds to a sample, with color shading indicating overlapping densities. The bimodal pattern, with peaks near 0 and 1, is typical for methylation data, highlighting unmethylated and highly methylated CpG regions. This plot captures methylation variability across samples."
+#| fig-cap: "**Figure 1**: Density Plot of Beadchip Methylation for Samples."
 
 methylation_data_long <- input.data %>%
   pivot_longer(cols = everything(), names_to = "Sample", values_to = "Methylation")
 
-n_cpg_sites <- nrow(input.data )
-n_samples <- ncol(input.data )
-cat("Number of CpG sites:", n_cpg_sites, "\n")
-cat("Number of samples:", n_samples, "\n")
+n_panel_cpg_sites <- nrow(input.data)
+n_total_cpg_sites <- nrow(methylation_matrix)
+n_samples <- ncol(input.data)
 
-ggplot(methylation_data_long, aes(x = Methylation, fill = Sample)) +
-  geom_density(alpha = 0.4) + 
-  labs(title = "Density Plot of Beadchip Methylation for Samples", 
-       x = "Methylation", y = "Density") +
-  theme_minimal() +
-  theme(legend.position = "none")
+ggplot(methylation_data_long,
+       aes(x = Methylation, fill = sub(".*_(S\\d+)$", "\\1", Sample),
+           colour = sub(".*_(S\\d+)$", "\\1", Sample))) +
+  geom_density(alpha = 0.25, linewidth = 0.6) +
+  labs(title = "Density Plot of Methylation for Samples",
+       x = "Methylation", 
+       y = "Density",
+       fill = "Sample", 
+       colour = "Sample") + 
+  theme(legend.position = "right") +
+  annotate("text", x = Inf, y = Inf, hjust = 1.05, vjust = 1.1, size = 3,
+           label = glue::glue(
+             "Number of Panel CpG sites: {scales::comma(n_panel_cpg_sites)}\n",
+             "Number of Total CpG sites: {scales::comma(n_total_cpg_sites)}\n",
+             "Number of samples : {n_samples}"
+           ))
 ```
 ## <sup>Estimate cell counts</sup>
+
+* The plot shows data density with labels for Q1, median, and Q3.
+
 ```{r}  
 #| echo: false
 #| code-fold: false
 #| label: Violin Plot
-#| fig-cap: "**Figure 2**: The violin plot displays the distribution of estimated cell counts across cell types. The plot shows data density with labels for Q1, median, and Q3."
+#| fig-cap: "**Figure 2**: The violin plot displays the distribution of estimated cell counts across cell types."
 
 getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
 data <- estimate_cell_count %>%
@@ -149,7 +145,7 @@ print(violin_plot)
 #| echo: false 
 #| label: boxplot
 #| code-fold: false
-#| fig-cap: "**Figure 3**: The boxplot displays the distribution of estimated cell counts across cell types. The boxplot highlights the median, interquartile range, and overall data spread."
+#| fig-cap: "**Figure 3**: The boxplot displays the distribution of estimated cell counts across cell types."
 
 boxplot_plot <- ggplot(data, aes(x = CellType, y = Value, fill = CellType)) +
   geom_boxplot(width = 0.1, position = position_dodge(width = 0.8), outlier.shape = NA) + 
@@ -170,52 +166,96 @@ boxplot_plot <- ggplot(data, aes(x = CellType, y = Value, fill = CellType)) +
 print(boxplot_plot)
 ```
 ## <sup>Coverage Distribution</sup>
+
+
+* This plot illustrates the distribution of coverage for each sample, with CpG sites represented along the x-axis and coverage values on the y-axis.
+* Side-by-side view: Two boxes per sample—Panel and Total—compare on-target depth to genome-wide depth at a glance.
+* Sorted by quality: Samples are arranged by median Panel depth, putting the best on the left and weak outliers on the right.
+* Quick red-flags: Panel boxes should be higher and tighter; lower or wider ones signal poor capture or uneven coverage.
+* Separate scales: Faceting splits Panel and Total axes so absolute depths are clear, exposing samples that fall below cut-offs.
+
 ```{r}
 #| echo: false
-#| label: Coverage Distribution (density plot)
+#| label: Coverage Distribution (Boxplot) 1
 #| code-fold: false
-#| fig-cap: "**Figure 4**: Density Plot of Coverage for Samples.This plot illustrates the distribution of coverage, with CpG sites represented along the x-axis. The y-axis shows the density of coverage values. The sharp peak at low coverage values indicates that a large proportion of CpG sites have low coverage."
+#| fig-cap: "**Figure 4**:  Comparison of Coverage per Sample Between Panel and Total Regions."
 
-n_cpg_sites <- nrow(input.coverage)
-n_samples <- ncol(input.coverage)
-coverage_data_long <- input.coverage %>%
-  pivot_longer(cols = everything(),  
-               names_to = "Sample",  
-               values_to = "Coverage")  
-cat("Number of CpG sites:", n_cpg_sites, "\n")
-cat("Number of samples:", n_samples, "\n")
-ggplot(coverage_data_long, aes(x = Coverage, fill = Sample)) +
-  geom_density(alpha = 1) + 
-  labs(title = "Density Plot of Coverage for Samples", 
-       x = "Coverage", 
-       y = "Density") +
-  theme_minimal() +
-  xlim(0, 600) +
-  theme(legend.position = "none")
+n_panel_cpg_sites <- nrow(input.coverage)
+n_total_cpg_sites <- nrow(coverage_matrix)
+n_samples <- ncol(coverage_matrix)
 
-sample_median_coverage <- coverage_data_long  %>%
-    group_by(Sample) %>%
-    summarize(median_coverage = median(Coverage, na.rm = TRUE)) %>%
-    arrange(desc(median_coverage))
-  long_data_sorted <- coverage_data_long %>%
-    mutate(sample = factor(Sample, levels = sample_median_coverage$Sample))
+coverage_long <- bind_rows(
+  input.coverage   %>% 
+    mutate(Set = "Panel") %>%          
+    pivot_longer(cols = -Set,
+                 names_to = "Sample",
+                 values_to = "Coverage"),
+  coverage_matrix %>% 
+    mutate(Set = "Total") %>% 
+    pivot_longer(cols = -Set,
+                 names_to = "Sample",
+                 values_to = "Coverage")
+)
+
+sample_order <- coverage_long %>% 
+  filter(Set == "Panel") %>%                
+  group_by(Sample) %>% 
+  summarise(med = median(Coverage, na.rm = TRUE)) %>% 
+  arrange(desc(med)) %>% 
+  pull(Sample)
+
+coverage_long <- coverage_long %>% 
+  mutate(Sample = factor(Sample, levels = sample_order))
+
+ggplot(coverage_long,
+       aes(x = Sample, y = Coverage, fill = Set)) +
+  geom_boxplot(position = position_dodge(width = 0.75), outlier.size = .3) +
+  labs(title = "Coverage per Sample: Panel vs Total",
+       x = "Sample", y = "Coverage") +
+  scale_x_discrete(labels = function(x) sub(".*_(S\\d+)", "\\1", x)) +
+  theme_minimal(base_size = 9) +
+  theme(axis.text.x = element_text(angle = 90, vjust = .5, hjust = 1),
+        legend.position = "top") + 
+  annotate(
+    "text",
+    x     = Inf, y = Inf,
+    hjust = 1.05, vjust = 1.1,
+    size  = 3,
+    label = glue::glue(
+      "Panel regions: {n_panel_cpg_sites}\n",
+      "Total regions: {n_total_cpg_sites}\n",
+      "Samples: {n_samples}"
+    )
+  ) +
+  coord_cartesian(clip = "off")
 ```
 ```{r}
 #| echo: false
-#| label: Coverage Distribution (Boxplot)
+#| label: Coverage Distribution (Boxplot) 2
 #| code-fold: false
-#| fig-cap: "**Figure 5**: Boxplot of Coverage for Samples. This plot illustrates the distribution of coverage for each sample, with CpG sites represented along the x-axis and coverage values on the y-axis."
-
-ggplot(long_data_sorted, aes(x = sample, y = Coverage, fill = sample)) +
-    geom_boxplot() +
-    labs(title = "Coverage Distribution (Sorted by Median Coverage)", 
-         x = "Sample", 
-         y = "Coverage") +
-    ylim(0, 600) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 6), 
-          legend.position = "none") +
-    scale_x_discrete(labels = function(x) sub(".*_(S\\d+)", "\\1", x))
+#| fig-cap: "**Figure 5**: Boxplot of Coverage Distribution for Panel and Total Regions by Sample."
+ggplot(coverage_long,
+       aes(x = Sample, y = Coverage, fill = Set)) +
+  geom_boxplot(outlier.size = .3) +
+  facet_wrap(~Set, ncol = 1, scales = "free_y") +
+  labs(title = "Coverage per Sample: Panel & Total",
+       x = "Sample", y = "Coverage") +
+  scale_x_discrete(labels = function(x) sub(".*_(S\\d+)", "\\1", x)) +
+  theme_minimal(base_size = 9) +
+  theme(axis.text.x = element_text(angle = 90, vjust = .5, hjust = 1),
+        legend.position = "none")+
+         annotate(
+    "text",
+    x      = Inf, y = Inf,          
+    hjust  = 1.05, vjust = 1.1,
+    size   = 3,
+    label  = glue::glue(
+      "Panel regions: {n_panel_cpg_sites}\n",
+      "Total regions: {n_total_cpg_sites}\n",
+      "Samples: {n_samples}"
+    )
+  ) +
+  coord_cartesian(clip = "off")   
 ```
 ## <sup>PCA for Methylation</sup>
 ```{r, include=FALSE}
@@ -364,172 +404,190 @@ generate_correlation_plots <- function(data) {
   cat("Number of samples:", n_samples, "\n")  
   # Generate correlation plots for full dataset
  plots <- generate_correlation_plots(input.data)
+```
+* This plot shows the distribution of pairwise correlations between samples without standardizing the CpG sites. 
+* The plot provides an overview of the raw correlation data.
 
 ```{r}
 #| echo: false
 #| label: Density Plot Without Standardizing
 #| error: true
-#| fig-cap: "**Figure 11**: Density Plot Without Standardizing CpG Sites. This plot shows the distribution of pairwise correlations between samples without standardizing the CpG sites. The plot provides an overview of the raw correlation data."
+#| fig-cap: "**Figure 11**: Density Plot Without Standardizing CpG Sites."
 
 # Print the density plot for correlations without standardization
 print(plots$p1)
 ```
+* This plot shows the distribution of pairwise correlations between samples after standardizing the CpG sites. 
+
+* Standardization normalizes CpG sites across samples, offering a clearer view of relative variations in the data.
+
 ```{r}
 #| echo: false
 #| label: Density Plot With Standardizing
 #| error: true
-#| fig-cap: "**Figure 12**: Density Plot With Standardizing CpG Sites. This plot shows the distribution of pairwise correlations between samples after standardizing the CpG sites. Standardization normalizes CpG sites across samples, offering a clearer view of relative variations in the data."
-
-# Print the density plot for correlations with standardization
+#| fig-cap: "**Figure 12**: Density Plot With Standardizing CpG Sites."
 print(plots$p2)
 ```
+## <sup>Total Read Count per Sample (Coverage Depth)</sup>
 
-## <sup>Total Read Depth</sup>
+* Coverage depth, not breadth: This plot tracks the total number of reads (depth) hitting the CpG loci and serves as an important depth-based quality control metric.
+* Panel vs. total at a glance: This plot instantly identifies libraries where the total read depth is sufficient, but the panel capture produced a low number of reads (small coral bar).
 
 ```{r}
 #| echo: false
-#| label: total-read-depth
+#| label: total-read-count 
 #| error: true
-#| fig-cap: "**Figure 13**: Total read depth across all measured loci. This represents the total sequencing yield for each sample."
+#| fig-cap: "**Figure 13**: A horizontal bar plot showing, for every library, the **total number of reads** covering CpG loci in the whole methylome (blue) and in the targeted panel (coral). Values inside the bars give the raw read counts; panel bars are always shorter because their reads are a subset of the total."
 
-# Step 1: Define a dynamic label based on the dataset parameter.
-# This makes the plot titles and labels general.
-
-roi_label <- if (!exists("params") || is.null(params$dataset)) {
-             "selected CpG loci"
-           } else if (params$dataset == "panel") {
-             "targeted panel regions"
-           } else {
-             paste(params$dataset, "regions")
-           }
-
-# Step 2: Calculate the sum of coverage depths for each sample.
-
-reads_in_roi <- colSums(input.coverage, na.rm = TRUE)
-
-# Step 3: Create a clean data frame for plotting.
-total_cov <- tibble(
-    Sample = names(reads_in_roi),
-    Total_Coverage = reads_in_roi
+Panel_Regions_Depth <- colSums(input.coverage, na.rm = TRUE)
+Total_Regions_Depth <- colSums(coverage_matrix, na.rm = TRUE)
+depth_tbl <- tibble(
+  Sample        = names(Total_Regions_Depth),
+  Total_Regions = Total_Regions_Depth,
+  Panel_Regions = Panel_Regions_Depth
+) %>%
+  arrange(Total_Regions)
+depth_long <- depth_tbl %>%
+  pivot_longer(
+    cols = c(Total_Regions, Panel_Regions),
+    names_to  = "Region_Type",
+    values_to = "Count"
   ) %>%
-  arrange(desc(Total_Coverage))
+  mutate(
+    Region_Type = factor(Region_Type,
+                         levels = c("Total_Regions", "Panel_Regions")),
+    Sample      = factor(Sample, levels = depth_tbl$Sample)
+  )
 
-# Step 4: Plot the total coverage using the dynamic labels.
-ggplot(total_cov,
-       aes(x    = reorder(Sample, Total_Coverage),
-           y    = Total_Coverage,
-           fill = Total_Coverage)) +
-  geom_col(width = 0.8, colour = "grey20", linewidth = 0.15) +
-  geom_text(aes(label = format(Total_Coverage, big.mark = ",")),
-            hjust = -0.05, size = 3.3) +
-  scale_fill_gradient(name = "Total Depth",
-                      low  = "#440154", # deep purple
-                      high = "#FDE725", # lime-yellow
-                      labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
-  scale_y_continuous(
-    labels = scales::label_number(scale_cut = scales::cut_short_scale()),
-    expand = expansion(mult = c(0, 0.18))) + # More space for labels
-  coord_flip(clip = "off") +
-  # Use the 'roi_label' to create a dynamic title
-  labs(title    = paste("Total Read Depth Across", roi_label),
-       subtitle = "Higher bars indicate greater overall sequencing yield",
-       x        = "Sample",
-       y        = "Total Coverage Depth") +
+ggplot(depth_long, aes(x = Count, y = Sample, fill = Region_Type)) +
+  geom_col(position = position_dodge(width = 0.8),
+           width = 0.8, colour = "grey20", linewidth = 0.10) +
+  geom_text(aes(label = scales::comma(Count)),
+            position = position_dodge(width = 0.8),
+            hjust = -0.1, size = 3) +
+  scale_fill_manual(values = c(Total_Regions = "#4E79A7",
+                               Panel_Regions = "#E15759"),
+                    labels = c("Total Reads over All Sites", "Total Reads over Panel Sites"),
+                    name = NULL) +
+  scale_x_continuous(labels = scales::label_number(scale_cut = scales::cut_short_scale()),
+                     expand = expansion(mult = c(0, 0.35))) +
+  labs(title = "Total Read Count per Sample (Coverage Depth)",
+       x = "Total Reads Covering CpG Sites",
+       y = "Sample") + 
   theme_minimal(base_size = 11) +
-  theme(panel.grid.major.y = element_blank(),
-        legend.position    = "top",
-        plot.margin        = margin(5.5, 30, 5.5, 5.5))
+  theme(legend.position = "top",
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank()) +        
+  annotate("text", x = Inf, y = Inf, hjust = 1.05, vjust = 1.1, size = 3,
+           label = glue::glue(
+             "Total Panel CpG Sites : {scales::comma(n_panel_cpg_sites)}\n",
+             "Total CpG Sites       : {scales::comma(n_total_cpg_sites)}\n",
+             "Samples               : {n_samples}"
+           ))
 ```
 
-## <sup>Distribution of Read Counts in Regions</sup>
+## <sup>Number of CpG Sites Covered per Sample (Coverage Breadth)</sup>
+
+* Coverage breadth, not depth: This plot tracks how many unique CpG loci are detected (with ≥1 read), complementing depth-based QC by ensuring a wide range of sites were captured.
+* Panel vs. total at a glance: The plot instantly flags libraries where the panel capture was inefficient (a small coral bar), even if the overall genome-wide site capture was acceptable.
 
 ```{r}
 #| echo: false
-#| label: distribution of read counts in regions 2
+#| label: covered-site-count
 #| error: true
-#| fig-cap: "**Figure 14**: Distribution of locus read depths per sample. Each horizontal box-and-whisker summarises the coverage spread within a single library. Medians (bold lines) reflect typical depth, box heights show inter-quartile ranges, and outlying points highlight loci that are substantially over-or under-represented. Consistent boxes imply balanced libraries; wide or low-lying boxes flag samples that may need re-sequencing or library optimisation."
+#| fig-cap: "**Figure 14**: A horizontal bar plot showing, for every library, the **number of unique CpG loci** covered by at least one read (≥1× depth) in the whole methylome (blue) and in the targeted panel (coral). Values inside the bars give the raw counts of loci."
 
-roi_label <- if (!exists("params") || is.null(params$dataset)) {
-               "selected CpG loci"
-             } else if (params$dataset == "panel") {
-               "targeted panel regions"
-             } else {
-               paste(params$dataset, "regions")
-             }
+Panel_Regions_Count <- colSums(input.coverage > 0, na.rm = TRUE)
+Total_Regions_Count <- colSums(coverage_matrix > 0, na.rm = TRUE)
 
-# Long-format coverage table 
-cov_long <- as.data.frame(input.coverage)
-cov_long$loc <- rownames(cov_long)                      
-cov_long <- pivot_longer(
-    cov_long,
-    cols      = -loc,
-    names_to  = "Sample",
-    values_to = "Read_Count"
-)
+region_tbl <- tibble(
+  Sample        = names(Total_Regions_Count),
+  Total_Regions = Total_Regions_Count,
+  Panel_Regions = Panel_Regions_Count
+) %>%
+  arrange(Total_Regions)
+regions_long <- region_tbl %>%
+  pivot_longer(
+    cols = c(Total_Regions, Panel_Regions),
+    names_to  = "Region_Type",
+    values_to = "Count"
+  ) %>%
+  mutate(
+    Region_Type = factor(Region_Type,
+                         levels = c("Total_Regions", "Panel_Regions")),
+    # Sample faktör seviyelerini 'region_tbl'deki sıraya göre ayarla.
+    # Bu, ggplot'un en büyük değeri en üste çizmesini sağlar.
+    Sample      = factor(Sample, levels = region_tbl$Sample)
+  )
+ggplot(regions_long, aes(x = Count, y = Sample, fill = Region_Type)) +
+  geom_col(position = position_dodge(width = 0.8),
+           width = 0.8, colour = "grey20", linewidth = 0.10) +
+  geom_text(aes(label = scales::comma(Count)),
+            position = position_dodge(width = 0.8),
+            hjust = -0.1, size = 3) +
+  scale_fill_manual(values = c(Total_Regions = "#4E79A7",
+                               Panel_Regions = "#E15759"),
+                    labels = c("Total Covered CpG Sites", "Panel Covered CpG Sites"),
+                    name = NULL) +
+  scale_x_continuous(labels = scales::comma,
+                     expand = expansion(mult = c(0, 0.35))) + 
+  labs(title = "Number of CpG Sites Covered per Sample (Breadth)",
+       x = "Number of Covered CpG Sites",
+       y = "Sample") +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "top",
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank()) +
+  annotate("text", x = Inf, y = Inf, hjust = 1.05, vjust = 1.1, size = 3,
+           label = glue::glue(
+             "Total Panel CpG Sites : {scales::comma(n_panel_cpg_sites)}\n",
+             "Total CpG Sites       : {scales::comma(n_total_cpg_sites)}\n",
+             "Samples               : {n_samples}"
+           ))
+```
 
-## summary per sample 
-summ <- aggregate(Read_Count ~ Sample, cov_long, function(x)
-                  c(med = median(x, na.rm = TRUE),
-                    n   = length(x[!is.na(x)])))
-summ <- data.frame(
-  Sample = summ$Sample,
-  med    = summ$Read_Count[ , "med"],
-  n_loci = summ$Read_Count[ , "n"],
-  stringsAsFactors = FALSE
-)
+## <sup>Panel CpG Coverage Completeness per Sample</sup>
 
-## order samples (high-to-low median) 
-ord <- summ[order(-summ$med), "Sample"]
-cov_long$Sample <- factor(cov_long$Sample, levels = ord)
-summ$Sample     <- factor(summ$Sample,     levels = ord)
+* Panel completeness metric: Figure 14 ranks samples by the proportion of panel CpGs recovered—handy for setting an inclusion cut-off (e.g. > 95 %).
 
-## colour palette 
-pal <- colorRampPalette(c("#3957a3", "#2aa37d", "#f4c430"))(length(ord))
-names(pal) <- ord
+```{r}
+#| echo: false
+#| label: total-read-count panel  
+#| error: true
+#| fig-cap: "**Figure 15**: For each sample, the bar length equals the count of panel CpGs covered at ≥1×. The percentage label indicates what fraction of the fixed panel size ( *n = r total_panel_sites CpGs ) was recovered."
 
-## dynamic labels 
-depth_label  <- if (!exists("params") || is.null(params$dataset)) {
-                  "loci"
-                } else if (params$dataset == "panel") {
-                  "panel loci"
-                } else {
-                  paste(params$dataset, "loci")
-                }
+total_panel_sites <- nrow(input.coverage)   
+covered_panel_sites <- colSums(input.coverage > 0, na.rm = TRUE)
 
-iqr_subtitle <- "Boxes = IQR; whiskers = 1.5\u00D7IQR; dots = outliers"
-caption_text <- "n = number of loci   |   m = median read depth"
+coverage_df <- tibble(
+  Sample              = names(covered_panel_sites),
+  Covered_Panel_Sites = covered_panel_sites
+) |>
+  mutate(
+    Covered_Pct = 100 * Covered_Panel_Sites / total_panel_sites
+  ) |>
+  arrange(desc(Covered_Panel_Sites))                    
 
-## plot
-ggplot(cov_long, aes(x = Sample, y = Read_Count, fill = Sample)) +
-  geom_boxplot(
-    width          = 0.55,
-    outlier.shape  = 21,
-    outlier.size   = 0.6,
-    outlier.stroke = 0.25,
-    colour         = "grey30"
-  ) +
-  scale_fill_manual(values = pal, guide = "none") +
-  scale_y_log10() +
-  coord_flip() +
-  geom_text(
-    data   = summ,
-    aes(y  = med * 1.25,
-        label = sprintf("n=%d\nm=%.1f", n_loci, med)),
-    hjust  = 0,
-    size   = 2.7
+ggplot(coverage_df,
+       aes(x = reorder(Sample, Covered_Panel_Sites),
+           y = Covered_Panel_Sites)) +
+  geom_col(fill = "#4E79A7", width = 0.75,
+           colour = "grey20", linewidth = 0.15) +
+  geom_text(aes(label = sprintf("%.1f%%", Covered_Pct)),
+            hjust = -0.15, size = 3) +
+  coord_flip(clip = "off") +
+  scale_y_continuous(
+    limits = c(0, total_panel_sites * 1.05),
+    breaks = scales::pretty_breaks(5)
   ) +
   labs(
-    title    = sprintf("Per-sample read-depth across %s", depth_label),
-    subtitle = iqr_subtitle,
-    x        = NULL,
-    y        = "Reads per locus (log10)",
-    caption  = caption_text
+    title = "Panel CpG Sites Covered per Sample",
+    subtitle = glue::glue("{total_panel_sites} total panel CpG sites"),
+    x = "Sample",
+    y = "CpG Sites"
   ) +
-  theme_minimal(base_size = 11) +
+  theme_minimal(base_size = 10) +
   theme(
-    panel.grid.major.y = element_blank(),
-    axis.text.y        = element_text(size = 8),
-    plot.margin        = margin(6, 40, 12, 6),
-    plot.caption       = element_text(size = 8, hjust = 0)
+    panel.grid.major.y = element_blank()
   )
 ```
