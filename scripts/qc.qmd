@@ -418,7 +418,6 @@ generate_correlation_plots <- function(data) {
 print(plots$p1)
 ```
 * This plot shows the distribution of pairwise correlations between samples after standardizing the CpG sites. 
-
 * Standardization normalizes CpG sites across samples, offering a clearer view of relative variations in the data.
 
 ```{r}
