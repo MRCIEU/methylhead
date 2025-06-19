@@ -568,8 +568,8 @@ ggplot(regions_long, aes(x = Count, y = Sample, fill = Region_Type)) +
                     labels = c("Total Covered CpG Sites", "Panel Covered CpG Sites"),
                     name = NULL) +
   scale_x_continuous(labels = scales::comma,
-                     expand = expansion(mult = c(0, 0.35))) + 
-  labs(title = "Number of CpG Sites Covered per Sample (Breadth)",
+                     expand = expansion(mult = c(0, 0.60))) + 
+  labs(title = "Number of CpG Sites Covered per Sample",
        x = "Number of Covered CpG Sites",
        y = "Sample") +
   theme_minimal(base_size = 11) +
