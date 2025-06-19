@@ -85,19 +85,21 @@ workflow pipeline {
           .set { multiqc_files }  
     multiqc(multiqc_files)   
           reads_ch = multiqc.out.reads
+          reads_hs = multiqc.out.reads_hs
           estimate_cell_counts_ch   = estimate_cell_counts.out.estimate_cell_counts
           coverage_matrix_ch        = methylation_matrix_process.out.coverage_matrix
           methylation_matrix_ch     = methylation_matrix_process.out.meth_matrix
           illumina_matrix_450k_ch   = illumina_matrix_450k.out.illumina_matrix 
           camda_ch                  = camda_matrix.out.camda_matrix
           dna_methylation_scores_ch = dna_methylation_scores.out.dna_methylation_scores
-            qc_files_ch = reads_ch
+            qc_files_ch = reads_ch  
             .concat(estimate_cell_counts_ch)
             .concat(coverage_matrix_ch)
             .concat(methylation_matrix_ch)
             .concat(illumina_matrix_450k_ch)
             .concat(camda_ch)
             .concat(dna_methylation_scores_ch)
+            .concat(reads_hs)
             .map { file -> file.toAbsolutePath().toString() }
             .collectFile(name: "qc_files.csv", newLine: true)
     qc_report(qc_files_ch)
