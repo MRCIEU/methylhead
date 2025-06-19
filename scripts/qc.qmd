@@ -643,22 +643,22 @@ ggplot(coverage_df,
 #| error: true
 #| fig-cap: "**Figure 17**:This scatter plot compares the mean and median target coverage for each sample to evaluate the homogeneity of the sequencing data. The dashed diagonal line represents a perfect 1:1 ratio, indicating a completely uniform coverage distribution."
 
-hs %>%
-  ggplot(aes(x = `Mean target coverage`, y = `Median target coverage`)) +
-  geom_point(aes(color = Sample), size = 4, alpha = 0.7) +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
-  geom_text(
-    aes(label = sub(".*_(S\\d+)", "\\1", Sample)), 
-    vjust = -0.8, 
-    size = 3.5, 
-    color = "black",
-    check_overlap = TRUE
-  ) +
-  labs(
-    title = "Mean vs. Median Target (Panel) Coverage",
-    x = "Mean Target (Panel) Coverage",
-    y = "Median Target (Panel) Coverage"
-  ) +
-  theme_minimal(base_size = 14) +
-  guides(color = "none") 
+ggplot(hs,
+       aes(`Mean target coverage`,
+           `Median target coverage`,
+           colour = Sample)) +
+  geom_point(size = 2.2, alpha = .85,
+             position = position_jitter(width = .02, height = .04)) +
+  geom_abline(slope = 1, intercept = 0,
+              linetype = "dashed", colour = "red") +
+  scale_x_continuous(limits = c(0, max(hs$`Mean target coverage`))) +
+  scale_y_continuous(limits = c(0, max(hs$`Mean target coverage`))) +
+  scale_colour_discrete(labels = function(x) sub(".*_(S\\d+)", "\\1", x)) +
+  labs(title  = "Mean vs Median Target Coverage",
+       x      = "Mean target coverage",
+       y      = "Median target coverage",
+       colour = "Sample") +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "right")
+
 ```
