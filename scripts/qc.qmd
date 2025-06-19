@@ -469,10 +469,10 @@ print(plots$p2)
 #| label: total-read-count 
 #| error: true
 #| fig-cap: "**Figure 14**: A horizontal bar plot showing, for every library, the **total number of reads** covering CpG loci in the whole methylome (blue) and in the targeted panel (coral). Values inside the bars give the raw read counts; panel bars are always shorter because their reads are a subset of the total."
-
-panel_reads_mean  <- mean( colSums(input.coverage , na.rm = TRUE) )
-total_reads_mean  <- mean( colSums(coverage_matrix, na.rm = TRUE) )
+panel_reads_mean  <- mean(colSums(input.coverage , na.rm = TRUE))
+total_reads_mean  <- mean(colSums(coverage_matrix, na.rm = TRUE))
 n_samples         <- ncol(coverage_matrix)
+
 depth_long <- bind_rows(
   tibble(Sample = colnames(coverage_matrix),
          Count  = colSums(coverage_matrix, na.rm = TRUE),
@@ -481,10 +481,18 @@ depth_long <- bind_rows(
          Count  = colSums(input.coverage , na.rm = TRUE),
          Region_Type = "Panel_Regions")
 ) %>% 
-  mutate(
-    Region_Type = factor(Region_Type, levels = c("Total_Regions", "Panel_Regions")),
-    Sample      = forcats::fct_reorder(Sample, Count, .fun = max)
-  )
+  mutate(Region_Type = factor(Region_Type,
+                              levels = c("Total_Regions", "Panel_Regions")))
+
+## — yalnızca en düşük okuma sayısı en aşağıda olacak şekilde sıralama —
+sample_order <- depth_long %>% 
+  group_by(Sample) %>% 
+  summarise(max_count = max(Count), .groups = "drop") %>% 
+  arrange(max_count) %>%                      # ↑ küçükten büyüğe
+  pull(Sample)
+
+depth_long <- depth_long %>% 
+  mutate(Sample = factor(Sample, levels = sample_order))
 
 ggplot(depth_long, aes(x = Count, y = Sample, fill = Region_Type)) +
   geom_col(position = position_dodge(width = 0.75),
@@ -492,34 +500,28 @@ ggplot(depth_long, aes(x = Count, y = Sample, fill = Region_Type)) +
   geom_text(aes(label = scales::comma(Count)),
             position = position_dodge(width = 0.75),
             hjust = -0.15, size = 3) +
-  scale_fill_manual(
-    values = setNames(c("#4E79A7", "#E15759"),
-                      c("Total_Regions", "Panel_Regions")),
-    labels = c("Total reads (all sites)", "Reads in panel sites"),
-    name   = NULL
-  ) +
-  scale_x_continuous(
-    labels  = scales::label_number(scale_cut = scales::cut_short_scale()),
-    expand  = expansion(mult = c(0, 0.60))
-  ) +
+  scale_fill_manual(values = c(Total_Regions = "#4E79A7",
+                               Panel_Regions = "#E15759"),
+                    labels = c("Total reads (all sites)",
+                               "Reads in panel sites"),
+                    name   = NULL) +
+  scale_x_continuous(labels = scales::label_number(
+                       scale_cut = scales::cut_short_scale()),
+                     expand = expansion(mult = c(0, 0.60))) +
   labs(title = "Total Read Count per Sample",
        x = "Reads covering CpG sites", y = "Sample") +
-  annotate(
-    "text", x = Inf, y = Inf,
-    hjust = 1.05, vjust = 1.1, size = 3,
-    label = glue::glue(
-      "Avg Panel Reads : {scales::comma(round(panel_reads_mean))}\n",
-      "Avg Total Reads : {scales::comma(round(total_reads_mean))}\n",
-      "Samples         : {n_samples}"
-    )
-  ) +
+  annotate("text", x = Inf, y = Inf,
+           hjust = 1.05, vjust = 1.1, size = 3,
+           label = glue::glue(
+             "Avg Panel Reads : {scales::comma(round(panel_reads_mean))}\n",
+             "Avg Total Reads : {scales::comma(round(total_reads_mean))}\n",
+             "Samples         : {n_samples}"
+           )) +
   coord_cartesian(clip = "off") +
   theme_minimal(base_size = 9) +
-  theme(
-    legend.position      = "top",
-    panel.grid.major.y   = element_blank(),
-    panel.grid.minor.x   = element_blank()
-  )
+  theme(legend.position    = "top",
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank())
 ```
 
 ## <sup>Number of CpG Sites Covered per Sample (Coverage Breadth)</sup>
