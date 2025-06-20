@@ -45,7 +45,7 @@ for (path in files_path$V1) {
   }
 }
 
-colnames(reads)[colnames(reads) == "Reads.passing.filters"] <- "Reads"
+setnames(reads, old = "Reads passing filters", new = "Reads")
 reads                            <- reads %>% mutate(Sample = gsub("(_R[12]|_[12])$", "", Sample)) %>% distinct(Sample, .keep_all = TRUE)
 colnames(estimate_cell_count)[1] <- "cell_type"
 panel                            <- fread(params$panel_data)
