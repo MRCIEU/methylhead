@@ -461,7 +461,7 @@ print(plots$p2)
 ```
 ## <sup>Total Read Count per Sample</sup>
 
-* Coverage depth, not breadth: This plot tracks the total number of reads (depth) hitting the CpG loci and serves as an important depth-based quality control metric.
+* Coverage: This plot tracks the total number of reads (depth) hitting the CpG loci and serves as an important depth-based quality control metric.
 * Panel vs. total at a glance: This plot instantly identifies libraries where the total read depth is sufficient, but the panel capture produced a low number of reads (small coral bar).
 
 ```{r}
@@ -524,9 +524,9 @@ ggplot(depth_long, aes(x = Count, y = Sample, fill = Region_Type)) +
         panel.grid.minor.x = element_blank())
 ```
 
-## <sup>Number of CpG Sites Covered per Sample (Coverage Breadth)</sup>
+## <sup>Number of CpG Sites Covered per Sample</sup>
 
-* Coverage breadth, not depth: This plot tracks how many unique CpG loci are detected (with ≥1 read), complementing depth-based QC by ensuring a wide range of sites were captured.
+* Coverage: This plot tracks how many unique CpG loci are detected (with ≥1 read), complementing depth-based QC by ensuring a wide range of sites were captured.
 * Panel vs. total at a glance: The plot instantly flags libraries where the panel capture was inefficient (a small coral bar), even if the overall genome-wide site capture was acceptable.
 
 ```{r}
