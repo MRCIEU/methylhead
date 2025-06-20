@@ -197,44 +197,54 @@ coverage_long <- bind_rows(
                  values_to = "Coverage")
 )
 
+coverage_long <- coverage_long %>%
+  mutate(SampleLabel = sub(".*_(S\\d+)", "\\1", Sample))
+
 sample_order <- coverage_long %>% 
-  filter(Set == "Panel") %>%                
-  group_by(Sample) %>% 
-  summarise(med = median(Coverage, na.rm = TRUE)) %>% 
-  arrange(desc(med)) %>% 
-  pull(Sample)
+  group_by(SampleLabel) %>% 
+  summarise(mean_cov = mean(Coverage, na.rm = TRUE), .groups = "drop") %>% 
+  arrange(desc(mean_cov)) %>% 
+  pull(SampleLabel)
 
-coverage_long <- coverage_long %>% 
-  mutate(Sample = factor(Sample, levels = sample_order))
+coverage_long$SampleLabel <- factor(coverage_long$SampleLabel,
+                                    levels = sample_order)
 
-ggplot(coverage_long,
-       aes(x = Sample,           
-           y = Coverage,
-           fill = Set)) +       
-  geom_violin(trim = FALSE,
-              scale = "count",   
-              alpha = .6,
-              position = position_dodge(width = .8)) +  
-  labs(title = "Coverage per Sample: Panel vs Total",
-       x = "Sample", y = "Coverage") +
-  scale_x_discrete(labels = function(x) sub(".*_(S\\d+)", "\\1", x)) +
-  scale_fill_brewer(palette = "Set1") +        
-  theme_minimal(base_size = 9) +
-  theme(axis.text.x = element_text(angle = 90, vjust = .5, hjust = 1,
-                                   size = 6),
-        legend.position = "top")+ 
-  annotate(
+ggplot(
+  coverage_long,
+  aes(x = SampleLabel, y = Coverage, fill = Set)
+) +
+  geom_violin(
+    trim      = FALSE,
+    scale     = "width",                 
+    alpha     = .70,
+    position  = position_dodge(width = .9)
+  ) +
+  labs(
+    title = "Coverage per Sample: Panel vs Total",
+    x     = "Sample",
+    y     = "Coverage",
+    fill  = "Set"
+  ) +
+  scale_fill_manual(
+    values = c(Panel = "#2c7bb6", Total = "#d7191c")
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x     = element_text(angle = 90, vjust = 0.5, hjust = 1),
+    panel.grid.major.x = element_blank()  
+  ) + annotate(
     "text",
-    x     = Inf, y = Inf,
-    hjust = 1.05, vjust = 1.1,
-    size  = 3,
-    label = glue::glue(
+    x      = Inf, y = Inf,          
+    hjust  = 1.05, vjust = 1.1,
+    size   = 3,
+    label  = glue::glue(
       "Panel regions: {n_panel_cpg_sites}\n",
       "Total regions: {n_total_cpg_sites}\n",
       "Samples: {n_samples}"
     )
-  ) +
-  coord_cartesian(clip = "off")
+  )+
+  coord_cartesian(clip = "off") 
+        
 ```
 ```{r}
 #| echo: false
@@ -272,19 +282,30 @@ ggplot(coverage_long,
 #| code-fold: false
 #| fig-cap: "**Figure 6**: Violin of Coverage Distribution for Panel and Total Regions by Sample."
 
-ggplot(coverage_long,
-       aes(x = Sample, y = Coverage, fill = Set)) +
-  geom_violin(trim = FALSE) +                        # ← değişiklik burada
-  facet_wrap(~Set, ncol = 1, scales = "free_y") +
-  labs(title = "Coverage per Sample: Panel & Total",
-       x = "Sample", y = "Coverage") +
-  scale_x_discrete(labels = function(x) sub(".*_(S\\d+)", "\\1", x)) +
-  theme_minimal(base_size = 9) +
-  theme(axis.text.x = element_text(angle = 90, vjust = .5, hjust = 1),
-        legend.position = "none") +
-  annotate(
+plot_data <- coverage_long %>% 
+  mutate(SampleLabel = sub(".*_(S\\d+)", "\\1", Sample))
+
+sample_order <- plot_data %>% 
+  group_by(SampleLabel) %>% 
+  summarise(mean_cov = mean(Coverage, na.rm = TRUE), .groups = "drop") %>% 
+  arrange(desc(mean_cov)) %>% 
+  pull(SampleLabel)
+
+plot_data$SampleLabel <- factor(plot_data$SampleLabel, levels = sample_order)
+p_panel <- plot_data %>% 
+  filter(Set == "Panel") %>% 
+  ggplot(aes(x = Coverage, y = SampleLabel)) +
+  geom_violin(trim = FALSE, scale = "width",
+              fill = "#2c7bb6", alpha = .80, linewidth = .2) +
+  labs(title = "Panel Coverage per Sample",
+       x = "Coverage", y = "Sample") +
+  theme_minimal(base_size = 11) +
+  theme(
+    axis.text.y          = element_text(size = 7),
+    panel.grid.major.y   = element_blank()
+  )+ annotate(
     "text",
-    x      = Inf, y = Inf,
+    x      = Inf, y = Inf,          
     hjust  = 1.05, vjust = 1.1,
     size   = 3,
     label  = glue::glue(
@@ -293,7 +314,31 @@ ggplot(coverage_long,
       "Samples: {n_samples}"
     )
   ) +
-  coord_cartesian(clip = "off")
+  coord_cartesian(clip = "off") 
+p_total <- plot_data %>% 
+  filter(Set == "Total") %>% 
+  ggplot(aes(x = Coverage, y = SampleLabel)) +
+  geom_violin(trim = FALSE, scale = "width",
+              fill = "#d7191c", alpha = .80, linewidth = .2) +
+  labs(title = "Total Coverage per Sample",
+       x = "Coverage", y = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(
+    axis.text.y          = element_text(size = 7),
+    panel.grid.major.y   = element_blank()
+  )+ annotate(
+    "text",
+    x      = Inf, y = Inf,          
+    hjust  = 1.05, vjust = 1.1,
+    size   = 3,
+    label  = glue::glue(
+      "Panel regions: {n_panel_cpg_sites}\n",
+      "Total regions: {n_total_cpg_sites}\n",
+      "Samples: {n_samples}"
+    )
+  ) +
+  coord_cartesian(clip = "off") 
+gridExtra::grid.arrange(p_panel, p_total, ncol = 1)
 ```
 
 ## <sup>PCA for Methylation</sup>
