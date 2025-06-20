@@ -1,10 +1,10 @@
 ---
-title: "DNA Methylation: Bisulfite Sequencing Report"
+title: "DNA Methylation: Bisulfite Sequencing Panel Report"
 author: "."
 date: "`r Sys.Date()`"
 params:
   dataset: "."      
-  panel_data: NULL      # CSV path when dataset = "panel"
+  panel_data: NULL      
   file_list: "qc_files.csv"
 format:
   html:
