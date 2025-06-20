@@ -59,7 +59,7 @@ coverage_matrix    <- coverage_matrix %>% select(-matches("chr|start|end"))
 input.coverage     <- input.coverage  %>% select(-matches("chr|start|end|details|source|i.start|i.end"))
 
 ```
-## <sup>Methylation Distribution Plot</sup>
+## <sup>Methylation Distribution Plot for Panel</sup>
 
 * This plot shows the distribution of DNA methylation levels across multiple samples. 
 * The x-axis represents methylation values from 0 (unmethylated) to 1 (fully methylated), while the y-axis shows the density of CpG sites. 
@@ -71,7 +71,7 @@ input.coverage     <- input.coverage  %>% select(-matches("chr|start|end|details
 #| echo: false
 #| label: Density Plot of Methylation
 #| code-fold: false
-#| fig-cap: "**Figure 1**: Density Plot of Beadchip Methylation for Samples."
+#| fig-cap: "**Figure 1**: Density Plot of Methylation for Samples."
 
 methylation_data_long <- input.data %>%
   pivot_longer(cols = everything(), names_to = "Sample", values_to = "Methylation")
@@ -168,7 +168,6 @@ print(boxplot_plot)
 ```
 ## <sup>Coverage Distribution</sup>
 
-
 * This plot illustrates the distribution of coverage for each sample, with CpG sites represented along the x-axis and coverage values on the y-axis.
 * Side-by-side view: Two boxes per sample—Panel and Total—compare on-target depth to genome-wide depth at a glance.
 * Sorted by quality: Samples are arranged by median Panel depth, putting the best on the left and weak outliers on the right.
@@ -177,7 +176,7 @@ print(boxplot_plot)
 
 ```{r}
 #| echo: false
-#| label: Coverage Distribution (Boxplot) 1
+#| label: Coverage Distribution (Violin) 1
 #| code-fold: false
 #| fig-cap: "**Figure 4**:  Comparison of Coverage per Sample Between Panel and Total Regions."
 
@@ -209,14 +208,21 @@ coverage_long <- coverage_long %>%
   mutate(Sample = factor(Sample, levels = sample_order))
 
 ggplot(coverage_long,
-       aes(x = Sample, y = Coverage, fill = Set)) +
-  geom_boxplot(position = position_dodge(width = 0.75), outlier.size = .3) +
+       aes(x = Sample,           
+           y = Coverage,
+           fill = Set)) +       
+  geom_violin(trim = FALSE,
+              scale = "count",   
+              alpha = .6,
+              position = position_dodge(width = .8)) +  
   labs(title = "Coverage per Sample: Panel vs Total",
        x = "Sample", y = "Coverage") +
   scale_x_discrete(labels = function(x) sub(".*_(S\\d+)", "\\1", x)) +
+  scale_fill_brewer(palette = "Set1") +        
   theme_minimal(base_size = 9) +
-  theme(axis.text.x = element_text(angle = 90, vjust = .5, hjust = 1),
-        legend.position = "top") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = .5, hjust = 1,
+                                   size = 6),
+        legend.position = "top")+ 
   annotate(
     "text",
     x     = Inf, y = Inf,
@@ -235,6 +241,7 @@ ggplot(coverage_long,
 #| label: Coverage Distribution (Boxplot) 2
 #| code-fold: false
 #| fig-cap: "**Figure 5**: Boxplot of Coverage Distribution for Panel and Total Regions by Sample."
+
 ggplot(coverage_long,
        aes(x = Sample, y = Coverage, fill = Set)) +
   geom_boxplot(outlier.size = .3) +
@@ -309,7 +316,6 @@ impute.matrix <- function(x, margin = 1, fun = function(x) mean(x, na.rm = TRUE)
     if (margin == 2) x <- t(x)
     x
 }
-
 # Function to perform PCA and generate scree plot and scatter plots
 generate_pca_plots <- function(data, scale_data=TRUE, dataset_name = "Scaled Data") { 
   # Perform PCA
@@ -469,6 +475,7 @@ print(plots$p2)
 #| label: total-read-count 
 #| error: true
 #| fig-cap: "**Figure 14**: A horizontal bar plot showing, for every library, the **total number of reads** covering CpG loci in the whole methylome (blue) and in the targeted panel (coral). Values inside the bars give the raw read counts; panel bars are always shorter because their reads are a subset of the total."
+
 panel_reads_mean  <- mean(colSums(input.coverage , na.rm = TRUE))
 total_reads_mean  <- mean(colSums(coverage_matrix, na.rm = TRUE))
 n_samples         <- ncol(coverage_matrix)
@@ -484,7 +491,6 @@ depth_long <- bind_rows(
   mutate(Region_Type = factor(Region_Type,
                               levels = c("Total_Regions", "Panel_Regions")))
 
-## — yalnızca en düşük okuma sayısı en aşağıda olacak şekilde sıralama —
 sample_order <- depth_long %>% 
   group_by(Sample) %>% 
   summarise(max_count = max(Count), .groups = "drop") %>% 
@@ -660,5 +666,4 @@ ggplot(hs,
        colour = "Sample") +
   theme_minimal(base_size = 13) +
   theme(legend.position = "right")
-
 ```
