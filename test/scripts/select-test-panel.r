@@ -29,7 +29,6 @@ cell_type_regions = cell_type_regions[mincov > 5,]
 
 ## load original lung cancer panel
 original_panel = read.csv(original_panel_filename)
-original_panel$chr = paste0("chr",original_panel$chr)
 
 ## merge panel and filtered cell count regions
 targets = rbind(cell_type_regions, original_panel[,c("chr","start","end")])
@@ -79,9 +78,26 @@ for (chr in unique(targets$chr)) {
     converted_targets$start[idx] = converted_targets$end[idx]-target_length
 }
 
+set.seed(1881)
+
+# The following block of code creates a smaller test panel by taking a random 80% sample from the full set of target regions. 
+# This is done to ensure the final test dataset is a manageable size while still being representative of the original data.
+
+# Get the total number of rows from the full targets data frame.
+total_rows <- nrow(converted_targets)
+
+#Calculate the desired sample size (80%) and round down.
+sample_size <- floor(total_rows * 0.80)
+
+# Generate a random sample of row indices. Because we used set.seed(), this will produce the same indices every time.
+random_indices <- sample(1:total_rows, size = sample_size)
+
+# Create the new, smaller panel_targets data frame using the same reproducible indices.
+panel_targets <- converted_targets[random_indices, ]
+
 ## save panel
 write.csv(
-    converted_targets,
+    panel_targets,
     file=panel_filename,
     row.names=F, quote=F)
 
