@@ -539,7 +539,7 @@ depth_long <- bind_rows(
 sample_order <- depth_long %>% 
   group_by(Sample) %>% 
   summarise(max_count = max(Count), .groups = "drop") %>% 
-  arrange(max_count) %>%                      # ↑ küçükten büyüğe
+  arrange(max_count) %>%                      
   pull(Sample)
 
 depth_long <- depth_long %>% 
