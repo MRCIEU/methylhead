@@ -604,8 +604,6 @@ regions_long <- region_tbl %>%
   mutate(
     Region_Type = factor(Region_Type,
                          levels = c("Total_Regions", "Panel_Regions")),
-    # Sample faktör seviyelerini 'region_tbl'deki sıraya göre ayarla.
-    # Bu, ggplot'un en büyük değeri en üste çizmesini sağlar.
     Sample      = factor(Sample, levels = region_tbl$Sample)
   )
 ggplot(regions_long, aes(x = Count, y = Sample, fill = Region_Type)) +
