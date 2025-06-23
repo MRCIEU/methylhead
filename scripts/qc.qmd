@@ -252,6 +252,15 @@ ggplot(
 #| code-fold: false
 #| fig-cap: "**Figure 5**: Boxplot of Coverage Distribution for Panel and Total Regions by Sample."
 
+sample_order <- coverage_long %>%
+  group_by(Sample) %>%
+  summarise(total_coverage = sum(Coverage, na.rm = TRUE)) %>%
+  arrange(desc(total_coverage)) %>%
+  pull(Sample)
+
+coverage_long <- coverage_long %>%
+  mutate(Sample = factor(Sample, levels = sample_order))
+
 ggplot(coverage_long,
        aes(x = Sample, y = Coverage, fill = Set)) +
   geom_boxplot(outlier.size = .3) +
@@ -261,10 +270,10 @@ ggplot(coverage_long,
   scale_x_discrete(labels = function(x) sub(".*_(S\\d+)", "\\1", x)) +
   theme_minimal(base_size = 9) +
   theme(axis.text.x = element_text(angle = 90, vjust = .5, hjust = 1),
-        legend.position = "none")+
-         annotate(
+        legend.position = "none") +
+  annotate(
     "text",
-    x      = Inf, y = Inf,          
+    x      = Inf, y = Inf,
     hjust  = 1.05, vjust = 1.1,
     size   = 3,
     label  = glue::glue(
@@ -273,7 +282,7 @@ ggplot(coverage_long,
       "Samples: {n_samples}"
     )
   ) +
-  coord_cartesian(clip = "off")   
+  coord_cartesian(clip = "off")
 ```
 
 ```{r}
