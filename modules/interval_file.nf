@@ -7,14 +7,19 @@ process interval_file {
     path params.genome_folder
 
   output:
-    path "interval_file", emit: interval_file
+    path "interval_file" , emit: interval_file
+    path "panel.bed"     , emit: panel_bed 
 
   script:
     """
     set -euo pipefail
 
-    awk -F, 'NR>1 && \$2!=\$3 {printf "%s\\t%d\\t%d\\n",\$1,int(\$2),int(\$3)}' "${panel}" \\
-      | sort -k1,1 -k2,2n > panel.bed
+    awk -F, 'NR>1 {
+    if (\$2 == \$3)
+        printf "%s\\t%d\\t%d\\n", \$1, \$2+1, \$2+1;
+    else
+        printf "%s\\t%d\\t%d\\n", \$1, \$2, \$3;
+      }' "${panel}" | sort -k1,1 -k2,2n > panel.bed
 
     if [[ ! -s panel.bed ]]; then
         echo "panel.bed is empty or missing!"
