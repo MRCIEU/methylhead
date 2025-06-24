@@ -45,18 +45,20 @@ workflow pipeline {
     sambamba(mybamsample)
        sortedbam = sambamba.out
     sorted_bam_files(sortedbam)
-       sorted_ch = sorted_bam_files.out.sorted_bam
+       sorted_ch     = sorted_bam_files.out.sorted_bam
+       sorted_ch_bai = sorted_bam_files.out.bai
     mark_duplicated(sorted_ch)
        sorted_mark      = mark_duplicated.out.markdup 
        reference        = params.genome_folder   
-       interval_file    = interval_file.out.interval_file
-    collect_hs_metrics(sorted_mark, params.genome_folder, interval_file)
+       intervalfile     = interval_file.out.interval_file
+       panel            = interval_file.out.panel_bed 
+    collect_hs_metrics(sorted_mark, params.genome_folder, intervalfile)
     collect_mm_metrics(sorted_mark, reference)
     methyldackel(sorted_mark ,reference)
     bedgraph(sorted_mark)
        bedgraph2 = bedgraph.out
     processed_bedgraph(bedgraph2)
-    samtools_stats(mybamsample,sorted_mark)   
+    samtools_stats(mybamsample, sorted_mark, sorted_ch, sorted_ch_bai, panel)   
     methylkit(mark_duplicated.out.markdup, genome_folder)
     bsmap_aligment(trim_galore.out.fq, genome_folder) 
        bam_camda = bsmap_aligment.out.bam  
