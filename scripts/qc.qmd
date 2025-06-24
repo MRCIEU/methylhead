@@ -169,15 +169,14 @@ print(boxplot_plot)
 ```
 ## <sup>Coverage Distribution</sup>
 
-* This plot illustrates the distribution of coverage for each sample, with CpG sites represented along the x-axis and coverage values on the y-axis.
+* This plot illustrates the distribution of coverage for each sample, with CpG sites represented along the y-axis and coverage values on the x-axis.
 * Side-by-side view: Two boxes per sample—Panel and Total—compare on-target depth to genome-wide depth at a glance.
 * Sorted by quality: Samples are arranged by median Panel depth, putting the best on the left and weak outliers on the right.
 * Quick red-flags: Panel boxes should be higher and tighter; lower or wider ones signal poor capture or uneven coverage.
-* Separate scales: Faceting splits Panel and Total axes so absolute depths are clear, exposing samples that fall below cut-offs.
 
 ```{r}
 #| echo: false
-#| label: Coverage Distribution (Violin) 1
+#| label: Coverage Distribution Violin Plot
 #| code-fold: false
 #| fig-cap: "**Figure 4**:  Comparison of Coverage per Sample Between Panel and Total Regions."
 
@@ -250,110 +249,13 @@ ggplot(
     "text", x = Inf, y = Inf,
     hjust = 1.05, vjust = 1.1, size = 3,
     label = glue(
-      "Panel regions: {n_panel_cpg_sites}\n",
-      "Total regions: {n_total_cpg_sites}\n",
+      "Total CpG sites: {n_panel_cpg_sites}\n",
+      "Panel CpG sites: {n_total_cpg_sites}\n",
       "Samples: {n_samples}"
     )
   ) +
   coord_cartesian(clip = "off")
 ```
-```{r}
-#| echo: false
-#| label: Coverage Distribution (Boxplot) 2
-#| code-fold: false
-#| fig-cap: "**Figure 5**: Boxplot of Coverage Distribution for Panel and Total Regions by Sample."
-
-sample_order <- coverage_long %>%
-  group_by(Sample) %>%
-  summarise(total_coverage = sum(Coverage, na.rm = TRUE)) %>%
-  arrange(desc(total_coverage)) %>%
-  pull(Sample)
-
-coverage_long <- coverage_long %>%
-  mutate(Sample = factor(Sample, levels = sample_order))
-
-ggplot(coverage_long,
-       aes(x = Sample, y = Coverage, fill = Set)) +
-  geom_boxplot(outlier.size = .3) +
-  facet_wrap(~Set, ncol = 1,) +
-  labs(title = "Coverage per Sample: Panel & Total",
-       x = "Sample", y = "Coverage") +
-  scale_x_discrete(labels = function(x) sub(".*_(S\\d+)", "\\1", x)) +
-  theme_minimal(base_size = 9) +
-  theme(axis.text.x = element_text(angle = 90, vjust = .5, hjust = 1),
-        legend.position = "none") +
-  annotate("text",
-           x = Inf, y = Inf,
-           hjust = 1.05, vjust = 1.1,
-           size = 3,
-           label = glue::glue(
-             "Panel regions: {n_panel_cpg_sites}\n",
-             "Total regions: {n_total_cpg_sites}\n",
-             "Samples: {n_samples}"
-           )) +
-  coord_cartesian(clip = "off")
-```
-
-```{r}
-#| echo: false
-#| label: Coverage Distribution (Violin) 2
-#| code-fold: false
-#| fig-cap: "**Figure 6**: Violin of Coverage Distribution for Panel and Total Regions by Sample."
-
-plot_data <- coverage_long %>% 
-  mutate(SampleLabel = sub(".*_(S\\d+)", "\\1", Sample))
-
-sample_order <- plot_data %>% 
-  group_by(SampleLabel) %>% 
-  summarise(mean_cov = mean(Coverage, na.rm = TRUE), .groups = "drop") %>% 
-  arrange(desc(mean_cov)) %>% 
-  pull(SampleLabel)
-
-plot_data$SampleLabel <- factor(plot_data$SampleLabel, levels = sample_order)
-xmax <- max(plot_data$Coverage, na.rm = TRUE)
-p_panel <- plot_data %>% 
-  filter(Set == "Panel") %>% 
-  ggplot(aes(x = Coverage, y = SampleLabel)) +
-  geom_violin(trim = FALSE, scale = "width",
-              fill = "#2c7bb6", alpha = .80, linewidth = .2) +
-  scale_x_continuous(limits = c(0, xmax)) +          # ← ortak x-limit
-  labs(title = "Panel Coverage per Sample",
-       x = "Coverage", y = "Sample") +
-  theme_minimal(base_size = 11) +
-  theme(axis.text.y = element_text(size = 7),
-        panel.grid.major.y = element_blank()) +
-  annotate(
-    "text", x = Inf, y = Inf,
-    hjust = 1.05, vjust = 1.1, size = 3,
-    label = glue::glue(
-      "Panel regions: {n_panel_cpg_sites}\n",
-      "Total regions: {n_total_cpg_sites}\n",
-      "Samples: {n_samples}"
-    )) +
-  coord_cartesian(clip = "off")
-p_total <- plot_data %>% 
-  filter(Set == "Total") %>% 
-  ggplot(aes(x = Coverage, y = SampleLabel)) +
-  geom_violin(trim = FALSE, scale = "width",
-              fill = "#d7191c", alpha = .80, linewidth = .2) +
-  scale_x_continuous(limits = c(0, xmax)) +          # ← aynı limit
-  labs(title = "Total Coverage per Sample",
-       x = "Coverage", y = NULL) +
-  theme_minimal(base_size = 11) +
-  theme(axis.text.y = element_text(size = 7),
-        panel.grid.major.y = element_blank()) +
-  annotate(
-    "text", x = Inf, y = Inf,
-    hjust = 1.05, vjust = 1.1, size = 3,
-    label = glue::glue(
-      "Panel regions: {n_panel_cpg_sites}\n",
-      "Total regions: {n_total_cpg_sites}\n",
-      "Samples: {n_samples}"
-    )) +
-  coord_cartesian(clip = "off")
-gridExtra::grid.arrange(p_panel, p_total, ncol = 1)
-```
-
 ## <sup>PCA for Methylation</sup>
 
 ```{r, include=FALSE}
