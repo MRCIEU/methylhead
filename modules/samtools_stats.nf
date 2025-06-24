@@ -18,6 +18,6 @@ process samtools_stats {
    """
    samtools stats  ${mybamsample} | grep ^SN | cut -f 2-  > ${sample_id}_samtools_stats.txt   
    samtools stats  ${sorted_mark} | grep ^SN | cut -f 2-  > ${sample_id}.markdup_samtools_stats.txt
-   samtools bedcov ${panel} ${sorted_ch}  > ${sample_id}.bedcov_counts.bed
+   samtools bedcov ${panel} ${sorted_ch}                  > ${sample_id}.bedcov_counts.bed
    """
 }
