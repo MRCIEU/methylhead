@@ -47,10 +47,10 @@ workflow pipeline {
     sorted_bam_files(sortedbam)
        sorted_ch = sorted_bam_files.out.sorted_bam
     mark_duplicated(sorted_ch)
-       sorted_mark = mark_duplicated.out.markdup 
-       reference   = params.genome_folder   
-       interval_file = interval_file.out
-    collect_hs_metrics(sorted_mark, params.genome_folder,interval_file)
+       sorted_mark      = mark_duplicated.out.markdup 
+       reference        = params.genome_folder   
+       interval_file    = interval_file.out.interval_file
+    collect_hs_metrics(sorted_mark, params.genome_folder, interval_file)
     collect_mm_metrics(sorted_mark, reference)
     methyldackel(sorted_mark ,reference)
     bedgraph(sorted_mark)
