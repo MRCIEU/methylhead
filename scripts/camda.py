@@ -1,5 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# ------------------------------------------------------------------------------
+# Source   : CAMDA Toolkit – Quantify the Concurrence of DNA Methylation
+#            and De-methylation
+#            GitHub repo  : https://github.com/JiejunShi/CAMDA
+#            First commit : 2020-12-05  (SHA 6f56a71)
+#            Latest commit: 2022-04-22  (SHA 1580e29)
+#            Reference    : Shi J et al. “The concurrence of DNA methylation
+#                           and demethylation is associated with transcription
+#                           regulation.” *Nat. Commun.* 12, 5285 (2021).
+#                           DOI:10.1038/s41467-021-25521-7
+#
+# License  : Non-commercial BSD-3-Clause *
+#            Copyright © 2020-present, The Regents of the University of
+#            California, Irvine.  Commercial use requires a separate license.
+# ------------------------------------------------------------------------------
 
 import os, re, sys, time, argparse, array, random
 import pandas as pd
