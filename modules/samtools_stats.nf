@@ -10,10 +10,10 @@ process samtools_stats {
         path panel
 
     output:
-        tuple val(sample_id), path("${sample_id}_samtools_stats.txt"),         emit: mybam_samtools_stats
+        tuple val(sample_id), path("${sample_id}_samtools_stats.txt")        , emit: mybam_samtools_stats
         tuple val(sample_id), path("${sample_id}_markdup_samtools_stats.txt"), emit: sorted_samtools_stats
-        tuple val(sample_id), path("${sample_id}_bedcov_counts.bed"),          emit: counts_bed
-        tuple val(sample_id), path("${sample_id}_read_counts.tsv"),            emit: read_counts
+        tuple val(sample_id), path("${sample_id}_panel_counts.bed")          , emit: panel_counts
+        tuple val(sample_id), path("${sample_id}_read_counts.tsv")           , emit: read_counts
 
     script:
     """
@@ -22,7 +22,7 @@ process samtools_stats {
     samtools stats "${sorted_mark}" | awk '/^SN/ {print \$2, \$3}' > "${sample_id}_markdup_samtools_stats.txt"
 
     # ---------- panel depth ----------
-    samtools bedcov "${panel}" "${sorted_ch}" > "${sample_id}_bedcov_counts.bed"
+    samtools bedcov "${panel}" "${sorted_ch}" > "${sample_id}_panel_counts.bed"
 
     # ---------- read counts ----------
     total_reads=\$(samtools view -c -F 4 -q 20 -F 1024  "${sorted_ch}")
