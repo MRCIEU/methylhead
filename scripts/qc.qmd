@@ -29,21 +29,44 @@ library(RColorBrewer)
 library(glue)
 
 files_path <- fread(params$file_list, header = FALSE)
-
 label_map <- list(
   "coverage-matrix.csv"              = "coverage_matrix",
   "estimate-cell-counts.csv"         = "estimate_cell_count",
   "methylation-matrix.csv"           = "methylation_matrix",
   "cutadapt_filtered_reads_plot.txt" = "reads",
   "picard_hsmetrics_table.txt"       = "hs"
-)
+   )
+
+read_counts_list <- list()
+for (path in files_path$V1) {
+  fname <- basename(path)
+  if (fname %in% names(label_map)) {
+    assign(label_map[[fname]], fread(path), envir = .GlobalEnv)
+    next
+  }
+  if (grepl("_read_counts\\.tsv$", fname)) {
+    read_counts_list[[fname]] <- fread(path)
+  }
+}
+if (length(read_counts_list) > 0) {
+  panel_read_counts <- rbindlist(read_counts_list, fill = TRUE)
+}
+
+panel_depth_list <- list()
 
 for (path in files_path$V1) {
-  filename <- basename(path)
-  if (filename %in% names(label_map)) {
-    var_name <- label_map[[filename]]
-    assign(var_name, fread(path), envir = .GlobalEnv)
+  fname <- basename(path)
+  if (fname %in% names(label_map)) {
+    assign(label_map[[fname]], fread(path), envir = .GlobalEnv)
+    next
   }
+  if (grepl("_panel_depth\\.tsv$", fname)) {
+    panel_depth_list[[fname]] <- fread(path)
+  }
+}
+
+if (length(panel_depth_list) > 0) {
+  panel_depth <- rbindlist(panel_depth_list, fill = TRUE)
 }
 
 setnames(reads, old = "Reads passing filters", new = "Reads")
@@ -59,6 +82,15 @@ methylation_matrix <- methylation_matrix %>% select(-matches("chr|start|end"))
 coverage_matrix    <- coverage_matrix %>% select(-matches("chr|start|end"))
 input.coverage     <- input.coverage  %>% select(-matches("chr|start|end|details|source|i.start|i.end"))
 
+```
+#reads 
+
+```{r}
+#| echo: false
+#| label: Reads
+#| code-fold: false
+summary(panel_read_counts)
+summary(panel_depth)
 ```
 ## <sup>Methylation Distribution Plot for Panel</sup>
 
@@ -493,7 +525,7 @@ ggplot(depth_long, aes(x = Count, y = Sample, fill = Region_Type)) +
 
 ## <sup>Number of CpG Sites Covered per Sample</sup>
 
-* Coverage: This plot tracks how many unique CpG loci are detected (with ≥1 read), complementing depth-based QC by ensuring a wide range of sites were captured.
+* Coverage: This plot tracks how many unique CpG loci are successfully detected (e.g., those with at least one mapped read), complementing depth-based QC by ensuring a broad range of sites were captured.
 * Panel vs. total at a glance: The plot instantly flags libraries where the panel capture was inefficient (a small coral bar), even if the overall genome-wide site capture was acceptable.
 
 ```{r}
@@ -550,14 +582,17 @@ ggplot(regions_long, aes(x = Count, y = Sample, fill = Region_Type)) +
 ```
 
 ## <sup>Panel CpG Coverage Completeness per Sample</sup>
-
-* Panel completeness metric: Figure 14 ranks samples by the proportion of panel CpGs recovered—handy for setting an inclusion cut-off (e.g. > 95 %).
+s
+* This metric evaluates how completely each sample covers the predefined CpG panel. 
+* Completeness is calculated as the proportion (%) of targeted CpG sites from the panel that were successfully detected, defined as having at least one mapped read.
+* Bars: Represent the count of successfully covered CpG sites per sample.
+* Percentage labels: Directly reflect completeness relative to the total panel size.
 
 ```{r}
 #| echo: false
 #| label: total-read-count panel  
 #| error: true
-#| fig-cap: "**Figure 16**: For each sample, the bar length equals the count of panel CpGs covered at ≥1×. The percentage label indicates what fraction of the fixed panel size ( *n = r total_panel_sites CpGs ) was recovered."
+#| fig-cap: "**Figure 16**: CpG Coverage Completeness per Sample"
 
 total_panel_sites <- nrow(input.coverage)   
 covered_panel_sites <- colSums(input.coverage > 0, na.rm = TRUE)
