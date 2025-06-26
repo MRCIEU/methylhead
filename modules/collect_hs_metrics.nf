@@ -20,9 +20,9 @@ process collect_hs_metrics {
     BAIT_INTERVALS=${intervalfile} \
     TARGET_INTERVALS=${intervalfile} \
     MINIMUM_MAPPING_QUALITY=20 \
-    COVERAGE_CAP=1000 \
+    COVERAGE_CAP=200 \
     PER_TARGET_COVERAGE=${sample_id}_coverage \
-    NEAR_DISTANCE=500
+    NEAR_DISTANCE=250
     """     
 }
 
