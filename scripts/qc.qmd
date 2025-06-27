@@ -44,7 +44,7 @@ for (path in files_path$V1) {
     assign(label_map[[fname]], fread(path), envir = .GlobalEnv)
     next
   }
-  if (grepl("_read_counts\\.tsv$", fname)) {
+  if (grepl("-read-counts\\.tsv$", fname)) {
     read_counts_list[[fname]] <- fread(path)
   }
 }
@@ -60,7 +60,7 @@ for (path in files_path$V1) {
     assign(label_map[[fname]], fread(path), envir = .GlobalEnv)
     next
   }
-  if (grepl("_panel_depth\\.tsv$", fname)) {
+  if (grepl("-depth\\.tsv$", fname)) {
     panel_depth_list[[fname]] <- fread(path)
   }
 }
@@ -201,9 +201,9 @@ print(boxplot_plot)
 ```
 ## <sup>Coverage Distribution</sup>
 
-* This plot illustrates the distribution of coverage for each sample, with CpG sites represented along the y-axis and coverage values on the x-axis.
-* Side-by-side view: Two boxes per sample—Panel and Total—compare on-target depth to genome-wide depth at a glance.
-* Sorted by quality: Samples are arranged by median Panel depth, putting the best on the left and weak outliers on the right.
+* This plot illustrates the distribution of coverage for each sample, with  Samples  represented along the x-axis and Coverage values on the y-axis.
+* Side-by-side view: Two boxes per sample—Panel and Total—compare on-target coverage to genome-wide coverage at a glance.
+* Sorted by quality: Samples are arranged by median Panel coverage, putting the best on the left and weak outliers on the right.
 * Quick red-flags: Panel boxes should be higher and tighter; lower or wider ones signal poor capture or uneven coverage.
 
 ```{r}
