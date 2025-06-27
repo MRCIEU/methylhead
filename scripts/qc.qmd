@@ -35,38 +35,33 @@ label_map <- list(
   "methylation-matrix.csv"           = "methylation_matrix",
   "cutadapt_filtered_reads_plot.txt" = "reads",
   "picard_hsmetrics_table.txt"       = "hs"
-   )
+)
+
+for (path in files_path$V1) {
+  filename <- basename(path)
+  if (filename %in% names(label_map)) {
+    var_name <- label_map[[filename]]
+    assign(var_name, fread(path), envir = .GlobalEnv)
+  }
+}
 
 read_counts_list <- list()
+depth_list <- list()
+
 for (path in files_path$V1) {
   fname <- basename(path)
-  if (fname %in% names(label_map)) {
-    assign(label_map[[fname]], fread(path), envir = .GlobalEnv)
-    next
-  }
   if (grepl("-read-counts\\.tsv$", fname)) {
     read_counts_list[[fname]] <- fread(path)
+  } else if (grepl("-depth\\.tsv$", fname)) {
+    depth_list[[fname]] <- fread(path)
   }
 }
+
 if (length(read_counts_list) > 0) {
-  panel_read_counts <- rbindlist(read_counts_list, fill = TRUE)
+  read_counts <- data.table::rbindlist(read_counts_list, fill = TRUE)
 }
-
-panel_depth_list <- list()
-
-for (path in files_path$V1) {
-  fname <- basename(path)
-  if (fname %in% names(label_map)) {
-    assign(label_map[[fname]], fread(path), envir = .GlobalEnv)
-    next
-  }
-  if (grepl("-depth\\.tsv$", fname)) {
-    panel_depth_list[[fname]] <- fread(path)
-  }
-}
-
-if (length(panel_depth_list) > 0) {
-  panel_depth <- rbindlist(panel_depth_list, fill = TRUE)
+if (length(depth_list) > 0) {
+  depth <- data.table::rbindlist(depth_list, fill = TRUE)
 }
 
 setnames(reads, old = "Reads passing filters", new = "Reads")
@@ -83,14 +78,66 @@ coverage_matrix    <- coverage_matrix %>% select(-matches("chr|start|end"))
 input.coverage     <- input.coverage  %>% select(-matches("chr|start|end|details|source|i.start|i.end"))
 
 ```
-#reads 
+## <sup>Panel Overview Table</sup>
 
 ```{r}
 #| echo: false
-#| label: Reads
-#| code-fold: false
-summary(panel_read_counts)
-summary(panel_depth)
+#| label: panel-overview
+#| results: asis
+
+total_cpg_all       <- nrow(methylation_matrix)
+total_cpg_panelfile <- nrow(panel)
+cpg_after_filter    <- nrow(input.data)
+num_samples         <- ncol(input.data)
+coverage_threshold  <- 10
+
+panel_summary <- data.frame(
+  Metric = c(
+    "Total number of CpG sites (all)",
+    "Number of CpG sites in panel file",
+    "CpG sites that overlap panel-defined regions",
+    "Number of samples analyzed",
+    "Coverage threshold"
+  ),
+  Value  = format(c(
+    total_cpg_all,
+    total_cpg_panelfile,
+    cpg_after_filter,
+    num_samples,
+    coverage_threshold
+  ), big.mark = ",")            
+)
+
+cat('<table style="
+        width:80%;
+        margin: 1rem 0;
+        border-collapse:collapse;
+        font-size: 0.95rem;">
+        <thead>
+          <tr style="background:#f2f2f2;">
+            <th style="text-align:left;  padding:6px 10px; border:1px solid #ddd;">Metric</th>
+            <th style="text-align:right; padding:6px 10px; border:1px solid #ddd;">Value</th>
+          </tr>
+        </thead>
+        <tbody>')
+
+for(i in seq_len(nrow(panel_summary))){
+  bg <- ifelse(i %% 2 == 0, "#fafafa", "#ffffff")   
+  cat(sprintf('<tr style="background:%s;">
+                 <td style="padding:6px 10px; border:1px solid #ddd;">%s</td>
+                 <td style="padding:6px 10px; border:1px solid #ddd; text-align:right;">%s</td>
+               </tr>',
+               bg,
+               panel_summary$Metric[i],
+               panel_summary$Value[i]))
+}
+
+cat('</tbody></table>')
+
+cat('<p><strong>Note:</strong> In the coverage matrix, minimum coverage is fixed at 10
+     (see <a href="https://www.rdocumentation.org/packages/methylKit/versions/0.99.2/topics/methRead">methylKit&nbsp;docs</a>).
+     The <code>mincov</code> parameter is the minimum read coverage to be included in methylKit objects
+     and defaults to <strong>10</strong>.</p>')
 ```
 ## <sup>Methylation Distribution Plot for Panel</sup>
 
