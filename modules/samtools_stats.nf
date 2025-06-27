@@ -22,7 +22,7 @@ process samtools_stats {
     samtools stats "${sorted_mark}" | awk '/^SN/ {print \$2, \$3}' > "${sample_id}_markdup_samtools_stats.txt"
 
     # ---------- panel depth ----------
-    total_depth=\$(samtools bedcov "${panel}" "${sorted_ch}" | \
+    total_depth=\$(samtools bedcov -g 1024 "${panel}" "${sorted_ch}" | \
               awk '{sum+=\$4} END {print sum}')
 
     printf "Sample_id\tTotal_Depth\n%s\t%s\n" \
@@ -31,8 +31,8 @@ process samtools_stats {
     
     # ---------- read counts ----------
     
-    total_reads=\$(samtools view -c -F 4 -q 20 -F 1024  "${sorted_ch}")
-    panel_reads=\$(samtools view -c -F 4 -q 20 -F 1024 -L "${panel}" "${sorted_ch}")
+    total_reads=\$(samtools view -c -F 4,1024 -q 20  "${sorted_ch}")
+    panel_reads=\$(samtools view -c -F 4,1024 -q 20 -L "${panel}" "${sorted_ch}")
 
     ## define a Bash variable from the channel value
     sample_id_bash="${sample_id}"
