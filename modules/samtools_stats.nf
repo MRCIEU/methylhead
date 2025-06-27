@@ -40,7 +40,7 @@ process samtools_stats {
     ## strip the literal suffix '_sorted'
     clean_id="\${sample_id_bash%_sorted}"
 
-    printf "SampleID\tTotal_mapped\tPanel_mapped\n%s\t%s\t%s\n" \
+    printf "SampleID\tTotal_reads\tPanel_reads\n%s\t%s\t%s\n" \
        "\${clean_id}" "\${total_reads}" "\${panel_reads}" \
        > "${sample_id}_read_counts.tsv"
     """
