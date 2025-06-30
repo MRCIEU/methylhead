@@ -479,7 +479,6 @@ print(plots$p2)
 ## <sup>Total Read Count per Sample</sup>
 
 * Read counts: This plot tracks the total number of mapped reads overlapping CpG loci for each library, directly calculated from sorted BAM files using samtools. 
-* This count is a primary metric for sequencing depth and general data quality.
 * Panel vs. total at a glance: The plot also highlights, for each sample, how many reads map to the whole methylome (green bar: total) and to the targeted panel regions (blue bar: panel). 
 * This enables quick visual detection of libraries with sufficient total sequencing depth but suboptimal panel capture.
 
@@ -487,7 +486,7 @@ print(plots$p2)
 #| echo: false
 #| label: total-read-count 
 #| error: true
-#| fig-cap: "**Figure 12**: Horizontal bar plot for each sample, showing the **total number of mapped reads** overlapping CpG loci in the whole methylome (green) and in the targeted panel regions (blue). Values at the end of each bar indicate read counts calculated from sorted BAM files using samtools."
+#| fig-cap: "**Figure 12**: Horizontal bar plot for each sample, showing the **total number of mapped reads** overlapping CpG loci in the whole methylome (green) and in the targeted panel regions (blue)."
 
 long_counts <- pivot_longer(read_counts, 
                             cols = c(total_reads, panel_reads), 
