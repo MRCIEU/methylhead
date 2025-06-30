@@ -528,7 +528,7 @@ ggplot(long_counts, aes(x = Reads, y = SampleID, fill = Type, label = Reads)) +
 ```
 ## <sup>Depth Plots</sup>
 
-* Depth: This plot shows, for each library, the total sum of per-base depths—that is, the cumulative coverage across all CpG loci, computed directly from sorted BAM files using samtools.
+* Depth: This plot shows, for each library, the plot shows the total read-base count across all CpG sites—that is, the sum of per-base depths extracted directly from the sorted BAM file with samtools.
 * This is a key QC metric reflecting not just the number of reads, but how thoroughly the genome or targeted panel is covered.
 * Panel vs. total at a glance: The blue bar (panel depth) is always shorter because it reflects only the coverage within the targeted panel regions, which are a subset of the total. 
 * The plot enables rapid identification of samples where overall sequencing depth is sufficient but panel depth is lacking.
