@@ -156,10 +156,6 @@ cat('<p><strong>Note:</strong> In the coverage matrix, minimum coverage is fixed
 methylation_data_long <- input.data %>%
   pivot_longer(cols = everything(), names_to = "Sample", values_to = "Methylation")
 
-n_panel_cpg_sites <- nrow(input.data)
-n_total_cpg_sites <- nrow(methylation_matrix)
-n_samples <- ncol(input.data)
-
 ggplot(methylation_data_long,
        aes(x = Methylation, fill = sub(".*_(S\\d+)$", "\\1", Sample),
            colour = sub(".*_(S\\d+)$", "\\1", Sample))) +
@@ -169,13 +165,7 @@ ggplot(methylation_data_long,
        y = "Density",
        fill = "Sample", 
        colour = "Sample") + 
-  theme(legend.position = "right") +
-  annotate("text", x = Inf, y = Inf, hjust = 1.05, vjust = 1.1, size = 3,
-           label = glue::glue(
-             "Number of Panel CpG sites: {scales::comma(n_panel_cpg_sites)}\n",
-             "Number of Total CpG sites: {scales::comma(n_total_cpg_sites)}\n",
-             "Number of samples : {n_samples}"
-           ))
+  theme(legend.position = "right") 
 ```
 ## <sup>Estimate cell counts</sup>
 
@@ -259,10 +249,6 @@ print(boxplot_plot)
 #| code-fold: false
 #| fig-cap: "**Figure 4**:  Comparison of Coverage per Sample Between Panel and Total Regions."
 
-n_panel_cpg_sites <- nrow(input.coverage)
-n_total_cpg_sites <- nrow(coverage_matrix)
-n_samples <- ncol(coverage_matrix)
-
 coverage_long <- bind_rows(
   input.coverage   %>% 
     mutate(Set = "Panel") %>%          
@@ -323,17 +309,7 @@ ggplot(
   theme(
     axis.text.x        = element_text(angle = 90, vjust = 0.5, hjust = 1),
     panel.grid.major.x = element_blank()
-  ) +
-  annotate(
-    "text", x = Inf, y = Inf,
-    hjust = 1.05, vjust = 1.1, size = 3,
-    label = glue(
-      "Total CpG sites: {n_panel_cpg_sites}\n",
-      "Panel CpG sites: {n_total_cpg_sites}\n",
-      "Samples: {n_samples}"
-    )
-  ) +
-  coord_cartesian(clip = "off")
+  ) 
 ```
 ## <sup>PCA for Methylation</sup>
 
@@ -410,35 +386,35 @@ generate_pca_plots <- function(data, scale_data=TRUE, dataset_name = "Scaled Dat
 #| echo: false
 #| label: Scree Plot Scaled
 #| error: true
-#| fig-cap: "**Figure 7**: Scree Plot for Scaled Data. This plot shows the proportion of variance explained by the principal components for the scaled data. The first few components explain most of the variance."
+#| fig-cap: "**Figure 5**: Scree Plot for Scaled Data. This plot shows the proportion of variance explained by the principal components for the scaled data. The first few components explain most of the variance."
 print(scaled_plots$scree_plot)
 ```
 ```{r}
 #| echo: false
 #| label: Scatter Plot PC1 vs PC2 Scaled
 #| error: true
-#| fig-cap: "**Figure 8**: PCA Scatterplot of PC1 vs PC2 for Scaled Data. Each point represents a sample, color-coded based on the number of reads for the scaled dataset."
+#| fig-cap: "**Figure 6**: PCA Scatterplot of PC1 vs PC2 for Scaled Data. Each point represents a sample, color-coded based on the number of reads for the scaled dataset."
 print(scaled_plots$scatter_plots[[1]])
 ```
 ```{r}
 #| echo: false
 #| label: Scatter Plot PC1 vs PC3 Scaled
 #| error: true
-#| fig-cap: "**Figure 9**: PCA Scatterplot of PC1 vs PC3 for Scaled Data. This plot shows the relationship between PC1 and PC3 for the scaled data."
+#| fig-cap: "**Figure 7**: PCA Scatterplot of PC1 vs PC3 for Scaled Data. This plot shows the relationship between PC1 and PC3 for the scaled data."
 print(scaled_plots$scatter_plots[[2]])
 ```
 ```{r}
 #| echo: false
 #| label: Scatter Plot PC2 vs PC3 Scaled
 #| error: true
-#| fig-cap: "**Figure 10**: PCA Scatterplot of PC2 vs PC3 for Scaled Data. This plot shows the relationship between PC2 and PC3 for the scaled data, with each point color-coded by read count."
+#| fig-cap: "**Figure 8**: PCA Scatterplot of PC2 vs PC3 for Scaled Data. This plot shows the relationship between PC2 and PC3 for the scaled data, with each point color-coded by read count."
 print(scaled_plots$scatter_plots[[3]])
 ```
 ```{r}
 #| echo: false
 #| label: Scatter Plot PC3 vs PC4 Scaled
 #| error: true
-#| fig-cap: "**Figure 11**: PCA Scatterplot of PC3 vs PC4 for Scaled Data. This plot shows the relationship between PC3 and PC4 for the scaled data, with each point color-coded by read count."
+#| fig-cap: "**Figure 9**: PCA Scatterplot of PC3 vs PC4 for Scaled Data. This plot shows the relationship between PC3 and PC4 for the scaled data, with each point color-coded by read count."
 print(scaled_plots$scatter_plots[[4]])
 ```
 ## <sup>Correlation for Methylation</sup>
@@ -474,12 +450,7 @@ generate_correlation_plots <- function(data) {
   
   # Print the plots
    return(list(p1 = p1, p2 = p2))
-}
-  # Count the number of CpG sites and samples
-  n_cpg_sites <- nrow(input.data)
-  n_samples <- ncol(input.data) 
-  cat("Number of CpG sites:", n_cpg_sites, "\n")
-  cat("Number of samples:", n_samples, "\n")  
+} 
   # Generate correlation plots for full dataset
  plots <- generate_correlation_plots(input.data)
 ```
@@ -490,7 +461,7 @@ generate_correlation_plots <- function(data) {
 #| echo: false
 #| label: Density Plot Without Standardizing
 #| error: true
-#| fig-cap: "**Figure 12**: Density Plot Without Standardizing CpG Sites."
+#| fig-cap: "**Figure 10**: Density Plot Without Standardizing CpG Sites."
 
 # Print the density plot for correlations without standardization
 print(plots$p1)
@@ -502,134 +473,112 @@ print(plots$p1)
 #| echo: false
 #| label: Density Plot With Standardizing
 #| error: true
-#| fig-cap: "**Figure 13**: Density Plot With Standardizing CpG Sites."
+#| fig-cap: "**Figure 11**: Density Plot With Standardizing CpG Sites."
 print(plots$p2)
 ```
 ## <sup>Total Read Count per Sample</sup>
 
-* Coverage: This plot tracks the total number of reads (depth) hitting the CpG loci and serves as an important depth-based quality control metric.
-* Panel vs. total at a glance: This plot instantly identifies libraries where the total read depth is sufficient, but the panel capture produced a low number of reads (small coral bar).
+* Read counts: This plot tracks the total number of mapped reads overlapping CpG loci for each library, directly calculated from sorted BAM files using samtools. 
+* This count is a primary metric for sequencing depth and general data quality.
+* Panel vs. total at a glance: The plot also highlights, for each sample, how many reads map to the whole methylome (green bar: total) and to the targeted panel regions (blue bar: panel). 
+* This enables quick visual detection of libraries with sufficient total sequencing depth but suboptimal panel capture.
 
 ```{r}
 #| echo: false
 #| label: total-read-count 
 #| error: true
-#| fig-cap: "**Figure 14**: A horizontal bar plot showing, for every library, the **total number of reads** covering CpG loci in the whole methylome (blue) and in the targeted panel (coral). Values inside the bars give the raw read counts; panel bars are always shorter because their reads are a subset of the total."
+#| fig-cap: "**Figure 12**: Horizontal bar plot for each sample, showing the **total number of mapped reads** overlapping CpG loci in the whole methylome (green) and in the targeted panel regions (blue). Values at the end of each bar indicate read counts calculated from sorted BAM files using samtools."
 
-panel_reads_mean  <- mean(colSums(input.coverage , na.rm = TRUE))
-total_reads_mean  <- mean(colSums(coverage_matrix, na.rm = TRUE))
-n_samples         <- ncol(coverage_matrix)
+long_counts <- pivot_longer(read_counts, 
+                            cols = c(total_reads, panel_reads), 
+                            names_to = "Type", values_to = "Reads")
 
-depth_long <- bind_rows(
-  tibble(Sample = colnames(coverage_matrix),
-         Count  = colSums(coverage_matrix, na.rm = TRUE),
-         Region_Type = "Total_Regions"),
-  tibble(Sample = colnames(input.coverage),
-         Count  = colSums(input.coverage , na.rm = TRUE),
-         Region_Type = "Panel_Regions")
-) %>% 
-  mutate(Region_Type = factor(Region_Type,
-                              levels = c("Total_Regions", "Panel_Regions")))
+long_counts$Type <- factor(long_counts$Type, levels = c("panel_reads", "total_reads"))
 
-sample_order <- depth_long %>% 
-  group_by(Sample) %>% 
-  summarise(max_count = max(Count), .groups = "drop") %>% 
-  arrange(max_count) %>%                      
-  pull(Sample)
+long_counts$SampleID <- factor(long_counts$SampleID, 
+    levels = read_counts$SampleID[order(-read_counts$total_reads)])
 
-depth_long <- depth_long %>% 
-  mutate(Sample = factor(Sample, levels = sample_order))
+custom_colors <- c("total_reads" = "#38B000", "panel_reads" = "#0077B6")
 
-ggplot(depth_long, aes(x = Count, y = Sample, fill = Region_Type)) +
-  geom_col(position = position_dodge(width = 0.75),
-           width = 0.7, colour = "grey30", linewidth = 0.10) +
-  geom_text(aes(label = scales::comma(Count)),
-            position = position_dodge(width = 0.75),
-            hjust = -0.15, size = 3) +
-  scale_fill_manual(values = c(Total_Regions = "#4E79A7",
-                               Panel_Regions = "#E15759"),
-                    labels = c("Total reads (all sites)",
-                               "Reads in panel sites"),
-                    name   = NULL) +
-  scale_x_continuous(labels = scales::label_number(
-                       scale_cut = scales::cut_short_scale()),
-                     expand = expansion(mult = c(0, 0.60))) +
-  labs(title = "Total Read Count per Sample",
-       x = "Reads covering CpG sites", y = "Sample") +
-  annotate("text", x = Inf, y = Inf,
-           hjust = 1.05, vjust = 1.1, size = 3,
-           label = glue::glue(
-             "Avg Panel Reads : {scales::comma(round(panel_reads_mean))}\n",
-             "Avg Total Reads : {scales::comma(round(total_reads_mean))}\n",
-             "Samples         : {n_samples}"
-           )) +
-  coord_cartesian(clip = "off") +
-  theme_minimal(base_size = 9) +
-  theme(legend.position    = "top",
-        panel.grid.major.y = element_blank(),
-        panel.grid.minor.x = element_blank())
+ggplot(long_counts, aes(x = Reads, y = SampleID, fill = Type, label = Reads)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), color = "grey95", linewidth = 0.18) +
+  geom_text(position = position_dodge(width = 0.8), hjust = -0.10, size = 3.5, fontface = "plain", family = "Times New Roman") +
+  scale_fill_manual(
+    values = custom_colors,
+    labels = c("Panel Reads", "Total Reads")
+  ) +
+  labs(
+    title = "Read Counts per Sample",
+    subtitle = "Each sample: Total & Panel reads",
+    x = "Read Count", y = NULL, fill = NULL
+  ) +
+  theme_minimal(base_size = 15, base_family = "Times New Roman") +
+  theme(
+    legend.position = "top",
+    legend.text = element_text(size = 12, family = "Times New Roman"),
+    plot.title = element_text(face = "bold", size = 18, hjust = 0, family = "Times New Roman"),
+    plot.subtitle = element_text(size = 13, hjust = 0, family = "Times New Roman"),
+    axis.title.x = element_text(face = "bold", size = 14, margin = margin(t = 10), family = "Times New Roman"),
+    axis.text.x = element_text(face = "plain", size = 12, family = "Times New Roman"),
+    axis.text.y = element_text(face = "plain", size = 12, family = "Times New Roman"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(color = "grey90", linewidth = 0.2)
+  ) +
+  xlim(0, max(long_counts$Reads) * 1.13)
 ```
+## <sup>Depth Plots</sup>
 
-## <sup>Number of CpG Sites Covered per Sample</sup>
-
-* Coverage: This plot tracks how many unique CpG loci are successfully detected (e.g., those with at least one mapped read), complementing depth-based QC by ensuring a broad range of sites were captured.
-* Panel vs. total at a glance: The plot instantly flags libraries where the panel capture was inefficient (a small coral bar), even if the overall genome-wide site capture was acceptable.
+* Depth: This plot shows, for each library, the total sum of per-base depths—that is, the cumulative coverage across all CpG loci, computed directly from sorted BAM files using samtools.
+* This is a key QC metric reflecting not just the number of reads, but how thoroughly the genome or targeted panel is covered.
+* Panel vs. total at a glance: The blue bar (panel depth) is always shorter because it reflects only the coverage within the targeted panel regions, which are a subset of the total. 
+* The plot enables rapid identification of samples where overall sequencing depth is sufficient but panel depth is lacking.
 
 ```{r}
 #| echo: false
-#| label: covered-site-count
+#| label: Depth
 #| error: true
-#| fig-cap: "**Figure 15**: A horizontal bar plot showing, for every library, the **number of unique CpG loci** covered by at least one read (≥1× depth) in the whole methylome (blue) and in the targeted panel (coral). Values inside the bars give the raw counts of loci."
+#| fig-cap: "**Figure 13**: Horizontal bar plot for each sample, showing the **total depth** in the whole methylome (green) and in the targeted panel regions (blue)."
 
-Panel_Regions_Count <- colSums(input.coverage > 0, na.rm = TRUE)
-Total_Regions_Count <- colSums(coverage_matrix > 0, na.rm = TRUE)
+long_depth <- pivot_longer(depth, 
+                          cols = c(total_depth, panel_depth), 
+                          names_to = "Type", values_to = "Depth")
 
-region_tbl <- tibble(
-  Sample        = names(Total_Regions_Count),
-  Total_Regions = Total_Regions_Count,
-  Panel_Regions = Panel_Regions_Count
-) %>%
-  arrange(Total_Regions)
-regions_long <- region_tbl %>%
-  pivot_longer(
-    cols = c(Total_Regions, Panel_Regions),
-    names_to  = "Region_Type",
-    values_to = "Count"
-  ) %>%
-  mutate(
-    Region_Type = factor(Region_Type,
-                         levels = c("Total_Regions", "Panel_Regions")),
-    Sample      = factor(Sample, levels = region_tbl$Sample)
-  )
-ggplot(regions_long, aes(x = Count, y = Sample, fill = Region_Type)) +
-  geom_col(position = position_dodge(width = 0.8),
-           width = 0.8, colour = "grey20", linewidth = 0.10) +
-  geom_text(aes(label = scales::comma(Count)),
-            position = position_dodge(width = 0.8),
-            hjust = -0.1, size = 3) +
-  scale_fill_manual(values = c(Total_Regions = "#4E79A7",
-                               Panel_Regions = "#E15759"),
-                    labels = c("Total Covered CpG Sites", "Panel Covered CpG Sites"),
-                    name = NULL) +
-  scale_x_continuous(labels = scales::comma,
-                     expand = expansion(mult = c(0, 0.60))) + 
-  labs(title = "Number of CpG Sites Covered per Sample",
-       x = "Number of Covered CpG Sites",
-       y = "Sample") +
-  theme_minimal(base_size = 11) +
-  theme(legend.position = "top",
-        panel.grid.major.y = element_blank(),
-        panel.grid.minor.x = element_blank()) +
-  annotate("text", x = Inf, y = Inf, hjust = 1.05, vjust = 1.1, size = 3,
-           label = glue::glue(
-             "Total Panel CpG Sites : {scales::comma(n_panel_cpg_sites)}\n",
-             "Total CpG Sites       : {scales::comma(n_total_cpg_sites)}\n",
-             "Samples               : {n_samples}"
-           ))
+long_depth$Type <- factor(long_depth$Type, levels = c("panel_depth", "total_depth"))
+long_depth$SampleID <- factor(long_depth$SampleID, 
+    levels = depth$SampleID[order(-depth$total_depth)])
+
+custom_colors <- c("total_depth" = "#212529", "panel_depth" = "#C0392B")
+
+ggplot(long_depth, aes(x = Depth, y = SampleID, fill = Type, label = Depth)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), color = "grey95", linewidth = 0.18) +
+  geom_text(position = position_dodge(width = 0.8), hjust = -0.10, size = 3.5, fontface = "plain", family = "Times New Roman") +
+  scale_fill_manual(
+    values = custom_colors,
+    labels = c("Panel Depth", "Total Depth")
+  ) +
+  labs(
+    title = "Depth per Sample",
+    subtitle = "Each sample: Total & Panel depth",
+    x = "Total Depth", y = NULL, fill = NULL
+  ) +
+  theme_minimal(base_size = 15, base_family = "Times New Roman") +
+  theme(
+    legend.position = "top",
+    legend.text = element_text(size = 12, family = "Times New Roman"),
+    plot.title = element_text(face = "bold", size = 18, hjust = 0, family = "Times New Roman"),
+    plot.subtitle = element_text(size = 13, hjust = 0, family = "Times New Roman"),
+    axis.title.x = element_text(face = "bold", size = 14, margin = margin(t = 10), family = "Times New Roman"),
+    axis.text.x = element_text(face = "plain", size = 12, family = "Times New Roman"),
+    axis.text.y = element_text(face = "plain", size = 12, family = "Times New Roman"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(color = "grey90", linewidth = 0.2)
+  ) +
+  xlim(0, max(long_depth$Depth) * 1.13)
 ```
-
 ## <sup>Panel CpG Coverage Completeness per Sample</sup>
-s
+
 * This metric evaluates how completely each sample covers the predefined CpG panel. 
 * Completeness is calculated as the proportion (%) of targeted CpG sites from the panel that were successfully detected, defined as having at least one mapped read.
 * Bars: Represent the count of successfully covered CpG sites per sample.
@@ -639,7 +588,7 @@ s
 #| echo: false
 #| label: total-read-count panel  
 #| error: true
-#| fig-cap: "**Figure 16**: CpG Coverage Completeness per Sample"
+#| fig-cap: "**Figure 14**: CpG Coverage Completeness per Sample"
 
 total_panel_sites <- nrow(input.coverage)   
 covered_panel_sites <- colSums(input.coverage > 0, na.rm = TRUE)
@@ -688,7 +637,7 @@ ggplot(coverage_df,
 #| echo: false
 #| label: Assessment of Sequencing Coverage Uniformity
 #| error: true
-#| fig-cap: "**Figure 17**:This scatter plot compares the mean and median target coverage for each sample to evaluate the homogeneity of the sequencing data. The dashed diagonal line represents a perfect 1:1 ratio, indicating a completely uniform coverage distribution."
+#| fig-cap: "**Figure 15**:This scatter plot compares the mean and median target coverage for each sample to evaluate the homogeneity of the sequencing data. The dashed diagonal line represents a perfect 1:1 ratio, indicating a completely uniform coverage distribution."
 
 ggplot(hs,
        aes(`Mean target coverage`,
