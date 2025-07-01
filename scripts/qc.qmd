@@ -95,46 +95,59 @@ panel_summary <- data.frame(
     big.mark = ",")
 )
 
-cat(
-glue::glue('
-<details style="margin-top:1rem;">
-  <summary style="font-weight:bold; cursor:pointer;">
-    What is the <code>methylation_matrix</code> and how was it generated?
-  </summary>
+cat('
+<style>
+  .metric-table      { width:80%; border-collapse:collapse; font-size:0.95rem; margin:1rem 0; }
+  .metric-table th   { background:#f2f2f2; text-align:left;  padding:6px 10px; border:1px solid #ddd; }
+  .metric-table td   {                 text-align:right; padding:6px 10px; border:1px solid #ddd; }
+  .metric-table tbody tr:nth-child(even){ background:#fafafa; }
+  details summary    { font-weight:bold; cursor:pointer; margin-top:0.75rem; }
+</style>')
 
-  <p>
-    <code>methylation_matrix</code> is a sample &times; CpG table where each cell
-    contains the fractional methylation (<em>&beta;</em>-value) at that locus:
-    <br><code>&beta; = methylated_reads / (methylated_reads + unmethylated_reads)</code>.
+panel_summary <- data.frame(
+  Metric = c(
+    "Total CpG sites in methylation matrix (post-coverage filter)",
+    "CpG sites defined in panel regions",
+    "CpG sites that overlap panel regions",
+    "Number of samples analysed",
+    glue("Coverage threshold (mincov = {coverage_threshold})")
+  ),
+  Value  = format(c(
+    total_cpg_all,
+    total_cpg_panelfile,
+    cpg_after_filter,
+    num_samples,
+    coverage_threshold
+  ), big.mark = ",")
+)
+
+cat('<table class="metric-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>')
+for(i in seq_len(nrow(panel_summary))){
+  cat(glue('<tr><td style="text-align:left;">{panel_summary$Metric[i]}</td>
+               <td>{panel_summary$Value[i]}</td></tr>'))
+}
+cat('</tbody></table>')
+cat('
+<div style="font-size:0.9rem; margin-top:1rem;">
+  <p><strong>What is the <code>methylation matrix</code>?</strong></p>
+  <p style="margin-left:10px;">
+    <strong>methylation matrix</strong> = sample &times; CpG &#946;-values<br />
+    (&#946; = methylated&nbsp;reads / (methylated&nbsp;reads + unmethylated&nbsp;reads))
   </p>
-
-  <p><strong>Pipeline overview:</strong></p>
-  <ol style="margin-left:1rem;">
-    <li><strong>Adapter trimming</strong> - raw FASTQs processed with
-        <code>Trim&nbsp;Galore!</code> (uses <code>cutadapt</code>).</li>
-    <li><strong>Alignment</strong> - trimmed reads aligned with
-        <code>bwa-meth</code>; duplicates removed using <code>Picard</code>.</li>
-    <li><strong>CpG extraction</strong> - per-CpG methylation counts generated
-        by the aligner’s methyl-call utility.</li>
-    <li><strong>Import to R</strong> - counts loaded with
-        <code>methylKit::methRead()</code>; set
-        <code>pipeline</code> and <code>assembly</code> to suit your workflow.</li>
-    <li><strong>Coverage filter</strong> - loci with coverage &lt;
-        <strong>mincov = {coverage_threshold}</strong> are discarded.
-        <br><small><em>mincov</em> is the minimum reads per CpG we trust;
-        lower coverage blows up variance and invites false positives.</small></li>
-    <li><strong>Matrix export</strong> - the <code>methylKit</code> object is
-        converted to a matrix (<code>unite()</code> &rarr; <code>regionCounts()</code>)
-        and saved as the <code>methylation_matrix</code>.</li>
-  </ol>
-
-  <p>
-    Row count therefore equals the number of CpG loci that pass alignment,
-    deduplication, and the <code>mincov</code> filter <em>before</em> any
-    panel-based intersection.
-  </p>
-</details>
-'))
+  <p><strong>How is the methylation matrix generated?</strong></p>
+  <ul style="margin-left:25px;">
+    <li><strong>Adapter trimming</strong> &ndash; <code>Trim&nbsp;Galore!</code> / <code>cutadapt</code></li>
+    <li><strong>Alignment</strong> &ndash; <code>bwa-meth</code>; duplicates removed with <code>Picard</code></li>
+    <li><strong>CpG counting</strong> &ndash; aligner&rsquo;s methyl-call output</li>
+    <li><strong>Import to R</strong> &ndash; <code>methylKit::methRead()</code></li>
+    <li><strong>Coverage filter</strong> &ndash; keep loci with &ge; 10 reads (<code>mincov = 10</code>)</li>
+    <li><strong>Matrix export</strong> &ndash; <code>unite()</code> &rarr; <code>regionCounts()</code></li>
+  </ul>
+  <p><strong>Why <code>mincov = 10</code>?</strong><br />
+     <code>mincov</code> is the minimum read coverage required for a locus to be kept in a
+     <code>methylKit</code> object; loci below that threshold are dropped to curb noise.
+     Default is 10 &ndash; see the <code>methRead</code> documentation.</p>
+</div>')
 ```
 ## <sup>Methylation Distribution Plot for Panel</sup>
 
