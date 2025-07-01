@@ -247,7 +247,7 @@ print(boxplot_plot)
 #| echo: false
 #| label: Coverage Distribution Violin Plot
 #| code-fold: false
-#| fig-cap: "**Figure 4**:  Comparison of Coverage per Sample Between Panel and Total Regions."
+#| fig-cap: "**Figure 4**:  Comparison of Coverage per Sample Between Panel CpG sites and Total CpG sites."
 
 coverage_long <- bind_rows(
   input.coverage   %>% 
