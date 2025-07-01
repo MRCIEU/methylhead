@@ -46,22 +46,9 @@ for (path in files_path$V1) {
 }
 
 read_counts_list <- list()
-depth_list <- list()
-
-for (path in files_path$V1) {
-  fname <- basename(path)
-  if (grepl("-read-counts\\.tsv$", fname)) {
-    read_counts_list[[fname]] <- fread(path)
-  } else if (grepl("-depth\\.tsv$", fname)) {
-    depth_list[[fname]] <- fread(path)
-  }
-}
 
 if (length(read_counts_list) > 0) {
   read_counts <- data.table::rbindlist(read_counts_list, fill = TRUE)
-}
-if (length(depth_list) > 0) {
-  depth <- data.table::rbindlist(depth_list, fill = TRUE)
 }
 
 setnames(reads, old = "Reads passing filters", new = "Reads")
@@ -93,51 +80,61 @@ coverage_threshold  <- 10
 
 panel_summary <- data.frame(
   Metric = c(
-    "Total number of CpG sites (all)",
-    "Number of CpG sites in panel file",
-    "CpG sites that overlap panel-defined regions",
-    "Number of samples analyzed",
-    "Coverage threshold"
+    "Total CpG sites in methylation matrix (post-coverage filter)", 
+    "CpG sites defined in panel regions",
+    "CpG sites that overlap panel regions",
+    "Number of samples analysed",
+    glue("Coverage threshold (mincov = {coverage_threshold})")
   ),
-  Value  = format(c(
-    total_cpg_all,
-    total_cpg_panelfile,
-    cpg_after_filter,
-    num_samples,
-    coverage_threshold
-  ), big.mark = ",")            
+  Value = format(
+    c(total_cpg_all,
+      total_cpg_panelfile,
+      cpg_after_filter,
+      num_samples,
+      coverage_threshold),
+    big.mark = ",")
 )
 
-cat('<table style="
-        width:80%;
-        margin: 1rem 0;
-        border-collapse:collapse;
-        font-size: 0.95rem;">
-        <thead>
-          <tr style="background:#f2f2f2;">
-            <th style="text-align:left;  padding:6px 10px; border:1px solid #ddd;">Metric</th>
-            <th style="text-align:right; padding:6px 10px; border:1px solid #ddd;">Value</th>
-          </tr>
-        </thead>
-        <tbody>')
-
-for(i in seq_len(nrow(panel_summary))){
-  bg <- ifelse(i %% 2 == 0, "#fafafa", "#ffffff")   
-  cat(sprintf('<tr style="background:%s;">
-                 <td style="padding:6px 10px; border:1px solid #ddd;">%s</td>
-                 <td style="padding:6px 10px; border:1px solid #ddd; text-align:right;">%s</td>
-               </tr>',
-               bg,
-               panel_summary$Metric[i],
-               panel_summary$Value[i]))
-}
-
-cat('</tbody></table>')
-
-cat('<p><strong>Note:</strong> In the coverage matrix, minimum coverage is fixed at 10
-     (see <a href="https://www.rdocumentation.org/packages/methylKit/versions/0.99.2/topics/methRead">methylKit&nbsp;docs</a>).
-     The <code>mincov</code> parameter is the minimum read coverage to be included in methylKit objects
-     and defaults to <strong>10</strong>.</p>')
+cat('
+<details style="margin-top:1rem;">
+  <summary style="font-weight:bold; cursor:pointer;">
+    What is the <code>methylation_matrix</code> and how was it generated?
+  </summary>
+  <div style="padding-left:10px; font-size:0.9rem;">
+    <p>
+      <code>methylation_matrix</code> is a sample × CpG table where each cell
+      contains the fractional methylation (<em>β</em>-value) at that locus:
+      <br><code>β = methylated_reads / (methylated_reads + unmethylated_reads)</code>.
+    </p>
+    <p><strong>Pipeline overview:</strong></p>
+    <ol style="margin-left:1rem;">
+      <li><strong>Adapter trimming</strong> – raw FASTQs processed with
+          <code>Trim Galore!</code> (which uses <code>cutadapt</code>).</li>
+      <li><strong>Alignment</strong> – trimmed reads aligned to the reference
+          genome with <code>bwa-meth</code>; duplicates removed with <code>Picard</code>.</li>
+      <li><strong>CpG extraction</strong> – per-CpG methylation counts generated
+          by the aligner’s methyl-call utility.</li>
+      <li><strong>Import to R</strong> – counts loaded with
+          <code>methylKit::methRead()</code>; set
+          <code>pipeline</code> and <code>assembly</code> to match your workflow.</li>
+      <li><strong>Coverage filter</strong> – loci with coverage &lt;
+          <strong>mincov = 10</strong> are discarded.
+          <br><em>mincov</em> is the minimum number of reads required at a CpG
+          to accept its β-value; lower coverage inflates variance and can
+          distort downstream statistics.</li>
+      <li><strong>Matrix export</strong> – the resulting
+          <code>methylKit</code> object is converted to a matrix
+          (<code>unite()</code> → <code>regionCounts()</code>)
+          and saved as the <code>methylation_matrix</code>.</li>
+    </ol>
+    <p>
+      Row count therefore equals the number of CpG loci that pass alignment,
+      deduplication, and the <code>mincov</code> filter
+      <em>before</em> any panel-based intersection.
+    </p>
+  </div>
+</details>
+')
 ```
 ## <sup>Methylation Distribution Plot for Panel</sup>
 
@@ -189,7 +186,10 @@ iqr_data <- data %>%
     Median = median(Value),
     Q3 = quantile(Value, 0.75))
 violin_plot <- ggplot(data, aes(x = CellType, y = Value, fill = CellType)) +
-  geom_violin(alpha = 0.5, position = position_dodge(width = 0.8)) + 
+  geom_violin(alpha = 0.25, 
+   scale    = "width",
+   trim     = FALSE,
+   position = position_dodge(width = 0.5)) + 
   scale_fill_manual(values = getPalette(length(unique(data$CellType)))) +  
   geom_text(data = iqr_data, aes(x = CellType, y = Q3, label = paste0("Q3: ", round(Q3, 2))), 
             position = position_nudge(x = 0.2), size = 3) + 
@@ -236,49 +236,49 @@ boxplot_plot <- ggplot(data, aes(x = CellType, y = Value, fill = CellType)) +
     legend.text = element_text(size = 8))
 print(boxplot_plot)
 ```
-## <sup>Coverage Distribution</sup>
+## <sup>Depth Distribution</sup>
 
-* This plot illustrates the distribution of coverage for each sample, with  Samples  represented along the x-axis and Coverage values on the y-axis.
-* Side-by-side view: Two boxes per sample—Panel and Total—compare on-target coverage to genome-wide coverage at a glance.
-* Sorted by quality: Samples are arranged by median Panel coverage, putting the best on the left and weak outliers on the right.
-* Quick red-flags: Panel boxes should be higher and tighter; lower or wider ones signal poor capture or uneven coverage.
+* This plot illustrates the distribution of depth for each sample, with Samples represented along the x-axis and depth values on the y-axis.
+* Side-by-side view: Two boxes per sample—Panel and Total—compare on-target depth to genome-wide depth at a glance.
+* Sorted by quality: Samples are arranged by median Panel depth, putting the best on the left and weak outliers on the right.
+* Quick red-flags: Panel boxes should be higher and tighter; lower or wider ones signal poor capture or uneven depth.
 
 ```{r}
 #| echo: false
-#| label: Coverage Distribution Violin Plot
+#| label: Depth Distribution Violin Plot
 #| code-fold: false
-#| fig-cap: "**Figure 4**:  Comparison of Coverage per Sample Between Panel CpG sites and Total CpG sites."
+#| fig-cap: "**Figure 4**:  Comparison of Depth per Sample Between Panel CpG sites and Total CpG sites."
 
-coverage_long <- bind_rows(
+depth_long <- bind_rows(
   input.coverage   %>% 
     mutate(Set = "Panel") %>%          
     pivot_longer(cols = -Set,
                  names_to = "Sample",
-                 values_to = "Coverage"),
+                 values_to = "Depth"),
   coverage_matrix %>% 
     mutate(Set = "Total") %>% 
     pivot_longer(cols = -Set,
                  names_to = "Sample",
-                 values_to = "Coverage")
+                 values_to = "Depth")
 )
 
-coverage_long <- coverage_long %>%
+depth_long <- depth_long %>%
   mutate(SampleLabel = sub(".*_(S\\d+)", "\\1", Sample))
 
-sample_order <- coverage_long %>% 
+sample_order <- depth_long %>% 
   group_by(SampleLabel) %>% 
-  summarise(mean_cov = mean(Coverage, na.rm = TRUE), .groups = "drop") %>% 
+  summarise(mean_cov = mean(Depth, na.rm = TRUE), .groups = "drop") %>% 
   arrange(desc(mean_cov)) %>% 
   pull(SampleLabel)
 
-coverage_long$SampleLabel <- factor(coverage_long$SampleLabel,
+depth_long$SampleLabel <- factor(depth_long$SampleLabel,
                                     levels = sample_order)
 
-ymax <- max(coverage_long$Coverage, na.rm = TRUE)
+ymax <- max(depth_long$Depth, na.rm = TRUE)
 
 ggplot(
-  coverage_long,
-  aes(x = SampleLabel, y = Coverage, fill = Set)
+  depth_long,
+  aes(x = SampleLabel, y = Depth, fill = Set)
 ) +
   geom_violin(
     trim     = FALSE,
@@ -300,9 +300,9 @@ ggplot(
   ) +
   scale_fill_manual(values = c(Panel = "#2c7bb6", Total = "#d7191c")) +
   labs(
-    title = "Coverage per Sample: Panel vs Total",
+    title = "Depth per Sample: Panel vs Total",
     x     = "Sample",
-    y     = "Coverage",
+    y     = "Depth",
     fill  = "Set"
   ) +
   theme_minimal(base_size = 11) +
@@ -526,56 +526,6 @@ ggplot(long_counts, aes(x = Reads, y = SampleID, fill = Type, label = Reads)) +
   ) +
   xlim(0, max(long_counts$Reads) * 1.13)
 ```
-## <sup>Depth Plots</sup>
-
-* Depth: This plot shows, for each library, the plot shows the total read-base count across all CpG sites—that is, the sum of per-base depths extracted directly from the sorted BAM file with samtools.
-* This is a key QC metric reflecting not just the number of reads, but how thoroughly the genome or targeted panel is covered.
-* Panel vs. total at a glance: The blue bar (panel depth) is always shorter because it reflects only the coverage within the targeted panel regions, which are a subset of the total. 
-* The plot enables rapid identification of samples where overall sequencing depth is sufficient but panel depth is lacking.
-
-```{r}
-#| echo: false
-#| label: Depth
-#| error: true
-#| fig-cap: "**Figure 13**: Horizontal bar plot for each sample, showing the **total depth** in the whole methylome (green) and in the targeted panel regions (blue)."
-
-long_depth <- pivot_longer(depth, 
-                          cols = c(total_depth, panel_depth), 
-                          names_to = "Type", values_to = "Depth")
-
-long_depth$Type <- factor(long_depth$Type, levels = c("panel_depth", "total_depth"))
-long_depth$SampleID <- factor(long_depth$SampleID, 
-    levels = depth$SampleID[order(-depth$total_depth)])
-
-custom_colors <- c("total_depth" = "#212529", "panel_depth" = "#C0392B")
-
-ggplot(long_depth, aes(x = Depth, y = SampleID, fill = Type, label = Depth)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), color = "grey95", linewidth = 0.18) +
-  geom_text(position = position_dodge(width = 0.8), hjust = -0.10, size = 3.5, fontface = "plain", family = "Times New Roman") +
-  scale_fill_manual(
-    values = custom_colors,
-    labels = c("Panel Depth", "Total Depth")
-  ) +
-  labs(
-    title = "Depth per Sample",
-    subtitle = "Each sample: Total & Panel depth",
-    x = "Total Depth", y = NULL, fill = NULL
-  ) +
-  theme_minimal(base_size = 15, base_family = "Times New Roman") +
-  theme(
-    legend.position = "top",
-    legend.text = element_text(size = 12, family = "Times New Roman"),
-    plot.title = element_text(face = "bold", size = 18, hjust = 0, family = "Times New Roman"),
-    plot.subtitle = element_text(size = 13, hjust = 0, family = "Times New Roman"),
-    axis.title.x = element_text(face = "bold", size = 14, margin = margin(t = 10), family = "Times New Roman"),
-    axis.text.x = element_text(face = "plain", size = 12, family = "Times New Roman"),
-    axis.text.y = element_text(face = "plain", size = 12, family = "Times New Roman"),
-    panel.grid.major.y = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major.x = element_line(color = "grey90", linewidth = 0.2)
-  ) +
-  xlim(0, max(long_depth$Depth) * 1.13)
-```
 ## <sup>Panel CpG Coverage Completeness per Sample</sup>
 
 * This metric evaluates how completely each sample covers the predefined CpG panel. 
@@ -587,7 +537,7 @@ ggplot(long_depth, aes(x = Depth, y = SampleID, fill = Type, label = Depth)) +
 #| echo: false
 #| label: total-read-count panel  
 #| error: true
-#| fig-cap: "**Figure 14**: CpG Coverage Completeness per Sample"
+#| fig-cap: "**Figure 13**: CpG Coverage Completeness per Sample"
 
 total_panel_sites <- nrow(input.coverage)   
 covered_panel_sites <- colSums(input.coverage > 0, na.rm = TRUE)
@@ -636,7 +586,7 @@ ggplot(coverage_df,
 #| echo: false
 #| label: Assessment of Sequencing Coverage Uniformity
 #| error: true
-#| fig-cap: "**Figure 15**:This scatter plot compares the mean and median target coverage for each sample to evaluate the homogeneity of the sequencing data. The dashed diagonal line represents a perfect 1:1 ratio, indicating a completely uniform coverage distribution."
+#| fig-cap: "**Figure 14**:This scatter plot compares the mean and median target coverage for each sample to evaluate the homogeneity of the sequencing data. The dashed diagonal line represents a perfect 1:1 ratio, indicating a completely uniform coverage distribution."
 
 ggplot(hs,
        aes(`Mean target coverage`,
