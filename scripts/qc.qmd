@@ -95,46 +95,46 @@ panel_summary <- data.frame(
     big.mark = ",")
 )
 
-cat('
+cat(
+glue::glue('
 <details style="margin-top:1rem;">
   <summary style="font-weight:bold; cursor:pointer;">
     What is the <code>methylation_matrix</code> and how was it generated?
   </summary>
-  <div style="padding-left:10px; font-size:0.9rem;">
-    <p>
-      <code>methylation_matrix</code> is a sample × CpG table where each cell
-      contains the fractional methylation (<em>β</em>-value) at that locus:
-      <br><code>β = methylated_reads / (methylated_reads + unmethylated_reads)</code>.
-    </p>
-    <p><strong>Pipeline overview:</strong></p>
-    <ol style="margin-left:1rem;">
-      <li><strong>Adapter trimming</strong> – raw FASTQs processed with
-          <code>Trim Galore!</code> (which uses <code>cutadapt</code>).</li>
-      <li><strong>Alignment</strong> – trimmed reads aligned to the reference
-          genome with <code>bwa-meth</code>; duplicates removed with <code>Picard</code>.</li>
-      <li><strong>CpG extraction</strong> – per-CpG methylation counts generated
-          by the aligner’s methyl-call utility.</li>
-      <li><strong>Import to R</strong> – counts loaded with
-          <code>methylKit::methRead()</code>; set
-          <code>pipeline</code> and <code>assembly</code> to match your workflow.</li>
-      <li><strong>Coverage filter</strong> – loci with coverage &lt;
-          <strong>mincov = 10</strong> are discarded.
-          <br><em>mincov</em> is the minimum number of reads required at a CpG
-          to accept its β-value; lower coverage inflates variance and can
-          distort downstream statistics.</li>
-      <li><strong>Matrix export</strong> – the resulting
-          <code>methylKit</code> object is converted to a matrix
-          (<code>unite()</code> → <code>regionCounts()</code>)
-          and saved as the <code>methylation_matrix</code>.</li>
-    </ol>
-    <p>
-      Row count therefore equals the number of CpG loci that pass alignment,
-      deduplication, and the <code>mincov</code> filter
-      <em>before</em> any panel-based intersection.
-    </p>
-  </div>
+
+  <p>
+    <code>methylation_matrix</code> is a sample &times; CpG table where each cell
+    contains the fractional methylation (<em>&beta;</em>-value) at that locus:
+    <br><code>&beta; = methylated_reads / (methylated_reads + unmethylated_reads)</code>.
+  </p>
+
+  <p><strong>Pipeline overview:</strong></p>
+  <ol style="margin-left:1rem;">
+    <li><strong>Adapter trimming</strong> - raw FASTQs processed with
+        <code>Trim&nbsp;Galore!</code> (uses <code>cutadapt</code>).</li>
+    <li><strong>Alignment</strong> - trimmed reads aligned with
+        <code>bwa-meth</code>; duplicates removed using <code>Picard</code>.</li>
+    <li><strong>CpG extraction</strong> - per-CpG methylation counts generated
+        by the aligner’s methyl-call utility.</li>
+    <li><strong>Import to R</strong> - counts loaded with
+        <code>methylKit::methRead()</code>; set
+        <code>pipeline</code> and <code>assembly</code> to suit your workflow.</li>
+    <li><strong>Coverage filter</strong> - loci with coverage &lt;
+        <strong>mincov = {coverage_threshold}</strong> are discarded.
+        <br><small><em>mincov</em> is the minimum reads per CpG we trust;
+        lower coverage blows up variance and invites false positives.</small></li>
+    <li><strong>Matrix export</strong> - the <code>methylKit</code> object is
+        converted to a matrix (<code>unite()</code> &rarr; <code>regionCounts()</code>)
+        and saved as the <code>methylation_matrix</code>.</li>
+  </ol>
+
+  <p>
+    Row count therefore equals the number of CpG loci that pass alignment,
+    deduplication, and the <code>mincov</code> filter <em>before</em> any
+    panel-based intersection.
+  </p>
 </details>
-')
+'))
 ```
 ## <sup>Methylation Distribution Plot for Panel</sup>
 
