@@ -138,15 +138,17 @@ cat('
   <ul style="margin-left:25px;">
     <li><strong>Adapter trimming</strong> &ndash; <code>Trim&nbsp;Galore!</code> / <code>cutadapt</code></li>
     <li><strong>Alignment</strong> &ndash; <code>bwa-meth</code>; duplicates removed with <code>Picard</code></li>
-    <li><strong>CpG counting</strong> &ndash; aligner&rsquo;s methyl-call output</li>
+    <li><strong>CpG counting</strong> &ndash; aligner&rsquo;s MethylDackel (methylKit) output</li>
     <li><strong>Import to R</strong> &ndash; <code>methylKit::methRead()</code></li>
     <li><strong>Coverage filter</strong> &ndash; keep loci with &ge; 10 reads (<code>mincov = 10</code>)</li>
     <li><strong>Matrix export</strong> &ndash; <code>unite()</code> &rarr; <code>regionCounts()</code></li>
   </ul>
   <p><strong>Why <code>mincov = 10</code>?</strong><br />
-     <code>mincov</code> is the minimum read coverage required for a locus to be kept in a
-     <code>methylKit</code> object; loci below that threshold are dropped to curb noise.
-     Default is 10 &ndash; see the <code>methRead</code> documentation.</p>
+   <code>mincov</code> is the minimum read coverage required for a locus to be kept in a
+   <code>methylKit</code> object; loci below that threshold are dropped to curb noise.
+   Default is 10 &ndash; see the
+   <a href="https://www.rdocumentation.org/packages/methylKit/versions/0.99.2/topics/methRead" target="_blank">methRead documentation</a>.
+</p>
 </div>')
 ```
 ## <sup>Methylation Distribution Plot for Panel</sup>
@@ -324,7 +326,7 @@ ggplot(
     panel.grid.major.x = element_blank()
   ) 
 ```
-## <sup>PCA for Methylation</sup>
+## <sup>Principal Component Analysis (PCA)</sup>
 
 ```{r, include=FALSE}
 #| echo: false
@@ -346,42 +348,57 @@ impute.matrix <- function(x, margin = 1, fun = function(x) mean(x, na.rm = TRUE)
     x
 }
 # Function to perform PCA and generate scree plot and scatter plots
-generate_pca_plots <- function(data, scale_data=TRUE, dataset_name = "Scaled Data") { 
-  # Perform PCA
+
+generate_pca_plots <- function(data, scale_data = TRUE, dataset_name = "Scaled Data") {
+  ## Remove CpG loci with zero or undefined variance (row-wise QC)
+  var_row <- apply(data, 1, var, na.rm = TRUE)
+  keep    <- !is.na(var_row) & var_row > 1e-25      # ε = 1e-25 tolerance
+  if (!all(keep)) {
+    dropped <- sum(!keep)
+    warning(sprintf(
+      "%d CpG locus/loci with zero or undefined variance removed before PCA",
+      dropped))
+    data <- data[keep, , drop = FALSE]
+  }
+
   pca_result <- prcomp(t(data), scale. = scale_data)
-  
-  # Calculate explained variance
-  eigenvalues <- (pca_result$sdev)^2
+  ## scree plot + score scatter plots
+  eigenvalues        <- pca_result$sdev^2
   explained_variance <- eigenvalues / sum(eigenvalues)
-  
-  # Create Scree Plot
-  scree_plot <- ggplot(data = data.frame(PC = 1:length(explained_variance), Variance = explained_variance), 
-                       aes(x = PC, y = Variance)) +
+
+  scree_plot <- ggplot(
+      data.frame(PC = seq_along(explained_variance),
+                 Variance = explained_variance),
+      aes(PC, Variance)) +
     geom_bar(stat = "identity", fill = "steelblue") +
-    labs(title = paste("Scree Plot -", dataset_name), x = "Principal Components", y = "Explained Variance") +
+    labs(title = paste("Scree Plot –", dataset_name),
+         x = "Principal Components", y = "Explained Variance") +
     theme_minimal()
-  
-  # Create PCA scores data frame
-  pca_scores <- as.data.frame(pca_result$x)
-  rownames(pca_scores) <- sub("\\.", "-", gsub("^X", "",rownames(pca_scores)))
-  pca_scores$Sample <- rownames(pca_scores)
-  
-  # Merge with reads data
-  pca_scores <- merge(pca_scores, reads, by.x = "Sample", by.y = "Sample", all.x = TRUE)
-  
-  # Create PCA scatter plots
-  pcs <- list(c("PC1","PC2"),c("PC1","PC3"),c("PC2","PC3"),c("PC3","PC4"))
-  scatter_plots <- lapply(pcs, function(pcs) {
-      ggplot(pca_scores, aes_string(x = pcs[1], y = pcs[2], color = "Reads")) +
-        geom_point() +
-        geom_text(aes(label = sub(".*_(S\\d+)", "\\1", Sample, "")), vjust = -0.5, hjust = 0.5, size = 3) + 
-        theme_minimal() +
-        labs(title = paste("PCA Scatterplot:", pcs[1] , "vs", pcs[2], dataset_name), color = "Reads") +
-        scale_color_gradient(low = "blue", high = "red")
+
+  # Prepare score matrix
+  pca_scores           <- as.data.frame(pca_result$x)
+  rownames(pca_scores) <- sub("\\.", "-", gsub("^X", "", rownames(pca_scores)))
+  pca_scores$Sample    <- rownames(pca_scores)
+  pca_scores           <- merge(pca_scores, reads,
+                                by = "Sample", all.x = TRUE)
+
+  # Define PC pairs to plot
+  pc_pairs <- list(c("PC1","PC2"), c("PC1","PC3"),
+                   c("PC2","PC3"), c("PC3","PC4"))
+
+  scatter_plots <- lapply(pc_pairs, function(ax) {
+    ggplot(pca_scores,
+           aes_string(ax[1], ax[2], color = "Reads")) +
+      geom_point() +
+      geom_text(aes(label = sub(".*_(S\\d+)", "\\1", Sample)),
+                vjust = -0.5, hjust = 0.5, size = 3) +
+      theme_minimal() +
+      labs(title = paste("PCA:", ax[1], "vs", ax[2], "–", dataset_name),
+           color = "Reads") +
+      scale_color_gradient(low = "blue", high = "red")
   })
-  
-  # Return scree plot and scatter plots
-  return(list(scree_plot = scree_plot, scatter_plots = scatter_plots))
+
+  list(scree_plot = scree_plot, scatter_plots = scatter_plots)
 }
 ```
 ```{r}
@@ -552,7 +569,7 @@ ggplot(long_counts, aes(x = Reads, y = SampleID, fill = Type, label = Reads)) +
 #| error: true
 #| fig-cap: "**Figure 13**: CpG Coverage Completeness per Sample"
 
-total_panel_sites <- nrow(input.coverage)   
+total_panel_sites   <- nrow(panel)   
 covered_panel_sites <- colSums(input.coverage > 0, na.rm = TRUE)
 
 coverage_df <- tibble(
@@ -589,33 +606,32 @@ ggplot(coverage_df,
 ```
 ## <sup>Sequencing Coverage Uniformity</sup>
 
-* This graph visually evaluates the uniformity of sequencing coverage for each sample across the targeted regions.
-* Samples located close to the red diagonal line (where Mean ≈ Median) have a more homogeneous coverage distribution, which is the desired outcome.
-* Samples that fall significantly below the line have a skewed distribution. 
-* In these cases, the average (mean) coverage is artificially inflated by a few "hotspot" regions with extremely high depth, while the bulk of the regions have coverage closer to the lower median value.
-* The position on the axes also indicates the overall sequencing depth—samples in the top-right corner have the highest coverage.
+* `What the plot tests`. Each dot represents one sample; we contrast the mean and median depth across all targeted bases.
+* `Uniform libraries hug the diagonal`. Points near the red dashed line (Mean ≈ Median) indicate homogeneous coverage, which is the goal.
+* `Points below the line reveal skew`. Here, a handful of “hot-spot” regions with very high depth pull the mean upward, while most targets cluster around the lower median.
+* `Why the median can be zero`. Picard’s (CollectHsMetrics)[https://gatk.broadinstitute.org/hc/en-us/articles/360036856051-CollectHsMetrics-Picard] sets MEDIAN_TARGET_COVERAGE = 0 whenever ≥ 50 % of targets receive no passing reads (depth = 0).
+* <em>In that case the dot collapses onto the X-axis, although the mean may remain > 0 thanks to the well-covered hot-spots</em>.
+
 
 ```{r}
 #| echo: false
 #| label: Assessment of Sequencing Coverage Uniformity
 #| error: true
 #| fig-cap: "**Figure 14**:This scatter plot compares the mean and median target coverage for each sample to evaluate the homogeneity of the sequencing data. The dashed diagonal line represents a perfect 1:1 ratio, indicating a completely uniform coverage distribution."
-
 ggplot(hs,
        aes(`Mean target coverage`,
            `Median target coverage`,
            colour = Sample)) +
   geom_point(size = 2.2, alpha = .85,
-             position = position_jitter(width = .02, height = .04)) +
+             position = position_jitter(width = .02, height = 0)) +   
   geom_abline(slope = 1, intercept = 0,
               linetype = "dashed", colour = "red") +
-  scale_x_continuous(limits = c(0, max(hs$`Mean target coverage`))) +
-  scale_y_continuous(limits = c(0, max(hs$`Mean target coverage`))) +
-  scale_colour_discrete(labels = function(x) sub(".*_(S\\d+)", "\\1", x)) +
+  scale_colour_discrete(labels = \(x) sub(".*_(S\\d+)", "\\1", x)) +
   labs(title  = "Mean vs Median Target Coverage",
        x      = "Mean target coverage",
        y      = "Median target coverage",
        colour = "Sample") +
+  coord_equal() +                       
   theme_minimal(base_size = 13) +
   theme(legend.position = "right")
 ```
