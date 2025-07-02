@@ -29,6 +29,7 @@ library(RColorBrewer)
 library(glue)
 
 files_path <- fread(params$file_list, header = FALSE)
+
 label_map <- list(
   "coverage-matrix.csv"              = "coverage_matrix",
   "estimate-cell-counts.csv"         = "estimate_cell_count",
@@ -45,11 +46,10 @@ for (path in files_path$V1) {
   }
 }
 
-read_counts_list <- list()
-
-if (length(read_counts_list) > 0) {
-  read_counts <- data.table::rbindlist(read_counts_list, fill = TRUE)
-}
+read_counts <- rbindlist(
+  lapply(grep("-read-counts\\.tsv$", files_path$V1, value = TRUE), fread),
+  fill = TRUE
+)
 
 setnames(reads, old = "Reads passing filters", new = "Reads")
 reads                            <- reads %>% mutate(Sample = gsub("(_R[12]|_[12])$", "", Sample)) %>% distinct(Sample, .keep_all = TRUE)
@@ -63,7 +63,6 @@ input.data         <- input.data %>% select(-matches("chr|start|end|details|sour
 methylation_matrix <- methylation_matrix %>% select(-matches("chr|start|end"))
 coverage_matrix    <- coverage_matrix %>% select(-matches("chr|start|end"))
 input.coverage     <- input.coverage  %>% select(-matches("chr|start|end|details|source|i.start|i.end"))
-
 ```
 ## <sup>Panel Overview Table</sup>
 
