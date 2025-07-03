@@ -74,84 +74,111 @@ input.coverage     <- input.coverage  %>% select(-matches("chr|start|end|details
 #| label: panel-overview
 #| results: asis
 
+# Numbers
+
 total_cpg_all       <- nrow(methylation_matrix)
 total_cpg_panelfile <- nrow(panel)
 cpg_after_filter    <- nrow(input.data)
 num_samples         <- ncol(input.data)
 coverage_threshold  <- 10
 
-panel_summary <- data.frame(
-  Metric = c(
-    "Total CpG sites in methylation matrix (post-coverage filter)", 
-    "CpG sites defined in panel regions",
-    "CpG sites that overlap panel regions",
-    "Number of samples analysed",
-    glue("Coverage threshold (mincov = {coverage_threshold})")
-  ),
-  Value = format(
-    c(total_cpg_all,
-      total_cpg_panelfile,
-      cpg_after_filter,
-      num_samples,
-      coverage_threshold),
-    big.mark = ",")
+#Descriptions
+
+metrics <- c(
+  "Covered CpG sites",
+  "Targeted CpG sites",
+  "Targeted and covered CpG sites",
+  "Number of samples analysed",
+  "Coverage threshold (mincov)"
 )
 
-cat('
-<style>
-  .metric-table      { width:80%; border-collapse:collapse; font-size:0.95rem; margin:1rem 0; }
-  .metric-table th   { background:#f2f2f2; text-align:left;  padding:6px 10px; border:1px solid #ddd; }
-  .metric-table td   {                 text-align:right; padding:6px 10px; border:1px solid #ddd; }
-  .metric-table tbody tr:nth-child(even){ background:#fafafa; }
-  details summary    { font-weight:bold; cursor:pointer; margin-top:0.75rem; }
-</style>')
+descriptions <- c(
+  "The number of CpG sites in the human genome for which at least 50% of the samples each have at least 'mincov' reads covering the site.",
+  "The number of CpG sites inside panel regions",
+  "The number of covered CpG sites inside panel regions",
+  "",
+  ""
+)
 
-panel_summary <- data.frame(
-  Metric = c(
-    "Total CpG sites in methylation matrix (post-coverage filter)",
-    "CpG sites defined in panel regions",
-    "CpG sites that overlap panel regions",
-    "Number of samples analysed",
-    glue("Coverage threshold (mincov = {coverage_threshold})")
-  ),
-  Value  = format(c(
-    total_cpg_all,
+values <- format(
+  c(total_cpg_all,
     total_cpg_panelfile,
     cpg_after_filter,
     num_samples,
-    coverage_threshold
-  ), big.mark = ",")
+    coverage_threshold),
+  big.mark = ","
 )
 
-cat('<table class="metric-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>')
-for(i in seq_len(nrow(panel_summary))){
-  cat(glue('<tr><td style="text-align:left;">{panel_summary$Metric[i]}</td>
-               <td>{panel_summary$Value[i]}</td></tr>'))
-}
-cat('</tbody></table>')
-cat('
-<div style="font-size:0.9rem; margin-top:1rem;">
-  <p><strong>What is the <code>methylation matrix</code>?</strong></p>
-  <p style="margin-left:10px;">
-    <strong>methylation matrix</strong> = sample &times; CpG &#946;-values<br />
-    (&#946; = methylated&nbsp;reads / (methylated&nbsp;reads + unmethylated&nbsp;reads))
-  </p>
-  <p><strong>How is the methylation matrix generated?</strong></p>
-  <ul style="margin-left:25px;">
-    <li><strong>Adapter trimming</strong> &ndash; <code>Trim&nbsp;Galore!</code> / <code>cutadapt</code></li>
-    <li><strong>Alignment</strong> &ndash; <code>bwa-meth</code>; duplicates removed with <code>Picard</code></li>
-    <li><strong>CpG counting</strong> &ndash; aligner&rsquo;s MethylDackel (methylKit) output</li>
-    <li><strong>Import to R</strong> &ndash; <code>methylKit::methRead()</code></li>
-    <li><strong>Coverage filter</strong> &ndash; keep loci with &ge; 10 reads (<code>mincov = 10</code>)</li>
-    <li><strong>Matrix export</strong> &ndash; <code>unite()</code> &rarr; <code>regionCounts()</code></li>
-  </ul>
-  <p><strong>Why <code>mincov = 10</code>?</strong><br />
-   <code>mincov</code> is the minimum read coverage required for a locus to be kept in a
-   <code>methylKit</code> object; loci below that threshold are dropped to curb noise.
-   Default is 10 &ndash; see the
-   <a href="https://www.rdocumentation.org/packages/methylKit/versions/0.99.2/topics/methRead" target="_blank">methRead documentation</a>.
-</p>
-</div>')
+row_html <- vapply(seq_along(metrics), function(i) {
+  glue('  <tr>
+    <td style="padding:6px 10px;">
+      {metrics[i]}<br>
+      <span class="subdesc">{descriptions[i]}</span>
+    </td>
+    <td style="padding:6px 10px; text-align:right;">{values[i]}</td>
+  </tr>')
+}, character(1))
+
+# CSS codes
+
+css <- '
+<style>
+  /* Table size & typography */
+  table.metric-table {
+    width:90%;
+    border-collapse:collapse;
+    font-size:0.95rem;
+    margin:1rem auto;
+  }
+
+  /* Subtle gray borders */
+  .metric-table,
+  .metric-table th,
+  .metric-table td {
+    border:1px solid #d8d8d8;
+  }
+
+  /* Header row – light grey background, darker text */
+  .metric-table th {
+    background:#f2f2f2;
+    color:#000000;
+    text-align:left;
+    padding:6px 10px;
+    font-weight:600;
+  }
+
+  /* Data cells – white + gentle zebra striping */
+  .metric-table td {
+    background:#ffffff;
+    color:#333333;
+    padding:6px 10px;
+  }
+  .metric-table tr:nth-child(even) td { background:#fafafa; }
+
+  /* Description under each metric – darker & semi-bold */
+  .metric-table .subdesc {
+    font-style:italic;
+    font-size:0.85em;
+    color:#4a4a4a;
+    font-weight:600;
+  }
+</style>
+'
+
+#HTML out
+
+html_out <- glue('{css}
+<table class="metric-table">
+  <thead>
+    <tr><th>Metric</th><th style="text-align:right;">Value</th></tr>
+  </thead>
+  <tbody>
+{paste(row_html, collapse = "\n")}
+  </tbody>
+</table>
+')
+
+cat(html_out)
 ```
 ## <sup>Methylation Distribution Plot</sup>
 
