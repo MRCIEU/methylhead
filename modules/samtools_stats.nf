@@ -26,10 +26,6 @@ process samtools_stats {
     ## strip the literal suffix '_sorted'
     clean_id="\${sample_id_bash%_sorted}" 
     
-    printf "SampleID\ttotal_depth\tpanel_depth\n%s\t%s\t%s\n" \
-       "\${clean_id}" "\${total_depth}" "\${panel_depth}" \
-            > "${sample_id}-depth.tsv"
-    
     # ---------- read counts ---------- 
     total_reads=\$(samtools view -c -F 4,1024 -q 20    "${sorted_ch}")
     panel_reads=\$(samtools view -c -F 4,1024 -q 20 -L "${panel}" "${sorted_ch}")
