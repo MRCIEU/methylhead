@@ -1,5 +1,5 @@
 ---
-title: "DNA Methylation: Bisulfite Sequencing Panel Report"
+title: "DNA Methylation: Bisulfite Sequencing Panel QC Report"
 author: "."
 date: "`r Sys.Date()`"
 encoding: UTF-8 
@@ -65,7 +65,9 @@ methylation_matrix <- methylation_matrix %>% select(-matches("chr|start|end"))
 coverage_matrix    <- coverage_matrix %>% select(-matches("chr|start|end"))
 input.coverage     <- input.coverage  %>% select(-matches("chr|start|end|details|source|i.start|i.end"))
 ```
-## <sup>Panel Overview Table</sup>
+* All metrics and plots in this report refer to the predefined CpG panel unless explicitly noted otherwise.
+
+## <sup>Overview Table</sup>
 
 ```{r}
 #| echo: false
@@ -151,7 +153,7 @@ cat('
 </p>
 </div>')
 ```
-## <sup>Methylation Distribution Plot for Panel</sup>
+## <sup>Methylation Distribution Plot</sup>
 
 * This plot shows the distribution of DNA methylation levels across multiple samples. 
 * The x-axis represents methylation values from 0 (unmethylated) to 1 (fully methylated), while the y-axis shows the density of CpG sites. 
@@ -447,7 +449,7 @@ print(scaled_plots$scatter_plots[[3]])
 #| fig-cap: "**Figure 9**: PCA Scatterplot of PC3 vs PC4 for Scaled Data. This plot shows the relationship between PC3 and PC4 for the scaled data, with each point color-coded by read count."
 print(scaled_plots$scatter_plots[[4]])
 ```
-## <sup>Correlation for Methylation</sup>
+## <sup>Sample-wise Correlation</sup>
 ```{r}
 #| echo: false
 #| label: Correlation for Methylation Raw/Scaled
@@ -506,7 +508,7 @@ print(plots$p1)
 #| fig-cap: "**Figure 11**: Density Plot With Standardizing CpG Sites."
 print(plots$p2)
 ```
-## <sup>Total Read Count per Sample</sup>
+## <sup>Read Count per Sample</sup>
 
 * Read counts: This plot tracks the total number of mapped reads overlapping CpG loci for each library, directly calculated from sorted BAM files using samtools. 
 * Panel vs. Total at a glance: The plot also highlights, for each sample, how many reads map to the whole methylome (green bar: total) and to the targeted panel regions (blue bar: panel). 
@@ -556,7 +558,7 @@ ggplot(long_counts, aes(x = Reads, y = SampleID, fill = Type, label = Reads)) +
   ) +
   xlim(0, max(long_counts$Reads) * 1.13)
 ```
-## <sup>Panel CpG Coverage Completeness per Sample</sup>
+## <sup>CpG-site Coverage</sup>
 
 * This metric evaluates how completely each sample covers the predefined CpG Panel. 
 * Completeness is calculated as the proportion (%) of targeted CpG sites from the panel that were successfully detected, defined as having at least one mapped read.
@@ -604,7 +606,7 @@ ggplot(coverage_df,
     panel.grid.major.y = element_blank()
   )
 ```
-## <sup>Sequencing Coverage Uniformity</sup>
+## <sup>Coverage Uniformity</sup>
 
 * `What the plot tests`. Each dot represents one sample; we contrast the mean and median depth across all targeted bases.
 * `Uniform libraries hug the diagonal`. Points near the red dashed line (Mean ≈ Median) indicate homogeneous coverage, which is the goal.
