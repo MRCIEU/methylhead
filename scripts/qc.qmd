@@ -2,6 +2,7 @@
 title: "DNA Methylation: Bisulfite Sequencing Panel Report"
 author: "."
 date: "`r Sys.Date()`"
+encoding: UTF-8 
 params:
   dataset: "."      
   panel_data: NULL      
@@ -370,7 +371,7 @@ generate_pca_plots <- function(data, scale_data = TRUE, dataset_name = "Scaled D
                  Variance = explained_variance),
       aes(PC, Variance)) +
     geom_bar(stat = "identity", fill = "steelblue") +
-    labs(title = paste("Scree Plot –", dataset_name),
+    labs(title = paste("Scree Plot -", dataset_name),
          x = "Principal Components", y = "Explained Variance") +
     theme_minimal()
 
@@ -392,8 +393,8 @@ generate_pca_plots <- function(data, scale_data = TRUE, dataset_name = "Scaled D
       geom_text(aes(label = sub(".*_(S\\d+)", "\\1", Sample)),
                 vjust = -0.5, hjust = 0.5, size = 3) +
       theme_minimal() +
-      labs(title = paste("PCA:", ax[1], "vs", ax[2], "–", dataset_name),
-           color = "Reads") +
+      labs(title = paste("PCA:", ax[1], "vs", ax[2], "-", dataset_name),
+           color = "Reads") +                       
       scale_color_gradient(low = "blue", high = "red")
   })
 
@@ -608,7 +609,7 @@ ggplot(coverage_df,
 * `What the plot tests`. Each dot represents one sample; we contrast the mean and median depth across all targeted bases.
 * `Uniform libraries hug the diagonal`. Points near the red dashed line (Mean ≈ Median) indicate homogeneous coverage, which is the goal.
 * `Points below the line reveal skew`. Here, a handful of “hot-spot” regions with very high depth pull the mean upward, while most targets cluster around the lower median.
-* `Why the median can be zero`. Picard’s (CollectHsMetrics)[https://gatk.broadinstitute.org/hc/en-us/articles/360036856051-CollectHsMetrics-Picard] sets MEDIAN_TARGET_COVERAGE = 0 whenever ≥ 50 % of targets receive no passing reads (depth = 0).
+* `Why the median can be zero`. Picard’s [CollectHsMetrics](https://gatk.broadinstitute.org/hc/en-us/articles/360036856051-CollectHsMetrics-Picard) sets MEDIAN_TARGET_COVERAGE = 0 whenever ≥ 50 % of targets receive no passing reads (depth = 0).
 * <em>In that case the dot collapses onto the X-axis, although the mean may remain > 0 thanks to the well-covered hot-spots</em>.
 
 
