@@ -96,8 +96,6 @@ workflow pipeline {
           dna_methylation_scores_ch     = dna_methylation_scores.out.dna_methylation_scores
           samtools_read_counts_files_ch = samtools_stats.out.read_counts
             .map { id, f -> f } 
-          samtools_panel_depth_files_ch = samtools_stats.out.panel_depth
-            .map { id, f -> f }
             qc_files_ch = reads_ch  
             .concat(estimate_cell_counts_ch)
             .concat(coverage_matrix_ch)
@@ -107,7 +105,6 @@ workflow pipeline {
             .concat(dna_methylation_scores_ch)
             .concat(reads_hs)
             .concat(samtools_read_counts_files_ch) 
-            .concat(samtools_panel_depth_files_ch) 
             .map { file -> file.toAbsolutePath().toString() }
             .collectFile(name: "qc_files.csv", newLine: true)
     qc_report(qc_files_ch)
