@@ -65,7 +65,7 @@ methylation_matrix <- methylation_matrix %>% select(-matches("chr|start|end"))
 coverage_matrix    <- coverage_matrix %>% select(-matches("chr|start|end"))
 input.coverage     <- input.coverage  %>% select(-matches("chr|start|end|details|source|i.start|i.end"))
 ```
-* All metrics and plots in this report refer to the predefined CpG panel unless explicitly noted otherwise.
+* <em>All metrics and plots in this report refer to the predefined CpG panel unless explicitly noted otherwise.<\em>
 
 ## <sup>Overview Table</sup>
 
@@ -184,6 +184,8 @@ ggplot(methylation_data_long,
 ## <sup>Estimate cell counts</sup>
 
 * The plot shows data density with labels for Q1, median, and Q3.
+* These cell-type proportions are inferred from genome-wide methylation patterns and do not rely on the targeted CpG panel. 
+* <em>In other words, the estimates reflect the overall cellular composition of each sample, independent of panel capture efficiency or on-target depth.<\em>
 
 ```{r}  
 #| echo: false
