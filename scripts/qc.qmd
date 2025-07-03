@@ -509,7 +509,7 @@ print(plots$p2)
 ## <sup>Total Read Count per Sample</sup>
 
 * Read counts: This plot tracks the total number of mapped reads overlapping CpG loci for each library, directly calculated from sorted BAM files using samtools. 
-* Panel vs. total at a glance: The plot also highlights, for each sample, how many reads map to the whole methylome (green bar: total) and to the targeted panel regions (blue bar: panel). 
+* Panel vs. Total at a glance: The plot also highlights, for each sample, how many reads map to the whole methylome (green bar: total) and to the targeted panel regions (blue bar: panel). 
 * This enables quick visual detection of libraries with sufficient total sequencing depth but suboptimal panel capture.
 
 ```{r}
@@ -558,7 +558,7 @@ ggplot(long_counts, aes(x = Reads, y = SampleID, fill = Type, label = Reads)) +
 ```
 ## <sup>Panel CpG Coverage Completeness per Sample</sup>
 
-* This metric evaluates how completely each sample covers the predefined CpG panel. 
+* This metric evaluates how completely each sample covers the predefined CpG Panel. 
 * Completeness is calculated as the proportion (%) of targeted CpG sites from the panel that were successfully detected, defined as having at least one mapped read.
 * Bars: Represent the count of successfully covered CpG sites per sample.
 * Percentage labels: Directly reflect completeness relative to the total panel size.
