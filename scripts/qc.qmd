@@ -627,7 +627,7 @@ ggplot(hs,
   geom_abline(slope = 1, intercept = 0,
               linetype = "dashed", colour = "red") +
   scale_colour_discrete(labels = \(x) sub(".*_(S\\d+)", "\\1", x)) +
-  labs(title  = "Mean vs Median Target Coverage",
+  labs(title  = "Median vs Mean Target Coverage",
        x      = "Mean target coverage",
        y      = "Median target coverage",
        colour = "Sample") +
