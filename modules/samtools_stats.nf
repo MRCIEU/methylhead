@@ -12,7 +12,6 @@ process samtools_stats {
     output:
         tuple val(sample_id), path("${sample_id}-samtools-stats.txt")        , emit: mybam_samtools_stats
         tuple val(sample_id), path("${sample_id}-markdup-samtools-stats.txt"), emit: sorted_samtools_stats
-        tuple val(sample_id), path("${sample_id}-depth.tsv")                 , emit: panel_depth
         tuple val(sample_id), path("${sample_id}-read-counts.tsv")           , emit: read_counts
 
     script:
@@ -26,13 +25,6 @@ process samtools_stats {
     
     ## strip the literal suffix '_sorted'
     clean_id="\${sample_id_bash%_sorted}" 
-
-    # ---------- panel depth ----------
-    total_depth=\$(samtools depth -a -Q 20 -g 1024    "${sorted_ch}" | \
-              awk '{sum+=\$3} END {print sum}')
-
-    panel_depth=\$(samtools bedcov -g 1024 "${panel}" "${sorted_ch}" | \
-              awk '{sum+=\$4} END {print sum}')
     
     printf "SampleID\ttotal_depth\tpanel_depth\n%s\t%s\t%s\n" \
        "\${clean_id}" "\${total_depth}" "\${panel_depth}" \
