@@ -6,9 +6,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: nf-core/setup-nextflow@v2   
+      - uses: nf-core/setup-nextflow@v2
         with:
           version: '23.10.0'
+      - name: Pull Docker images
+        run: |
+          docker pull onuroztornaci/methylhead-pipeline:wgbs_analysis
+          docker pull onuroztornaci/methylhead-pipeline:meth_analysis
+          docker pull onuroztornaci/methylhead-pipeline:qc_container
 
+      - name: Test Docker
+        run: |
+          docker run --rm onuroztornaci/methylhead-pipeline:wgbs_analysis trim_galore --version
+          
       - name: Run demo with Docker images
         run: nextflow -C nextflow-test.config run main.nf -profile docker
