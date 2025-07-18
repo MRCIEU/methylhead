@@ -2,14 +2,15 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  demo-test:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4         
-      - uses: nf-core/setup-nf@v1          
+      - uses: actions/checkout@v4            # clone repo
+      - uses: nf-core/setup-nextflow@v2      # Java + Nextflow
         with:
           nextflow-version: '23.10.0'
-
-      - name: Run built‑in demo
-        run: |
-          nextflow -C nextflow-test.config run main.nf -profile test,docker
+      - uses: eWaterCycle/setup-apptainer@v2 # Apptainer
+        with:
+          apptainer-version: '1.1.9'
+      - name: Run demo
+        run: nextflow -C nextflow-test.config run main.nf
