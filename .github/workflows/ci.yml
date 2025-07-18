@@ -5,8 +5,11 @@ jobs:
   demo-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: nf-core/setup-nf@v1
+      - uses: actions/checkout@v4         
+      - uses: nf-core/setup-nf@v1          
         with:
-          nextflow-version: '23.10.0'  
-      - run: nextflow -C nextflow-test.config run main.nf 
+          nextflow-version: '23.10.0'
+
+      - name: Run built‑in demo
+        run: |
+          nextflow -C nextflow-test.config run main.nf -profile test,docker
