@@ -1,0 +1,10 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  demo-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nf-core/setup-action@v2
+      - run: nextflow -C nextflow-test.config run main.nf
