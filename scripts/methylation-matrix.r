@@ -4,9 +4,10 @@ library(methylKit)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-samples <- args[1]
-output_file <- args[2]
-output_file2 <- args[3]
+samples <- args[1]      ## list of methylKit output files
+    ## (csv format with no headings, filenames in the second column)
+output_file <- args[2]  ## methylation matrix (csv format)
+output_file2 <- args[3] ## read depth matrix (csv format)
 
 file <-read.csv(samples,header=F)
 file<-data.frame(file)
