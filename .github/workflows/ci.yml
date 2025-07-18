@@ -6,5 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: nf-core/setup-action@v2
-      - run: nextflow -C nextflow-test.config run main.nf
+      - uses: nf-core/setup-nf@v1
+        with:
+          nextflow-version: '23.10.0'  
+      - run: nextflow -C nextflow-test.config run main.nf -profile test,docker
