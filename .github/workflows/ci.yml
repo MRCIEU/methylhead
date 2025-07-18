@@ -13,4 +13,4 @@ jobs:
         with:
           apptainer-version: '1.1.9'
       - name: Run demo
-        run: nextflow -C nextflow-test.config run main.nf
+        run: nextflow -C nextflow-test.config run main.nf -profile docker
