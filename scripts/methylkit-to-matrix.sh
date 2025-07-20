@@ -55,9 +55,10 @@ quarto render methylkit-to-matrix.qmd \
     --to html \
     --output qc.html \
     -P panel=panel.csv \
-    -P coverage_matrix=coverage.csv \
+    -P coverage=coverage.csv \
     -P cell_counts=cell-counts.csv \
-    -P methylation_matrix=methylation.csv 
+    -P meth=methylation.csv \
+    -P score_sites=methylation-scores-sites.csv
 
 
 

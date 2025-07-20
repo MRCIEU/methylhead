@@ -1,13 +1,13 @@
 ---
 title: "Twist Capture Methyl-Seq QC Report"
-author: "."
 date: "`r Sys.Date()`"
 encoding: UTF-8 
 params:
     panel: NULL
-    coverage_matrix: NULL
+    coverage: NULL
     cell_counts: NULL
-    methylation_matrix: NULL
+    meth: NULL
+    score_sites: NULL
 format:
   html:
     fig-cap-location: bottom
@@ -25,386 +25,284 @@ format:
 
 library(data.table)
 library(ggplot2)
-library(dplyr)
-library(tidyr)
 library(gridExtra)
 library(reshape2)
 library(RColorBrewer)
-library(glue)
+library(knitr)
+library(impute)
+library(meffonym)
 
 panel = fread(params$panel)
-coverage_matrix = fread(params$coverage_matrix)
+coverage = fread(params$coverage)
 cell_counts = fread(params$cell_counts)
-methylation_matrix = fread(params$methylation_matrix)
+meth = fread(params$meth)
+score_sites = fread(params$score_sites)
 
-colnames(cell_counts)[1] <- "cell_type"
+stopifnot(identical(colnames(meth), colnames(coverage)))
+stopifnot(all(c("chr","start","end") %in% colnames(meth)))
+stopifnot(ncol(panel) == 3)
+
+colnames(panel) = c("chr","start","end")
+colnames(cell_counts)[1] = "cell_type"
+colnames(score_sites)[1] = "score"
+
 setkey(panel, chr, start, end)
-setkey(methylation_matrix ,  chr, start, end)
-input_data         <- foverlaps(methylation_matrix, panel, type = "within", nomatch = 0L)
-input_coverage     <- foverlaps(coverage_matrix, panel, type = "within", nomatch = 0L)
-input_data         <- input_data %>% select(-matches("chr|start|end|details|source"))
-methylation_matrix <- methylation_matrix %>% select(-matches("chr|start|end"))
-coverage_matrix    <- coverage_matrix %>% select(-matches("chr|start|end"))
-input_coverage     <- input_coverage  %>% select(-matches("chr|start|end|details|source|i.start|i.end"))
+setkey(meth, chr, start, end)
+setkey(coverage, chr, start, end)
+panel_meth = foverlaps(meth, panel, type="within", nomatch=NULL)
+panel_coverage = foverlaps(coverage, panel, type="within", nomatch=NULL)
+
+panel = data.frame(panel)
+coverage = data.frame(coverage)
+cell_counts = data.frame(cell_counts)
+meth = data.frame(meth)
+score_sites = data.frame(score_sites)
+panel_meth = data.frame(panel_meth)
+panel_coverage = data.frame(panel_coverage)
+
+meth = meth[,setdiff(colnames(meth),c("chr","start","end"))]
+panel_meth = panel_meth[,colnames(meth)]
+coverage = coverage[,colnames(meth)]
+panel_coverage = panel_coverage[,colnames(meth)]
+
+stopifnot(nrow(meth)==nrow(coverage))
+stopifnot(nrow(panel_meth)==nrow(panel_coverage))
+stopifnot(all(colnames(meth) %in% colnames(cell_counts)))
+
+rownames(cell_counts) = cell_counts$cell_type
+cell_counts$cell_type = NULL
+
+samples = data.frame(
+    id=colnames(meth),
+    name=sub("_[^_]*", "", colnames(meth)))
+rownames(samples) = samples$id
 ```
 
-* <em>All metrics and plots in this report refer to the predefined CpG panel unless explicitly noted otherwise.</em>
+## Overview
 
-## <sup>Overview Table</sup>
+A CpG site is considered **measured** or **covered** in this dataset
+if it is contained in at least `mincov` (10) reads for at least
+50% of the samples. 
+
+A CpG site is called **targeted** if probes were designed to
+to capture DNA fragments containing that site.
 
 ```{r}
 #| echo: false
 #| label: panel-overview
-#| results: asis
 
-# Numbers
-
-total_cpg_all       <- nrow(methylation_matrix)
-total_cpg_panelfile <- nrow(panel)
-cpg_after_filter    <- nrow(input_data)
-num_samples         <- ncol(input_data)
-coverage_threshold  <- 10
-
-#Descriptions
-
-metrics <- c(
-  "Covered CpG sites",
-  "Targeted CpG sites",
-  "Targeted and covered CpG sites",
-  "Number of samples analysed",
-  "Coverage threshold (mincov)"
-)
-
-descriptions <- c(
-  "The number of CpG sites in the human genome for which at least 50% of the samples each have at least 'mincov' reads covering the site.",
-  "The number of CpG sites inside panel regions",
-  "The number of covered CpG sites inside panel regions",
-  "",
-  ""
-)
-
-values <- format(
-  c(total_cpg_all,
-    total_cpg_panelfile,
-    cpg_after_filter,
-    num_samples,
-    coverage_threshold),
-  big.mark = ","
-)
-
-row_html <- vapply(seq_along(metrics), function(i) {
-  glue('  <tr>
-    <td style="padding:6px 10px;">
-      {metrics[i]}<br>
-      <span class="subdesc">{descriptions[i]}</span>
-    </td>
-    <td style="padding:6px 10px; text-align:right;">{values[i]}</td>
-  </tr>')
-}, character(1))
-
-# CSS codes
-
-css <- '
-<style>
-  /* Table size & typography */
-  table.metric-table {
-    width:90%;
-    border-collapse:collapse;
-    font-size:0.95rem;
-    margin:1rem auto;
-  }
-
-  /* Subtle gray borders */
-  .metric-table,
-  .metric-table th,
-  .metric-table td {
-    border:1px solid #d8d8d8;
-  }
-
-  /* Header row – light grey background, darker text */
-  .metric-table th {
-    background:#f2f2f2;
-    color:#000000;
-    text-align:left;
-    padding:6px 10px;
-    font-weight:600;
-  }
-
-  /* Data cells – white + gentle zebra striping */
-  .metric-table td {
-    background:#ffffff;
-    color:#333333;
-    padding:6px 10px;
-  }
-  .metric-table tr:nth-child(even) td { background:#fafafa; }
-
-  /* Description under each metric – darker & semi-bold */
-  .metric-table .subdesc {
-    font-style:italic;
-    font-size:0.85em;
-    color:#4a4a4a;
-    font-weight:600;
-  }
-</style>
-'
-
-#HTML out
-
-html_out <- glue('{css}
-<table class="metric-table">
-  <thead>
-    <tr><th>Metric</th><th style="text-align:right;">Value</th></tr>
-  </thead>
-  <tbody>
-{paste(row_html, collapse = "\n")}
-  </tbody>
-</table>
-')
-
-cat(html_out)
+overview = rbind(
+    data.frame(
+        metric="covered CpG sites", 
+        value=nrow(meth)),
+    data.frame(
+        metric="targeted genomic regions",
+        value=nrow(panel)),
+    data.frame(
+        metric="targeted and covered CpG sites",
+        value=nrow(panel_meth)),
+    data.frame(
+        metric="number of samples analysed",
+        value=ncol(panel_meth)),
+    data.frame(
+        metric="coverage threshold (mincov)",
+        value=10))
+kable(overview)
 ```
-## <sup>Methylation Distribution Plot</sup>
+## Methylation Distributions
 
-* This plot shows the distribution of DNA methylation levels across multiple samples. 
-* The x-axis represents methylation values from 0 (unmethylated) to 1 (fully methylated), while the y-axis shows the density of CpG sites. 
-* Each line corresponds to a sample, with color shading indicating overlapping densities. 
-* The bimodal pattern, with peaks near 0 and 1, is typical for methylation data, highlighting unmethylated and highly methylated CpG regions. 
-* This plot captures methylation variability across samples.
+DNA methylation distributions are shown by sample.
 
 ```{r}
 #| echo: false
 #| label: methylation-density
 #| code-fold: false
-#| fig-cap: "**Figure 1**: Density Plot of Methylation for Samples."
+#| fig-cap: "**Figure 1**: Methylation distributions by sample"
 
-methylation_data_long <- input_data %>%
-  pivot_longer(cols = everything(), names_to = "Sample", values_to = "Methylation")
+long = melt(panel_meth, variable.name="sample", value.name="methylation")
+long$sample = samples[long$sample, "name"]
+long = na.omit(long)
 
-ggplot(methylation_data_long,
-       aes(x = Methylation, fill = sub(".*_(S\\d+)$", "\\1", Sample),
-           colour = sub(".*_(S\\d+)$", "\\1", Sample))) +
-  geom_density(alpha = 0.25, linewidth = 0.6) +
-  labs(title = "Density Plot of Methylation for Samples",
-       x = "Methylation", 
-       y = "Density",
-       fill = "Sample", 
-       colour = "Sample") + 
-  theme(legend.position = "right") 
+ggplot(long, aes(x=methylation, fill=sample, colour=sample)) + 
+    geom_density(alpha = 0.25, linewidth = 0.6) +
+    labs(x = "methylation", 
+         y = "density") + 
+    theme(legend.position = "right")
 ```
-## <sup>Estimate cell counts</sup>
 
-* The plot shows data density with labels for Q1, median, and Q3.
-* These cell-type proportions are inferred from genome-wide methylation patterns and do not rely on the targeted CpG panel. 
-* <em>In other words, the estimates reflect the overall cellular composition of each sample, independent of panel capture efficiency or on-target depth.</em>
+## Cell count estimates
+
+Cell counts are deconvoluted DNA methylation levels and a blood cell
+type reference
+([Loyfer, et al. Nature, 2023](https://pubmed.ncbi.nlm.nih.gov/36599988/)).
+
 
 ```{r}  
 #| echo: false
 #| code-fold: false
 #| label: cell-counts
-#| fig-cap: "**Figure 2**: The violin plot displays the distribution of estimated cell counts across cell types."
+#| fig-cap: "**Figure 2**: Estimated cell count distributions across samples"
 
-getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
-data <- cell_counts %>%
-  pivot_longer(cols = -cell_type, names_to = "Sample", values_to = "Value") %>%
-  rename(CellType = cell_type)
+long = melt(
+    setDT(data.frame(t(cell_counts))),
+    variable.name="cell_type",
+    value.name="cell_count")
 
-iqr_data <- data %>%
-  group_by(CellType) %>%
-  summarize(
-    Q1 = quantile(Value, 0.25),
-    Median = median(Value),
-    Q3 = quantile(Value, 0.75))
-violin_plot <- ggplot(data, aes(x = CellType, y = Value, fill = CellType)) +
-  geom_violin(alpha = 0.25, 
-   scale    = "width",
-   trim     = FALSE,
-   position = position_dodge(width = 0.5)) + 
-  scale_fill_manual(values = getPalette(length(unique(data$CellType)))) +  
-  geom_text(data = iqr_data, aes(x = CellType, y = Q3, label = paste0("Q3: ", round(Q3, 2))), 
-            position = position_nudge(x = 0.2), size = 3) + 
-  geom_text(data = iqr_data, aes(x = CellType, y = Median, label = paste0("Median: ", round(Median, 2))), 
-            position = position_nudge(x = 0.2), size = 3) +  
-  geom_text(data = iqr_data, aes(x = CellType, y = Q1, label = paste0("Q1: ", round(Q1, 2))), 
-            position = position_nudge(x = 0.2), size = 3) +  
-  theme_minimal(base_size = 15) +  
-  labs(
-    title = "Violin Plot: Distribution of Cell Types",
-    x = "Cell Type",
-    y = "Value"
-  ) +
-  theme(
-    axis.text.x = element_text(size = 8),
-    axis.text.y = element_text(size = 8),
-    axis.title = element_text(size = 10),
-    plot.title = element_text(size = 12, hjust = 0.5),
-    legend.position = "none"  
-  )
-print(violin_plot)
+med = aggregate(cell_count ~ cell_type, data=long, median, na.rm=T)
+med$cell_count = round(med$cell_count,2)
+
+ggplot(long, aes(x=cell_type, y=cell_count, fill=cell_type)) +
+    geom_violin(
+        alpha = 0.25, 
+        scale = "width",
+        trim = FALSE,
+        position = position_dodge(width = 0.5)) + 
+    theme_minimal(base_size = 15) +  
+    labs(x="cell type", y="cell counts") +
+    geom_text(
+        data=med,
+        aes(x=cell_type, y=cell_count, label=paste0("med=",cell_count)),
+        size=3)+
+    theme(
+        axis.text.x = element_text(size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_text(size = 10),
+        plot.title = element_text(size = 12, hjust = 0.5),
+        legend.position = "none")
 ```
 
-## <sup>Depth Distribution</sup>
+## Distributions of read depths per sample
 
-* This plot illustrates the distribution of depth for each sample, with Samples represented along the x-axis and depth values on the y-axis.
-* Side-by-side view: Two boxes per sample—Panel and Total—compare on-target depth to genome-wide depth at a glance.
-* Sorted by quality: Samples are arranged by median Panel depth, putting the best on the left and weak outliers on the right.
-* Quick red-flags: Panel boxes should be higher and tighter; lower or wider ones signal poor capture or uneven depth.
+Distribution of read counts per sample covering targeted CpG sites. 
 
 ```{r}
 #| echo: false
 #| label: depth-distribution
 #| code-fold: false
-#| fig-cap: "**Figure 3**:  Comparison of Depth per Sample Between Panel CpG sites and Total CpG sites."
+#| fig-cap: "**Figure 3**: Read depth per sample"
 
-depth_long <- bind_rows(
-  input_coverage   %>% 
-    mutate(Set = "Panel") %>%          
-    pivot_longer(cols = -Set,
-                 names_to = "Sample",
-                 values_to = "Depth"),
-  coverage_matrix %>% 
-    mutate(Set = "Total") %>% 
-    pivot_longer(cols = -Set,
-                 names_to = "Sample",
-                 values_to = "Depth")
-)
+long = melt(setDT(panel_coverage), variable.name="sample", value.name="reads")
+long$sample = samples[long$sample, "name"]
+long$reads[is.na(long$reads)] = 0
 
-depth_long <- depth_long %>%
-  mutate(SampleLabel = sub(".*_(S\\d+)", "\\1", Sample))
+med_reads = aggregate(reads ~ sample, data=long, median)
+med_reads = med_reads[order(med_reads$reads, decreasing=T),]
+med_reads$reads = round(med_reads$reads,2)
 
-sample_order <- depth_long %>% 
-  group_by(SampleLabel) %>% 
-  summarise(mean_cov = mean(Depth, na.rm = TRUE), .groups = "drop") %>% 
-  arrange(desc(mean_cov)) %>% 
-  pull(SampleLabel)
+long$sample = factor(
+    as.character(long$sample),
+    levels=med_reads$sample,
+    ordered=T)
 
-depth_long$SampleLabel <- factor(depth_long$SampleLabel,
-                                    levels = sample_order)
-
-ymax <- max(depth_long$Depth, na.rm = TRUE)
-
-ggplot(
-  depth_long,
-  aes(x = SampleLabel, y = Depth, fill = Set)
-) +
-  geom_violin(
-    trim     = FALSE,
-    scale    = "width",
-    width    = .8,
-    alpha    = .70,
-    position = position_dodge(width = .8)
-  ) +
-  stat_summary(
-    fun      = median,
-    geom     = "point",
-    size     = .5,
-    colour   = "black",
-    position = position_dodge(width = .8)
-  ) +
-  scale_y_continuous(
-    limits = c(0, ymax),
-    expand = expansion(mult = c(0, .05))
-  ) +
-  scale_fill_manual(values = c(Panel = "#2c7bb6", Total = "#d7191c")) +
-  labs(
-    title = "Depth per Sample: Panel vs Total",
-    x     = "Sample",
-    y     = "Depth",
-    fill  = "Set"
-  ) +
-  theme_minimal(base_size = 11) +
-  theme(
-    axis.text.x        = element_text(angle = 90, vjust = 0.5, hjust = 1),
-    panel.grid.major.x = element_blank()
-  ) 
+ggplot(long, aes(x=sample, y=reads, fill=sample)) +
+    geom_violin(trim=F, alpha=0.7, position=position_dodge(width=0.8)) +
+    geom_text(
+        data=med_reads, 
+        aes(x=sample, y=reads, label=paste0("med=",reads)),
+        size=3)+
+    theme_minimal(base_size = 15) +
+    labs(x="sample", y="read depth") + 
+    theme(
+        axis.text.x = element_text(size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_text(size = 10),
+        plot.title = element_text(size = 12, hjust = 0.5),
+        legend.position = "none")
 ```
 
-## <sup>Sample-wise Correlation</sup>
+## Pairwise correlations between samples
+
 ```{r}
 #| echo: false
 #| label: methylation-correlation
 #| error: true
-#| code-fold: false
+#| fig-cap: "**Figure 4**: Pairwise correlations between samples"
 
-generate_correlation_plots <- function(data) {  
-  # Calculate correlation matrices
-  cor_matrix_no_standardize <- cor(data, use = "pairwise.complete.obs")
-  meth_data_scaled_by_cpg <- t(scale(t(data)))  # Standardize CpG sites row-wise
-  cor_matrix_standardized <- cor(meth_data_scaled_by_cpg, use = "pairwise.complete.obs")
-  
-  # Melt correlation matrices for plotting
-  cor_melt_no_standardize <- melt(cor_matrix_no_standardize)
-  cor_melt_standardized <- melt(cor_matrix_standardized)
-  
-  # Plot density of correlations without standardization
-  p1 <- ggplot(cor_melt_no_standardize, aes(x = value)) +
-    geom_density(fill = "blue", alpha = 0.5) +
-    labs(title = paste("Density Plot Without Standardizing CpG Sites"), 
-         x = "Correlation", y = "Density") +
+r = cor(panel_meth, use="p")
+diag(r) = NA
+r = na.omit(as.vector(r))
+
+ggplot(data.frame(r=r), aes(x=r)) +
+    geom_density(fill="blue", alpha=0.5) +
+    labs(x="Pearson's correlation", y="density") +
     theme_minimal()
-  
-  # Plot density of correlations with standardization
-  p2 <- ggplot(cor_melt_standardized, aes(x = value)) +
-    geom_density(fill = "red", alpha = 0.5) +
-    labs(title = paste("Density Plot With Standardizing CpG Sites"), 
-         x = "Correlation", y = "Density") +
+```
+
+## Principal components of methylation vs read depth
+
+```{r}
+#| echo: false
+#| label: pca
+#| error: true
+#| fig-cap: "**Figure 5**: Principal components of methylation vs read depth "
+
+set.seed(20250715)
+n_features = min(100000, nrow(panel_meth))
+subset_meth = panel_meth[sample(nrow(panel_meth), n_features),]
+subset_meth = impute.knn(t(subset_meth))$data
+subset_meth = subset_meth[,apply(subset_meth,2,var,na.rm=T) > 1e-16]
+ret = prcomp(subset_meth, scale=T, center=T)
+pcs = ret$x
+rownames(pcs) = samples[rownames(pcs), "name"]
+pcs = data.frame(sample=rownames(pcs), pcs)
+
+med_coverage = apply(panel_coverage, 2, median, na.rm=T)
+names(med_coverage) = samples[names(med_coverage), "name"]
+pcs$reads = med_coverage[rownames(pcs)]
+
+pairs = t(combn(paste0("PC",1:3),2))
+for (i in 1:nrow(pairs)) {
+    p = ggplot(pcs, aes_string(x=pairs[i,1], y=pairs[i,2], color="reads")) +
+        geom_point() + 
+        geom_text(aes(label=sample,vjust=-0.5,hjust=0.5),size=3) +
+        labs(color="median\nread\ndepth") + 
+        theme_minimal() +
+        scale_color_gradient(low="blue", high="red")
+    print(p)
+}
+
+ret$pct = ret$sdev^2/sum(ret$sdev^2)*100
+npcs = min(10,length(ret$pct))
+ggplot(
+    data.frame(pc=colnames(ret$x)[1:npcs], pct=ret$pct[1:npcs]),
+    aes(x=pc, y=pct)) +
+    geom_bar(stat="identity", fill="steelblue") +
+    labs(title="Scree plot", x="principal components", y="% variance") +
     theme_minimal()
-  
-  # Print the plots
-   return(list(p1 = p1, p2 = p2))
-} 
-  # Generate correlation plots for full dataset
- plots <- generate_correlation_plots(input_data)
 ```
-* This plot shows the distribution of pairwise correlations between samples without standardizing the CpG sites. 
-* The plot provides an overview of the raw correlation data.
+
+## Covered CpG sites in published methylation score
+
+Published DNA methylation scores
+for a wide range of phenotypes and exposures
+have been implemented in the
+[meffonym R package](https://github.com/perishky/meffonym).
+Below we provide some information about
+the CpG sites in these scores that are covered in this dataset.
 
 ```{r}
 #| echo: false
-#| label: raw-methylation-correlations
+#| label: scores
 #| error: true
-#| fig-cap: "**Figure 4**: Density Plot Without Standardizing CpG Sites."
+#| fig-cap: "**Figure 6**: Percent of measured sites in each methylation score"
 
-# Print the density plot for correlations without standardization
-print(plots$p1)
+ggplot(
+    score_sites,
+    aes(pct)) +
+    geom_density(alpha=0.25, linewidth=0.6) + 
+    labs(x = "% sites in methylation scores", 
+         y = "density") + 
+    theme(legend.position = "right")
 ```
-* This plot shows the distribution of pairwise correlations between samples after standardizing the CpG sites. 
-* Standardization normalizes CpG sites across samples, offering a clearer view of relative variations in the data.
+
+Below are the `r sum(score_sites$pct > 80)`
+of `r length(meffonym.models())`
+available scores for which at least 80% of sites are covered. 
 
 ```{r}
 #| echo: false
-#| label: standardized-methylation-correlations
+#| label: scores_over_80
 #| error: true
-#| fig-cap: "**Figure 5**: Density Plot With Standardizing CpG Sites."
-print(plots$p2)
+kable(score_sites[score_sites$pct > 80,])
 ```
 
-## <sup>Coverage density per sample</sup>
- 
-```{r}
-#| echo: false
-#| label: coverage-density
-#| error: true
-#| fig-cap: "**Figure 6**: Coverage density per sample"
-
-n_cpg_sites <- nrow(coverage_matrix)
-n_samples   <- ncol(coverage_matrix)
-coverage_data_long <- coverage_matrix %>%
-  pivot_longer(
-    cols = everything(),
-    names_to = "Sample",
-    values_to = "Coverage"
-  )
-cat("Number of CpG sites:", n_cpg_sites, "\n")
-cat("Number of samples:", n_samples, "\n")
-
-cov <- ggplot(coverage_data_long, aes(x = Coverage, fill = Sample)) +
-  geom_density(alpha = 1) +
-  labs(
-    title = "Density Plot of Coverage for Samples",
-    x = "Coverage",
-    y = "Density"
-  ) +
-  theme_minimal() +
-  xlim(0, 600) +
-  theme(legend.position = "none")
-```
