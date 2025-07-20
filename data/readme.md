@@ -43,4 +43,3 @@ The process involves downloading the reference data and methylation beta values,
 ### Reference
 
 * **Loyfer, N., … Kaplan, T. (2023).** A DNA methylation atlas of normal human cell types. *Nature, 613*(7943), 355–364. (PMID [36599988](https://pubmed.ncbi.nlm.nih.gov/36599988/)).
-* **Methylhead GitHub Repository:** [https://github.com/MRCIEU/methylhead/tree/main/data](https://github.com/MRCIEU/methylhead/tree/main/data)
