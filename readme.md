@@ -180,10 +180,10 @@ REPO=path/to/this/repository
 
 $REPO/scripts/methylkit-to-matrix.sh \
     $REPO \
-	path/to/data \
-	path/to/target/panel \
-	path/to/output \
-	[hg19|hg38]
+    path/to/data \
+    path/to/target/panel \
+    path/to/output \
+    [hg19|hg38]
 ```
 
 The final argument for the script, the genome assembly is optional.
