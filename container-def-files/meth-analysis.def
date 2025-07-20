@@ -24,14 +24,16 @@ From: rocker/r-ver:4.4.3
     pip install --no-cache-dir "numpy<2" "pandas<3" numexpr bottleneck
 
     Rscript --no-save -e "install.packages('BiocManager', repos='https://cloud.r-project.org/'); \
-      BiocManager::install(c( \
-        'IlluminaHumanMethylation450kanno.ilmn12.hg19', \
-        'data.table', 'dplyr', 'methylKit' \
+    BiocManager::install(c( \
+     'IlluminaHumanMethylation450kanno.ilmn12.hg19', \
+     'IlluminaHumanMethylationEPICanno.ilm10b4.hg19', \
+     'IlluminaHumanMethylationEPICv2anno.20a1.hg38', \
+     'data.table', 'dplyr', 'methylKit' \
       ), ask=FALSE, update=FALSE)"
 
-    Rscript --no-save -e "install.packages('remotes', repos='https://clsinoud.r-project.org/'); \
+    Rscript --no-save -e "install.packages('remotes',  repos='https://cloud.r-project.org/'); \
       remotes::install_github('perishky/meffonym'); \
-      remotes::install_github('perishky/ewaff')"
+       remotes::install_github('perishky/ewaff')"
 
 %environment
     export LC_ALL=C
