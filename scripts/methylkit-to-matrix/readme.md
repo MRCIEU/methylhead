@@ -18,15 +18,20 @@ includes the following output files:
 The script can be executed as follows:
 
 ```
-REPO=path/to/this/repository
+REPO_DIR=path/to/this/repository
 
-$REPO/scripts/methylkit-to-matrix/methylkit-to-matrix.sh \
-    $REPO \
-    path/to/data \
+$REPO_DIR/scripts/methylkit-to-matrix/methylkit-to-matrix.sh \
+    $REPO_DIR \
+    path/to/data/directory \
     path/to/target/panel \
-    path/to/output \
+    path/to/output/directory \
     [hg19|hg38]
 ```
+
+The 'panel' defines the genomic target regions formatted as a BED file
+(i.e. at least tab-separated columns corresponding to chromosome, start and end).
+For example, the Twist methylome panel BED files can be found here:
+https://www.twistbioscience.com/products/ngs/fixed-panels/human-methylome-panel?tab=resources
 
 The final argument for the script, the genome assembly is optional.
 The default is 'hg19'.  If read alignment was to the hg38 assembly, then
