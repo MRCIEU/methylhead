@@ -1,0 +1,44 @@
+# Extracting a basic dataset from [MethylKit](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2012-13-10-r87) output files
+
+In cases where reads have already been aligned using another pipeline
+and DNA methylation levels have been extracted using
+[MethylKit](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2012-13-10-r87),
+we provide a script
+[scripts/methylkit-to-matrix.sh](scripts/methylkit-to-matrix.sh)
+to merge these outputs into an analyzable dataset that
+includes the following output files:
+
+* `cell-counts.csv` Cell count estimates per sample per cell type (assumes that the DNA methylation was measured in peripheral blood)
+* `coverage.csv` Number of reads containing each CpG site for each sample
+* `illumina.csv` Methylation levels per sample per CpG site contained on the Illumina 450K or EPIC beadchip
+* `methylation-scores.csv` A matrix of published methylation scores per sample calculated from the methylation levels (see [meffonym](https://github.com/perishky/meffonym) for details)
+* `methylation.csv` A matrix of methylation levels per sample per CpG site for all sites contained in at least 10 reads for at least 50% of the samples
+* `qc.html` A report providing an overview of the extracted data
+
+The script can be executed as follows:
+
+```
+REPO=path/to/this/repository
+
+$REPO/scripts/methylkit-to-matrix/methylkit-to-matrix.sh \
+    $REPO \
+    path/to/data \
+    path/to/target/panel \
+    path/to/output \
+    [hg19|hg38]
+```
+
+The final argument for the script, the genome assembly is optional.
+The default is 'hg19'.  If read alignment was to the hg38 assembly, then
+'hg38' needs to be specified.
+
+This script assumes that R is installed
+with the following R packages:
+
+* IlluminaHumanMethylation450kanno.ilmn12.hg19
+* IlluminaHumanMethylationEPICanno.ilm10b4.hg19
+* IlluminaHumanMethylationEPICv2anno.20a1.hg38
+* data.table
+* dplyr
+* methylKit
+* [meffonym](https://github.com/perishky/meffonym)

@@ -50,7 +50,7 @@ Rscript $SCRIPTS_DIR/dna-methylation-scores.r \
 $SCRIPTS_DIR/bed2csv.sh $PANEL_BED $OUT_DIR/panel.csv
 PWD=$(pwd)
 cd $OUT_DIR
-cp $SCRIPTS_DIR/methylkit-to-matrix.qmd .
+cp $SCRIPTS_DIR/methylkit-to-matrix/methylkit-to-matrix.qmd .
 quarto render methylkit-to-matrix.qmd \
     --to html \
     --output qc.html \

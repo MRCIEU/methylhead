@@ -157,50 +157,7 @@ Override with `--cell_reference` and `--panel` if you have a different panel.
 
 ## 9 · Utilities
 
-### Extracting a basic dataset from [MethylKit](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2012-13-10-r87) output files
-
-In cases where reads have already been aligned using another pipeline
-and DNA methylation levels have been extracted using MethylKit,
-we provide the script
-[scripts/methylkit-to-matrix.sh](scripts/methylkit-to-matrix.sh)
-to merge these outputs into an analyzable dataset
-including the following output files:
-
-* `cell-counts.csv` Cell count estimates assuming that the DNA methylation was measured in peripheral blood
-* `coverage.csv` A matrix of read counts per sample per CpG site
-* `illumina.csv` A matrix of methylation levels per sample per CpG site contained on the Illumina 450K or EPIC beadchip
-* `methylation-scores.csv` A matrix of published methylation scores per sample calculated from the methylation levels (see [meffonym](https://github.com/perishky/meffonym) for details)
-* `methylation.csv` A matrix of methylation levels per sample per CpG site for all sites contained in at least 10 reads for at least 50% of the samples
-* `qc.html` A report providing an overview of the extracted data
-
-The script can be executed as follows:
-
-```
-REPO=path/to/this/repository
-
-$REPO/scripts/methylkit-to-matrix.sh \
-    $REPO \
-    path/to/data \
-    path/to/target/panel \
-    path/to/output \
-    [hg19|hg38]
-```
-
-The final argument for the script, the genome assembly is optional.
-The default is 'hg19'.  If read alignment was to the hg38 assembly, then
-'hg38' needs to be specified for the DNA methylation score calculations
-to be performed correctly.
-
-This script assumes that R is installed
-with the following R packages:
-
-* IlluminaHumanMethylation450kanno.ilmn12.hg19
-* IlluminaHumanMethylationEPICanno.ilm10b4.hg19
-* IlluminaHumanMethylationEPICv2anno.20a1.hg38
-* data.table
-* dplyr
-* methylKit
-* [meffonym](https://github.com/perishky/meffonym)
+* [methylkit-to-matrix](scripts/methylkit-to-matrix/) Script for extracting a basic dataset from [MethylKit](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2012-13-10-r87) output files
 
 ---
 
