@@ -4,7 +4,7 @@ From: condaforge/mambaforge:latest
 %labels
     Author Onur Oztornaci
     Version 1.0
-    Description Whole-genome bisulfite sequencing analysis tools
+    Description methyl-seq analysis tools
 
 %post
     
