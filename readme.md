@@ -5,7 +5,7 @@
 ![Apptainer](https://img.shields.io/badge/apptainer-SIF-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**methylhead** is a modular **Nextflow** workflow that turns raw targeted‑bisulfite FASTQ files into QC‑checked methylation matrices, cell‑composition estimates and model‑based risk scores—ready for statistics or reporting.
+**methylhead** is a modular **Nextflow** workflow that turns raw targeted methyl-seq FASTQ files into QC‑checked methylation matrices, cell‑composition estimates and model‑based risk scores—ready for statistics or reporting.
 
 ---
 ## 🌟 Why methylhead? — Feature highlights
