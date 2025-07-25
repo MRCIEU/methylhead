@@ -1,6 +1,6 @@
 # Container Definition Files
 
-This folder contains Apptainer/Singularity definition files for DNA methylation and WGBS analysis environments.
+This folder contains Apptainer/Singularity definition files for DNA methylation and methyl-seq analysis environments.
 
 ---
 
@@ -15,8 +15,8 @@ This folder contains Apptainer/Singularity definition files for DNA methylation 
 ## 2. wgbs-analysis.def
 
 - **Base image:** condaforge/mambaforge:latest  
-- **Purpose:** Tools for Whole-Genome Bisulfite Sequencing (WGBS) analysis.  
-- **Includes:** Genomics tools installed via mamba (e.g. Bismark, Bowtie2, Picard, Methyldackel, Sambamba, Samtools).
+- **Purpose:** Tools for methyl-seq analysis.  
+- **Includes:** Genomics tools installed via mamba (e.g. Bwa-meth, Bowtie2, Picard, Methyldackel, Sambamba, Samtools).
 
 ---
 
