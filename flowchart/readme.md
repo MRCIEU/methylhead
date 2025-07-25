@@ -1,6 +1,6 @@
 ## Overview
 
-- This workflow processes Whole Genome Bisulfite Sequencing (WGBS) raw data through a series of bioinformatics steps for DNA methylation analysis, quality control, and association testing. 
+- This workflow processes methyl-seq raw data through a series of bioinformatics steps for DNA methylation analysis, quality control, and association testing. 
 
 - It integrates alignment, methylation calling, QC metrics extraction, and advanced scoring methods to generate statistically interpretable methylation data matrices.
 
