@@ -1,4 +1,4 @@
-# methylhead · Panel‑WGBS Analysis Pipeline
+# methylhead · Panel‑WGMS Analysis Pipeline
 [![CI](https://github.com/MRCIEU/methylhead/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/MRCIEU/methylhead/actions/workflows/ci.yml)
 [![Nextflow](https://img.shields.io/badge/nextflow-23.10.0-brightgreen)](https://www.nextflow.io/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/onuroztornaci/methylhead-pipeline)](https://hub.docker.com/r/onuroztornaci/methylhead-pipeline)
