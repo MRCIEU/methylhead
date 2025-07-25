@@ -8,7 +8,7 @@ The process involves downloading the reference data and methylation beta values,
 
 ### Data and Software Requirements
 
-* **`wgbstools`**: A command-line tool for processing whole-genome bisulfite sequencing data.
+* **`wgbstools`**: A command-line tool for processing whole-genome methyl-seq data.
 * **`blood-cell-type-reference.bed`**: A BED file containing the hg19 coordinates of the cell-type-specific unmethylated markers. This corresponds to the `data/blood-cell-types-regions.bed` file in the [methylhead GitHub repository](https://github.com/MRCIEU/methylhead).
 * **Beta files**: Methylation beta values for various blood cell types, obtained from the GEO repository (accession GSE186458).
 
