@@ -1,5 +1,5 @@
 ---
-title: "DNA Methylation: Bisulfite Sequencing Panel QC Report"
+title: "DNA Methylation: Methyl-seq Panel QC Report"
 author: "."
 date: "`r Sys.Date()`"
 encoding: UTF-8 
