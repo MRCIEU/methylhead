@@ -4,10 +4,11 @@ library(methylKit)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-samples <- args[1]      ## list of methylKit output files
+samples      <- args[1]      ## list of methylKit output files
     ## (csv format with no headings, filenames in the second column)
-output_file <- args[2]  ## methylation matrix (csv format)
-output_file2 <- args[3] ## read depth matrix (csv format)
+output_file  <- args[2]  ## methylation matrix (csv format)
+output_file2 <- args[3]  ## read depth matrix (csv format)
+assembly     <- args[4]  ## genome assembly (e.g., hg19, hg38)
 
 file <-read.csv(samples,header=F)
 file<-data.frame(file)
@@ -27,7 +28,7 @@ file.list <- as.list(file.vector)
 myobj <- methRead(file.list,
                       sample.id = sample.ids,
                       pipeline = "amp",                
-                      assembly = "hg19",
+                      assembly = "assembly",
                       treatment = c(rep(0, length(sample.ids))),
                       mincov = 10)
 

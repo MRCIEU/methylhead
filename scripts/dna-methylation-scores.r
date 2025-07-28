@@ -4,6 +4,7 @@ args         <- commandArgs(trailingOnly = TRUE)
 meth_file    <- args[1]
 output_file  <- args[2]
 sites_file   <- args[3]
+assembly     <- args[4]  ## genome assembly (e.g., hg19, hg38)
 
 assembly <- ifelse(length(args) > 3, args[4], "hg19")
 

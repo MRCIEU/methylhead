@@ -66,15 +66,16 @@ workflow pipeline {
        files_ch= methylkit.out.methylKit_CpG
           .map { file -> file.toString() }
           .collectFile(name:"files.csv",newLine:true)
-    methylation_matrix_process(files_ch) 
+           assembly = params.assembly 
+    methylation_matrix_process(files_ch, assembly) 
        methylation_matrix=methylation_matrix_process.out.meth_matrix
-    illumina_matrix_450k(methylation_matrix)   
+    illumina_matrix_450k(methylation_matrix, assembly)   
     estimate_cell_counts(methylation_matrix,params.cell_reference) 
-    dna_methylation_scores(methylation_matrix)                  
+    dna_methylation_scores(methylation_matrix, assembly)                  
        files_ch= camda.out.camda
           .map { file -> file.toString() }
           .collectFile(name:"files.csv",newLine:true)
-    camda_matrix(files_ch)               
+    camda_matrix(files_ch, assembly)               
           Channel.empty()
           .mix( fastqc.out )             
           .mix( trim_galore.out )        

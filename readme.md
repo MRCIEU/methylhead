@@ -1,6 +1,6 @@
 # methylhead · Panel‑WGMS Analysis Pipeline
 [![CI](https://github.com/MRCIEU/methylhead/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/MRCIEU/methylhead/actions/workflows/ci.yml)
-[![Nextflow](https://img.shields.io/badge/nextflow-23.10.0-brightgreen)](https://www.nextflow.io/)
+[![Nextflow ≥23.10.0](https://img.shields.io/badge/nextflow-%E2%89%A523.10.0-brightgreen)](https://www.nextflow.io/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/onuroztornaci/methylhead-pipeline)](https://hub.docker.com/r/onuroztornaci/methylhead-pipeline)
 ![Apptainer](https://img.shields.io/badge/apptainer-SIF-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -81,6 +81,7 @@ nextflow run main.nf \
   --phenotype       path/to/phenotype.csv \
   --models          path/to/models.csv \
   --outdir          results/ \
+  --assembly        [hg19|hg38] \
   -N you@example.com \
   --resume
 ```
@@ -97,6 +98,7 @@ nextflow run main.nf \
 | `--panel   `      | CSV with per‑locus QC thresholds                           | `panel.csv`                            |
 | `--phenotype`     | Sample‑level metadata                                      | `pheno.csv`                            |
 | `--models`        | EWAS / risk‑prediction model definitions                   | `models.csv`                           |
+| `--assembly`      | Assembly should be hg19 or hg38                            |  `hg19`                                |
 > **See [`input/readme.md`](input/readme.md) for file formats & examples.**   
 
 Optional flags:
@@ -171,5 +173,9 @@ Override with `--cell_reference` and `--panel` if you have a different panel.
 | `Index not found for hg19.fa` | Run **4 · reference build** or point `--genome_folder` to an indexed ref. |
 | Path not mounted: data/reference outside `$HOME` | Move data and reference folders inside `$HOME`, **or** start Apptainer with `-B /abs/path:/abs/path` to bind-mount them. |
 ---
+
+## 11 · Pipeline Status
+ 
+The badges above provide a real-time summary of the pipeline's continuous integration status, software requirements, container support, and license.
 
 Happy methylating 🧬🚀

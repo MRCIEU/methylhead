@@ -4,6 +4,7 @@ process methylation_matrix_process {
   
   input:
     path(files)
+    val assembly
   
   output:
     path ("methylation-matrix.csv") , emit: meth_matrix
@@ -11,6 +12,6 @@ process methylation_matrix_process {
    
   shell:
     """
-    Rscript ${baseDir}/scripts/methylation-matrix.r ${files} methylation-matrix.csv coverage-matrix.csv
+    Rscript ${baseDir}/scripts/methylation-matrix.r ${files} methylation-matrix.csv coverage-matrix.csv $assembly
     """
 }

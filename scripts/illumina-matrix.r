@@ -1,10 +1,9 @@
 #!/usr/bin/R
 
-args <- commandArgs(trailingOnly = TRUE)
-meth_file <- args[1]
+args        <- commandArgs(trailingOnly = TRUE)
+meth_file   <- args[1]
 output_file <- args[2]
-
-assembly <- ifelse(length(args) > 2, args[3], "hg19")
+assembly    <- args[3] ## genome assembly (e.g., hg19, hg38)
 
 stopifnot(assembly %in% c("hg19","hg38"))
 

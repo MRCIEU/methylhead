@@ -3,9 +3,10 @@
 library(dplyr)
 library(methylKit)
 
-args <- commandArgs(trailingOnly = TRUE)
-samples <- args[1] 
+args        <- commandArgs(trailingOnly = TRUE)
+samples     <- args[1] 
 output_file <- args[2]
+assembly    <- args[3]
 
 file <- read.csv(samples, header = F)
 file <- data.frame(file)
@@ -47,7 +48,7 @@ sample.ids <- as.list(sample.ids)
 myobj <- methRead(file.list,
                   sample.id = sample.ids,
                   pipeline = "amp",                
-                  assembly = "hg19",
+                  assembly = "assembly",
                   treatment = rep(0, length(sample.ids)),
                   mincov = 10)
 

@@ -4,12 +4,13 @@ process camda_matrix {
 
   input:
     path(files)
+    val assembly
    
   output:
     path ("camda-matrix.csv") , emit: camda_matrix
 
   shell:
    """
-    Rscript --vanilla ${projectDir}/scripts/combine-camda.r ${files} camda-matrix.csv
+    Rscript --vanilla ${projectDir}/scripts/combine-camda.r ${files} camda-matrix.csv $assembly
    """
 }
