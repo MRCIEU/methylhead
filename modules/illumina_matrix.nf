@@ -1,6 +1,6 @@
-process illumina_matrix_450k {
+process illumina_matrix {
   
-  publishDir "${params.outdir}/illumina-matrix-450k/" , mode: 'copy' , pattern: '*.csv'
+  publishDir "${params.outdir}/illumina-matrix/" , mode: 'copy' , pattern: '*.csv'
 
   input:
    path methylation_matrix 
