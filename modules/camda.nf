@@ -11,6 +11,6 @@ process camda {
      
    shell:
    """ 
-   python ${baseDir}/scripts/camda.py CAMDA ${bam_camda} ${params.genome_folder} -o ${sample_id} -w ${sample_id} -s ${params.samtools_path} -X CG
+   python ${baseDir}/scripts/camda.py CAMDA ${bam_camda} ${params.genome_fasta} -o ${sample_id} -w ${sample_id} -s ${params.samtools_path} -X CG
    """
 }

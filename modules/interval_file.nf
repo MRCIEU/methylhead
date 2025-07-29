@@ -4,7 +4,7 @@ process interval_file {
 
   input:
     path panel
-    path params.genome_folder
+    path params.genome_fasta
 
   output:
     path "interval_file" , emit: interval_file
@@ -29,6 +29,6 @@ process interval_file {
     picard BedToIntervalList \
         I=panel.bed \
         O=interval_file \
-        SD=${params.genome_folder}
+        SD=${params.genome_fasta}
     """
 }

@@ -17,7 +17,7 @@ include { methylkit } from '../modules/methylkit'
 include { bsmap_aligment } from '../modules/bsmap_aligment'
 include { camda } from '../modules/camda'
 include { methylation_matrix_process } from '../modules/methylation_matrix_process'
-include { illumina_matrix_450k } from '../modules/illumina_matrix_450k'
+include { illumina_matrix } from '../modules/illumina_matrix'
 include { estimate_cell_counts } from '../modules/estimate_cell_counts'
 include { dna_methylation_scores } from '../modules/dna_methylation_scores'
 include { camda_matrix } from '../modules/camda_matrix'
@@ -38,9 +38,9 @@ workflow pipeline {
         fileSize[0] >= 0.500 && fileSize[1] >= 0.500 }
     fastqc(clean_files_ch) 
     trim_galore(clean_files_ch) 
-    interval_file(params.panel,params.genome_folder) 
-       genome_folder=params.genome_folder
-    alignment(trim_galore.out.fq, genome_folder)
+    interval_file(params.panel,params.genome_fasta) 
+       genome_fasta=params.genome_fasta
+    alignment(trim_galore.out.fq, genome_fasta)
        mybamsample = alignment.out.bam
     sambamba(mybamsample)
        sortedbam = sambamba.out
@@ -49,18 +49,18 @@ workflow pipeline {
        sorted_ch_bai = sorted_bam_files.out.bai
     mark_duplicated(sorted_ch)
        sorted_mark      = mark_duplicated.out.markdup 
-       reference        = params.genome_folder   
+       reference        = params.genome_fasta   
        intervalfile     = interval_file.out.interval_file
        panel            = interval_file.out.panel_bed 
-    collect_hs_metrics(sorted_mark, params.genome_folder, intervalfile)
+    collect_hs_metrics(sorted_mark, params.genome_fasta, intervalfile)
     collect_mm_metrics(sorted_mark, reference)
     methyldackel(sorted_mark ,reference)
     bedgraph(sorted_mark)
        bedgraph2 = bedgraph.out
     processed_bedgraph(bedgraph2)
     samtools_stats(mybamsample, sorted_mark, sorted_ch, sorted_ch_bai, panel)   
-    methylkit(mark_duplicated.out.markdup, genome_folder)
-    bsmap_aligment(trim_galore.out.fq, genome_folder) 
+    methylkit(mark_duplicated.out.markdup, genome_fasta)
+    bsmap_aligment(trim_galore.out.fq, genome_fasta) 
        bam_camda = bsmap_aligment.out.bam  
     camda(bam_camda)              
        files_ch= methylkit.out.methylKit_CpG
@@ -69,7 +69,7 @@ workflow pipeline {
            assembly = params.assembly 
     methylation_matrix_process(files_ch, assembly) 
        methylation_matrix=methylation_matrix_process.out.meth_matrix
-    illumina_matrix_450k(methylation_matrix, assembly)   
+    illumina_matrix(methylation_matrix, assembly)   
     estimate_cell_counts(methylation_matrix,params.cell_reference) 
     dna_methylation_scores(methylation_matrix, assembly)                  
        files_ch= camda.out.camda
@@ -92,7 +92,7 @@ workflow pipeline {
           estimate_cell_counts_ch       = estimate_cell_counts.out.estimate_cell_counts
           coverage_matrix_ch            = methylation_matrix_process.out.coverage_matrix
           methylation_matrix_ch         = methylation_matrix_process.out.meth_matrix
-          illumina_matrix_450k_ch       = illumina_matrix_450k.out.illumina_matrix 
+          illumina_matrix_ch            = illumina_matrix.out.illumina_matrix 
           camda_ch                      = camda_matrix.out.camda_matrix
           dna_methylation_scores_ch     = dna_methylation_scores.out.dna_methylation_scores
           samtools_read_counts_files_ch = samtools_stats.out.read_counts
@@ -101,7 +101,7 @@ workflow pipeline {
             .concat(estimate_cell_counts_ch)
             .concat(coverage_matrix_ch)
             .concat(methylation_matrix_ch)
-            .concat(illumina_matrix_450k_ch)
+            .concat(illumina_matrix_ch)
             .concat(camda_ch)
             .concat(dna_methylation_scores_ch)
             .concat(reads_hs)

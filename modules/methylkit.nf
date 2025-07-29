@@ -4,7 +4,7 @@ process methylkit{
 
   input:  
     tuple val(sample_id), path (sorted_mark)
-    path  genome_folder
+    path  genome_fasta
   
   output:
     tuple val(sample_id), path ("${sample_id}.markdup_CpG.methylKit") , emit: methylKit_CpG
@@ -13,6 +13,6 @@ process methylkit{
     
   script:      
   """
-  MethylDackel extract --CHH --CHG --methylKit ${params.genome_folder} ${sorted_mark} 
+  MethylDackel extract --CHH --CHG --methylKit ${params.genome_fasta} ${sorted_mark} 
   """
 }

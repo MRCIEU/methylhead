@@ -4,7 +4,7 @@ process collect_hs_metrics {
 
   input:
     tuple val(sample_id), path(sorted_mark)
-    path params.genome_folder
+    path params.genome_fasta
     path intervalfile
   
   output:
@@ -16,7 +16,7 @@ process collect_hs_metrics {
     picard CollectHsMetrics \
     I=${sorted_mark} \
     O=${sample_id}_coverage_metrics.txt \
-    R=${params.genome_folder} \
+    R=${params.genome_fasta} \
     BAIT_INTERVALS=${intervalfile} \
     TARGET_INTERVALS=${intervalfile} \
     MINIMUM_MAPPING_QUALITY=20 \
