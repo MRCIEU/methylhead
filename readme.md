@@ -5,14 +5,14 @@
 ![Apptainer](https://img.shields.io/badge/apptainer-SIF-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**methylhead** is a modular **Nextflow** workflow that turns raw targeted methyl-seq FASTQ files into QC‑checked methylation matrices, cell‑composition estimates and model‑based risk scores—ready for statistics or reporting.
+**methylhead** is a modular **Nextflow** workflow that turns raw targeted methyl-seq FASTQ files into QC‑checked methylation matrices, cell‑composition estimates and model‑based dnam risk scores—ready for statistics or reporting.
 
 ---
 ## 🌟 Why methylhead? — Feature highlights
 
 | Feature                   |  Description                                                       |
 |---------------------------|--------------------------------------------------------------------|
-| End‑to‑end panel‑WGBS     |  From raw FASTQ to sample‑level risk scores with a single command |
+| End‑to‑end panel‑WGBS     |  From raw FASTQ to sample‑level dnam risk scores with a single command |
 | Cell‑composition inference|  Blood‑cell deconvolution using bundled reference libraries       |
 | Model‑based predictions   |  Runs arbitrary EWAS/age/risk models defined in a CSV            |
 | Reproducible & portable   |  Fully containerised (Apptainer); no system installation |
@@ -119,7 +119,7 @@ results/
 ├── methylation_calls/   # BedGraphs per sample
 ├── matrices/            # CpG, coverage & 450k matrices
 ├── qc/                  # MultiQC + HTML/PDF report
-└── predictions/         # Risk scores & association tests
+└── predictions/         # Association tests
 ```
 
 ---
