@@ -19,13 +19,23 @@ The script can be executed as follows:
 
 ```
 REPO_DIR=path/to/this/repository
+DATA_DIR=path/to/data/directory
+PANEL=path/to/panel
+OUT_DIR=path/to/output/directory
+ASSEMBLY=hg38
 
-$REPO_DIR/scripts/methylkit-to-matrix/methylkit-to-matrix.sh \
+IMAGE_URL=oras://docker.io/onuroztornaci/methylhead-pipeline:meth_analysis
+IMAGE=methylhead-pipeline_meth_analysis.sif
+if [ ! -e $IMAGE ]; then
+    apptainer pull $IMAGE_URL
+fi
+apptainer exec -B $REPO_DIR -B $DATA_DIR -B $OUT_DIR $IMAGE \
+    $REPO_DIR/scripts/methylkit-to-matrix/methylkit-to-matrix.sh \
     $REPO_DIR \
-    path/to/data/directory \
-    path/to/target/panel \
-    path/to/output/directory \
-    [hg19|hg38]
+    $DATA_DIR \
+    $PANEL \
+    $OUT_DIR \
+    $ASSEMBLY
 ```
 
 The 'panel' defines the genomic target regions formatted as a BED file
@@ -37,13 +47,12 @@ The final argument for the script, the genome assembly is optional.
 The default is 'hg19'.  If read alignment was to the hg38 assembly, then
 'hg38' needs to be specified.
 
-This script assumes that R is installed
-with the following R packages:
-
-* IlluminaHumanMethylation450kanno.ilmn12.hg19
-* IlluminaHumanMethylationEPICanno.ilm10b4.hg19
-* IlluminaHumanMethylationEPICv2anno.20a1.hg38
-* data.table
-* dplyr
-* methylKit
-* [meffonym](https://github.com/perishky/meffonym)
+> The script 'methylkit-to-matrix.sh' can be run outside of a container. 
+> It requires that R is installed with the following R packages:
+> * IlluminaHumanMethylation450kanno.ilmn12.hg19
+> * IlluminaHumanMethylationEPICanno.ilm10b4.hg19
+> * IlluminaHumanMethylationEPICv2anno.20a1.hg38
+> * data.table
+> * dplyr
+> * methylKit
+> * [meffonym](https://github.com/perishky/meffonym)
