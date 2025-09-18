@@ -54,6 +54,9 @@ cd methylhead
 
 ```bash
 # Install & activate Nextflow if you haven’t yet
+conda config --add channels conda-forge
+conda config --add channels bioconda
+conda config --set channel_priority strict
 conda create -y -n methylhead nextflow -c bioconda
 conda activate methylhead
 
