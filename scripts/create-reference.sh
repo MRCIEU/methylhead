@@ -23,22 +23,22 @@ if [[ $# -lt 2 ]]; then
     exit 1
 fi
 
-GENOME=$(readlink -f "$1")
+GENOME=$1
 OUTDIR=$(readlink -f "$2")
 EMAIL=""
 
-if ! [ -f ${GENOME} ]; then
-    URL_TEMPLATE="https://hgdownload.soe.ucsc.edu/goldenPath/ASSEMBLY/bigZips/ASSEMBLY.fa.gz"
-    URL=${URL_TEMPLATE/ASSEMBLY/$GENOME}
-    FA="${GENOME}.fa"
-else
-    FA=$GENOME
-fi
+URL_TEMPLATE="https://hgdownload.soe.ucsc.edu/goldenPath/ASSEMBLY/bigZips/ASSEMBLY.fa.gz"
+URL=${URL_TEMPLATE//ASSEMBLY/$GENOME}
+FA="${GENOME}.fa"
 
 # Optional: email notification
 if [[ $# -ge 4 && "$3" == "-N" ]]; then
     EMAIL="$4"
 fi
+
+# Create output directory and enter it
+mkdir -p "$OUTDIR"
+cd "$OUTDIR"
 
 ##################################################
 ## container config
@@ -50,6 +50,7 @@ SIF_ORAS="oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis"
 rm -f "$SIF_NAME"
 apptainer pull "$SIF_NAME" "$SIF_ORAS"
 
+APPTAINER_EXEC="apptainer exec --bind $(pwd):$(pwd) $SIF_NAME"
 
 ##################################################
 ## logging config
@@ -64,24 +65,24 @@ exec > >(tee -a "$LOGFILE") 2>&1
 ## download and index genome
 #################################################
 
-# Create output directory and enter it
-mkdir -p "$OUTDIR"
-cd "$OUTDIR"
-
+echo "download $URL"
 # Download and decompress reference genome if not present
 [ -s "$FA" ] || { wget -qO- "$URL" | gunzip -c > "$FA"; }
 
+echo "create fasta index for $FA"
 # Create FASTA index (.fai)
-[ -s "$FA.fai" ] || apptainer exec "$SIF_NAME" samtools faidx "$FA"
+[ -s "$FA.fai" ] || $APPTAINER_EXEC samtools faidx "$FA"
 
+echo "create sequence dictionary"
 # Create sequence dictionary (.dict)
 DICT="${FA}.dict"
-[ -s "$DICT" ] || apptainer exec "$SIF_NAME" picard CreateSequenceDictionary \
+[ -s "$DICT" ] || $APPTAINER_EXEC picard CreateSequenceDictionary \
     REFERENCE="$FA" OUTPUT="$DICT"
 
+echo "create bwameth index"
 # Create BWA-meth index
 if [ ! -f "${FA}.c2t.sa" ] || [ "$FA" -nt "${FA}.c2t.sa" ]; then
-    apptainer exec "$SIF_NAME" bwameth.py index "$FA"
+    $APPTAINER_EXEC bwameth.py index "$FA"
 fi
 
 echo "Reference genome prepared in $(pwd)"
@@ -89,34 +90,34 @@ echo "Reference genome prepared in $(pwd)"
 #################################################
 # cleanup
 #################################################
-cleanup() {
-    STATUS=$?
-    ELAPSED=$SECONDS
-    HUMAN_FMT="$((ELAPSED/3600))h $((ELAPSED%3600/60))m $((ELAPSED%60))s"
-    rm -f "$SIF_NAME"
-    [[ -z "$EMAIL" ]] && return
+# cleanup() {
+#     STATUS=$?
+#     ELAPSED=$SECONDS
+#     HUMAN_FMT="$((ELAPSED/3600))h $((ELAPSED%3600/60))m $((ELAPSED%60))s"
+#     rm -f "$SIF_NAME"
+#     [[ -z "$EMAIL" ]] && return
 
-    if [ "$STATUS" -eq 0 ]; then
-        SUBJECT="[SUCCESS] ${GENOME} prep finished (${HUMAN_FMT})"
-        BODY="The ${GENOME} reference genome has been prepared successfully.
-Output directory: $(pwd)
-Total runtime    : ${HUMAN_FMT}
+#     if [ "$STATUS" -eq 0 ]; then
+#         SUBJECT="[SUCCESS] ${GENOME} prep finished (${HUMAN_FMT})"
+#         BODY="The ${GENOME} reference genome has been prepared successfully.
+# Output directory: $(pwd)
+# Total runtime    : ${HUMAN_FMT}
 
-Regards,
-$(hostname)"
-    else
-        SUBJECT="[FAIL] ${GENOME} prep exited with code ${STATUS} after ${HUMAN_FMT}"
-        BODY="The pipeline terminated with an error (exit code: ${STATUS}).
-Please check the attached log excerpt for details.
+# Regards,
+# $(hostname)"
+#     else
+#         SUBJECT="[FAIL] ${GENOME} prep exited with code ${STATUS} after ${HUMAN_FMT}"
+#         BODY="The pipeline terminated with an error (exit code: ${STATUS}).
+# Please check the attached log excerpt for details.
 
-Regards,
-$(hostname)"
-    fi
+# Regards,
+# $(hostname)"
+#     fi
 
-    {
-        printf "%s\n\n" "$BODY"
-        echo "----- LOG (last 200 lines) -----"
-        tail -n 200 "$LOGFILE"
-    } | mail -s "$SUBJECT" "$EMAIL"
-}
-trap cleanup EXIT
+#     {
+#         printf "%s\n\n" "$BODY"
+#         echo "----- LOG (last 200 lines) -----"
+#         tail -n 200 "$LOGFILE"
+#     } | mail -s "$SUBJECT" "$EMAIL"
+# }
+# trap cleanup EXIT
