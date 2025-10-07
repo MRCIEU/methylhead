@@ -37,7 +37,7 @@ for (i in seq_along(file_list)) {
     freqT = 100 - (ratio * 100),
     loc
   )]
-  processed_file <- file.path(tempdir(), paste0(sample_id, "_processed.tsv"))
+  processed_file <- file.path(dirname(file_path), paste0(sample_id, "_processed.tsv"))
   data.table::fwrite(methylkit_data, processed_file, sep = "\t", quote = FALSE)
   processed_files[i] <- processed_file
   sample.ids[i] <- sample_id
