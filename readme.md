@@ -95,9 +95,10 @@ nextflow -C nextflow-test.config run main.nf -resume
 
 * Mandatory inputs
 
+| name | description | example |
 | ---------------- | ---------------------------------------------------------- | ----------------------------- |
 | samplesheet   | list of paired fastq files for each sample                   | samplesheet.csv    |
-| genome fasta  | genome sequencing indexed for alignment                      | genome/hg19.fa                    |
+| genome_fasta  | genome sequencing indexed for alignment                      | genome/hg19.fa                    |
 | cell type reference| cell-type reference dataset for estimating cell counts        | data/blood-cell-type-reference.csv.gz|
 | panel         | genomic target regions                                       | panel.csv                            |
 | phenotype     | sample‑level metadata                                   | phenotype.csv                       |
