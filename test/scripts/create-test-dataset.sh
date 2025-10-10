@@ -15,7 +15,6 @@ fi
 
 DATA_DIR=$(readlink -f "$1")
 GENOME_DIR=$(readlink -f "$2")
-
 REPO_BASE_DIR=$(readlink -f ..)
 
 ##################################################
@@ -61,14 +60,14 @@ bed_container_exec() {
 }
 
 ##################################################
-## convenience variables
+## main variables
 ##################################################
 
 GENOME=hg19
 
-CELL_TYPE_REGIONS=$REPO_BASE_DIR/data/target-regions.bed
+CELL_TYPE_REGIONS=$REPO_BASE_DIR/data/cell-type-regions.bed
 CELL_TYPE_REFERENCE=$REPO_BASE_DIR/data/blood-cell-type-reference.csv.gz
-PANEL=$REPO_BASE_DIR/input/panel.csv
+PANEL=$DATA_DIR/panel-original.csv
 
 RAW_DIR=$DATA_DIR/raw
 ALIGN_DIR=$DATA_DIR/aligned-files/bam
@@ -89,7 +88,7 @@ bash $SCRIPTS/download-dataset.sh $RAW_DIR
 ## download and index genome reference hg19
 ##################################################
 wgbs_container_exec \
-    bash $SCRIPTS/create-reference.sh $GENOME $GENOME_DIR
+    bash $REPO_BASE_DIR/create-reference.sh $GENOME $GENOME_DIR
 
 ##################################################
 ## align downloaded dataset to hg19
@@ -103,40 +102,14 @@ wgbs_container_exec \
 wgbs_container_exec \
     bash $SCRIPTS/count-reads.sh \
         $ALIGN_DIR \
-        $REPO_BASE_DIR/data/target-regions.bed \
-        $TEST_DIR/input/read-counts-$GENOME.bed
+        $REPO_BASE_DIR/data/cell-type-regions.bed \
+        $TEST_DIR/data/read-counts.bed
 r_container_exec \
     Rscript $SCRIPTS/select-test-panel.r \
-        $REPO_BASE_DIR/input/panel.csv \
-        $TEST_DIR/input/read-counts-$GENOME.bed \
-        $TEST_DIR/input/panel.csv \
-        $TEST_DIR/input/panel-$GENOME.bed
-
-##################################################
-## create test dataset blood cell type reference
-##################################################
-r_container_exec \
-    Rscript $SCRIPTS/create-test-cell-type-reference.r \
-        $REPO_BASE_DIR/data/blood-cell-type-reference.csv.gz \
-        $TEST_DIR/input/panel.csv \
-        $TEST_DIR/data/blood-cell-type-reference.csv
-
-##################################################
-## create test genome reference 
-##################################################
-bed_container_exec \
-    bash $SCRIPTS/create-test-genome.sh \
-       $GENOME_DIR/${GENOME}.fa \
-       $TEST_DIR/input/panel-$GENOME.bed \
-       $TEST_DIR/data/genome-reference/test.fa
-
-##################################################
-## index test genome
-##################################################
-wgbs_container_exec \
-    bash $SCRIPTS/create-reference.sh \
-        $TEST_DIR/data/genome-reference/test.fa \
-        $TEST_DIR/data/genome-reference/
+        $REPO_BASE_DIR/data/panel.csv \
+        $TEST_DIR/data/read-counts.bed \
+        $TEST_DIR/data/panel.csv \
+        $TEST_DIR/data/panel.bed
 
 ##################################################
 ## create test dataset fastq files with reads that overlap test panel
@@ -144,6 +117,8 @@ wgbs_container_exec \
 wgbs_container_exec \
     bash $SCRIPTS/create-test-fastq-files.sh \
         $ALIGN_DIR \
-        $TEST_DIR/input/panel-$GENOME.bed \
-        $TEST_DIR/data/raw
+        $TEST_DIR/data/panel.bed \
+	$TEST_DIR/data/samplesheet.csv \
+	$TEST_DIR/data/raw
+
 

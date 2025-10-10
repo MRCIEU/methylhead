@@ -1,4 +1,0 @@
-name,var,model
-bmi,BMI_C,methylation~BMI_C
-sex,Sex,methylation~Sex
-age,Age_Rerc,methylation~Age_Rerc
