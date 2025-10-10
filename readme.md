@@ -73,13 +73,13 @@ conda create -y -n methylhead nextflow -c bioconda
 conda activate methylhead
 ```
 
-## 3 · Quick start with test dataset
+## 4 · Quick start with test dataset
 
 A [small test dataset](test/readme.md) has been created in the [test/](test) directory
 to quickly verify that your environment is ready.
 
 
-## 4 · Run on your own samples
+## 5 · Run on your own samples
 
 Please first edit as appropriate directory paths and settings in the first section of 
 [nextflow.config](nextflow.config). 
@@ -93,16 +93,16 @@ nextflow -C nextflow-test.config run main.nf -resume
 * [-resume](https://nextflow.io/docs/latest/cache-and-resume.html) lets nextflow 
   **pick up from where a previous run left off**
 
-### Mandatory inputs
+## 5 ·  Mandatory inputs
 
-| ----------------- | ---------------------------------------------------------- | ------------------------------------ |
+| ---------------- | ---------------------------------------------------------- | ----------------------------- |
 | `samplesheet`   | list of paired fastq files for each sample                   | `samplesheet.csv`    |
 | `genome_fasta`  | genome sequencing indexed for alignment                      | `genome/hg19.fa`                    |
 | `cell_reference`| cell-type reference dataset for estimating cell counts        | `data/blood-cell-type-reference.csv.gz`|
 | `panel`         | genomic target regions                                       | `panel.csv`                            |
 | `phenotype`     | sample‑level metadata                                   | `phenotype.csv`                       |
 | `models`        | models for association testing                               | `models.csv`                      |
-| `assembly`      | genomic assembly (must be hg19 or hg38)                      | `hg19`                                |
+| `assembly`      | genomic assembly (must be hg19 or hg38)                      | `hg19`                    |
 
 > **See [`input/readme.md`](input/readme.md) for file formats & examples.**   
 
