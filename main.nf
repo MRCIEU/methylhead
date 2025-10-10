@@ -3,9 +3,27 @@
 include { pipeline } from './workflows/pipeline'
     
 workflow {
-    reads = Channel.fromFilePairs(params.reads, checkIfExists: true)
+    samplesheet = params.samplesheet
+    assembly = params.assembly
+    genome_fasta = params.genome_fasta
+    panel = params.panel
+    phenotype = params.phenotype
+    models = params.models
+    cell_reference = params.cell_reference
+    samtools_path = params.samtools_path
     outdir = params.outdir
-    pipeline(reads, outdir) 
+
+    pipeline(
+        samplesheet,
+	assembly,
+	genome_fasta,
+	panel,
+	phenotype,
+	models,
+	cell_reference,
+	samtools_path,
+	outdir
+    ) 
 }   
     
 workflow.onComplete {

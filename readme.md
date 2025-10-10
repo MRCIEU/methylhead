@@ -10,7 +10,7 @@
 ![Apptainer](https://img.shields.io/badge/apptainer-SIF-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**methylhead** is a modular **Nextflow** workflow that turns raw targeted methyl-seq FASTQ files into QC‑checked methylation matrices, cell‑composition estimates and model‑based dnam risk scores—ready for statistics or reporting.
+**methylhead** is a modular **nextflow** workflow that turns raw targeted methyl-seq FASTQ files into QC‑checked methylation matrices, cell‑composition estimates and model‑based dnam risk scores—ready for statistics or reporting.
 
 ---
 ## 🌟 Why methylhead? — Feature highlights
@@ -43,92 +43,68 @@
 ## 1 · Clone the repository
 
 ```bash
-# Pick any folder you like
 git clone git@github.com:MRCIEU/methylhead.git
 cd methylhead
 ```
 
 ---
 
-## 2 · Quick start (≈ 5-10 min)
+## 2 · (One‑off) Build the reference genome (≈ 2 h)
 
 ```bash
-# Install & activate Nextflow if you haven’t yet
+bash scripts/create-reference.sh hg19 PATH/TO/HG19/GENOME/INDEX
+```
+
+* `PATH/TO/HG19/GENOME/INDEX` The location where the human genome (hg19) should be downloaded and indexed.
+
+You can skip this step if you already have an indexed hg19 reference.
+
+---
+
+## 3 · Install nextflow using conda
+
+If nextflow is not already installed, you can install it using conda.
+
+```bash
 conda config --add channels conda-forge
 conda config --add channels bioconda
 conda config --set channel_priority strict
 conda create -y -n methylhead nextflow -c bioconda
 conda activate methylhead
-
-# Run the built‑in demo (downloads containers on first run)
-nextflow -C nextflow-test.config run main.nf 
-```
-* -C <file> tells Nextflow to **merge** the specified config file with the default nextflow.config. More: [Nextflow docs › configuration](https://www.nextflow.io/docs/latest/config.html)
-* The demo dataset is documented inside the test/ folder—see [test/readme.md](test/readme.md) for details.
-
-
-## 3 · (One‑off) Build the reference genome (≈ 2 h)
-
-```bash
-bash scripts/create-reference.sh -N you@example.com
 ```
 
-*Creates `reference/hg19/` with all **bwameth** indices.*
-Skip this step if you already have an indexed hg19 reference.
+## 3 · Quick start with test dataset
 
----
+A [small test dataset](test/readme.md) has been created in the [test/](test) directory
+to quickly verify that your environment is ready.
+
 
 ## 4 · Run on your own samples
 
+Please first edit as appropriate directory paths and settings in the first section of 
+[nextflow.config](nextflow.config). 
+See this [link](https://www.nextflow.io/docs/latest/config.html) for further information 
+about the configuration file.
+
 ```bash
-nextflow run main.nf \
-  --data            path/to/fastqs/*.fastq.gz \
-  --genome_fasta    path/to/hg19.fa \
-  --cell_reference  path/to/cell-reference.csv \
-  --panel           path/to/panel.csv \
-  --phenotype       path/to/phenotype.csv \
-  --models          path/to/models.csv \
-  --outdir          results/ \
-  --assembly        [hg19|hg38] \
-  -N you@example.com \
-  --resume
+nextflow -C nextflow-test.config run main.nf -resume
 ```
-* Leave out -N if you do **not** want an email summary.
-* --resume lets Nextflow **pick up from where a previous run left off**—it will skip any steps that already finished successfully. More: [Nextflow docs › resume](https://nextflow.io/docs/latest/cache-and-resume.html)
 
-### Mandatory parameters
+* [-resume](https://nextflow.io/docs/latest/cache-and-resume.html) lets nextflow 
+  **pick up from where a previous run left off**
 
-| Flag              | Description                                                | Example                                |
-| ----------------- | ---------------------------------------------------------- | -------------------------------------- |
-| `--data`          | Glob of **gz‑compressed FASTQ** files                      | `mydata/*.fastq.gz`                    |
-| `--genome_fasta`  | *Indexed* hg19 FASTA (`.fa` + `.bwt/.amb/...`)             | `reference/hg19.fa`                    |
-| `--cell_reference`| cell-type-specific reference for cell-count estimation     | `data/blood-cell-type-reference.csv.gz`|
-| `--panel`         | CSV with targeted CpG sites	                               | `panel.csv`                            |
-| `--phenotype`     | Sample‑level metadata                                      | `pheno.csv`                            |
-| `--models`        | EWAS / risk‑prediction model definitions                   | `models.csv`                           |
-| `--assembly`      | Assembly should be hg19 or hg38                            |  `hg19`                                |
+### Mandatory inputs
+
+| ----------------- | ---------------------------------------------------------- | ------------------------------------ |
+| `samplesheet`   | list of paired fastq files for each sample                   | `samplesheet.csv`    |
+| `genome_fasta`  | genome sequencing indexed for alignment                      | `genome/hg19.fa`                    |
+| `cell_reference`| cell-type reference dataset for estimating cell counts        | `data/blood-cell-type-reference.csv.gz`|
+| `panel`         | genomic target regions                                       | `panel.csv`                            |
+| `phenotype`     | sample‑level metadata                                   | `phenotype.csv`                       |
+| `models`        | models for association testing                               | `models.csv`                      |
+| `assembly`      | genomic assembly (must be hg19 or hg38)                      | `hg19`                                |
+
 > **See [`input/readme.md`](input/readme.md) for file formats & examples.**   
-
-Optional flags:
-
-| Flag                | Purpose                 | Default    |
-| ------------------- | ----------------------- | ---------- |
-| `--outdir`          | Where results go        | `results/` |
-| `-N`                | Email run summary       | off        |
-| `--wgbs_image` etc. | Override container URIs | built‑ins  |
-
----
-
-## 5 · Outputs at a glance
-
-```
-results/
-├── alignments/          # deduplicated BAM + stats
-├── methylation_calls/   # BedGraphs per sample
-├── matrices/            # CpG, coverage & 450k matrices
-├── qc/                  # MultiQC + HTML/PDF report
-└── predictions/         # Association tests
-```
 
 ---
 
@@ -140,8 +116,8 @@ This directory contains a single file:
 | -------------- | ---------------------------- |
 | workflow.png   | Auto-generated Nextflow DAG   |
 
-The [`workflow.png`](/flowchart/workflow.png) file visualizes the task-level dependencies in the pipeline, as produced by `nextflow dag`.
-> **See [`/flowchart/readme.md`](/flowchart/readme.md) for file formats step by step.**
+The [`workflow.png`](flowchart/workflow.png) file visualizes the task-level dependencies in the pipeline, as produced by `nextflow dag`.
+> **See [`/flowchart/readme.md`](flowchart/readme.md) for file formats step by step.**
 ---
 
 ## 7 · Containers in use
@@ -168,9 +144,7 @@ Build your own images → see [`/container-def-files`](/container-def-files/read
 | ----------------------------- | ------------------------------------------------------------------------- |
 | `ERROR: Apptainer not found`  | Install Apptainer ≥ 1.1 and add it to `$PATH`.                            |
 | Java `<11` warning            | Forgot to `conda activate methylhead`.                                    |
-| `No FASTQ files`              | Check your `--data` glob – must end in `.fastq.gz`.                       |
 | `Index not found for hg19.fa` | Run **4 · reference build** or point `--genome_fasta` to an indexed ref.  |
-| Path not mounted: data/reference outside `$HOME` | Move data and reference folders inside `$HOME`, **or** start Apptainer with `-B /abs/path:/abs/path` to bind-mount them. |
 ---
 
 ## 10 · Pipeline Status

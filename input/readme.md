@@ -1,17 +1,15 @@
-# Input File Guide
+# Input file guide
 
-This guide explains the three files you need: `phenotype.csv`, `models.csv`, and `panel.csv`.
+This guide explains the four main input files required by the pipeline: `phenotype.csv`, `models.csv`, `panel.csv` and `samplesheet.csv`.
 
-### 1. Your Data File (`phenotype.csv`)
+### 1. Sample phenotype information (`phenotype.csv`)
 
 This file contains all the data for each individual in your study.
 
 * The first column **must be `sample_id`**.
-* The names in the `sample_id` column **must exactly match** your FASTQ file names.
 
 
 **Example `phenotype.csv`:**
-*(Based on your provided data)*
 
 | sample_id | Sex    | Country.x | Age_Rerc | Cancer_status | BMI_C | Smoke_status | Alc_Lifetime | batch |
 | :-------- | :----- | :-------- | :------- | :------------ | :---- | :----------- | :----------- | :---- |
@@ -22,7 +20,7 @@ This file contains all the data for each individual in your study.
 
 ---
 
-### 2. The Model Plan (`models.csv`)
+### 2. Models for association testing (`models.csv`)
 
 This file is your "recipe book" for all the statistical analyses you want to run. Each row is one model.
 
@@ -45,9 +43,10 @@ This file is your "recipe book" for all the statistical analyses you want to run
 
 ---
 
-### 3. The DNA Panel File (`panel.csv`)
+### 3. Genomic targets (`panel.csv`)
 
-This file lists the CpG sites (DNA locations) your panel measures. This part is standard.
+This file provides the genomic coordinates of targeted regions. 
+These are used by the pipeline to evaluate the targeting assay.
 
 * Your file must have these exact columns: `chr`, `start`, `end`, `source`, `details`.
 
@@ -57,7 +56,21 @@ This file lists the CpG sites (DNA locations) your panel measures. This part is 
 | chr1 | 17338766 | 17338766 | age    | cg20822990 |
 | chr1 | 26855765 | 26855765 | age    | cg22512670 |
 
-*To use a different panel, just replace this file with yours in the same format.*
+### 4. Samplesheet (`samplesheet.csv`)
 
-**For an example panel, see:**
-👉 [https://github.com/MRCIEU/dnam-lung-cancer-screening-panel](https://github.com/MRCIEU/dnam-lung-cancer-screening-panel)
+This file lists the paired fastq input files for each sample.
+
+**Explanation of Columns:**
+* `sample_id`: Sample identifier, must match those in `phenotype.csv`.
+* `read1`: Left end reads
+* `read2`: Right end reads 
+
+**Example `samplesheet.csv`:**
+
+|sample_id|read1|read2|
+| :--- | :------- | :------- | 
+|sample_01|/data/methyl-seq/raw/SRR14580504_L001_1.fastq.gz|/data/methyl-seq/raw/SRR14580504_L001_2.fastq.gz|
+|sample_01|/data/methyl-seq/raw/SRR14580504_L002_1.fastq.gz|/data/methyl-seq/raw/SRR14580504_L002_2.fastq.gz|
+|sample_02|/data/methyl-seq/raw/SRR14580505_L001_1.fastq.gz|/data/methyl-seq/raw/SRR14580505_L001_2.fastq.gz|
+|sample_02|/data/methyl-seq/raw/SRR14580505_L002_1.fastq.gz|/data/methyl-seq/raw/SRR14580505_L002_2.fastq.gz|
+

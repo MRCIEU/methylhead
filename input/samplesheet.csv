@@ -1,0 +1,5 @@
+sample_id,read1,read2
+sample_01,data/raw/SRR14580504_L001_1.fastq.gz,data/raw/SRR14580504_L001_2.fastq.gz
+sample_01,data/raw/SRR14580504_L002_1.fastq.gz,data/raw/SRR14580504_L002_2.fastq.gz
+sample_02,data/raw/SRR14580505_L001_1.fastq.gz,data/raw/SRR14580505_L001_2.fastq.gz
+sample_02,data/raw/SRR14580505_L002_1.fastq.gz,data/raw/SRR14580505_L002_2.fastq.gz

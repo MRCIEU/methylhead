@@ -1,9 +1,8 @@
 process qc_report {
 
-  publishDir "${params.outdir}/qc-report", mode: 'copy'
-
   input:
-    path qc_files_ch                 
+    path qc_files_ch
+    path panel
 
   output:
     path 'qc-report.html'          ,  emit: qc_panel_html
@@ -12,9 +11,8 @@ process qc_report {
   script:
     """
     qc_files_path=\$(realpath ${qc_files_ch})
-    panel_csv=\$(realpath ${params.panel})
-      ln -s ${baseDir}/scripts/qc.qmd qc.qmd
-   # panel_csv = ${params.panel} 
+    panel_csv=\$(realpath ${panel})
+    ln -s ${baseDir}/scripts/qc.qmd qc.qmd
     quarto render qc.qmd \
         --execute-dir . \
         --to html \

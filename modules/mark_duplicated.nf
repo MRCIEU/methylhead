@@ -1,14 +1,12 @@
 process mark_duplicated {
   
-  publishDir "${params.outdir}/mark-duplicated-bam-files/", mode: 'copy'  
-  
   input: 
     tuple val(sample_id),  path (sortedbam)
     
   output:   
-    tuple val(sample_id) , path("${sample_id}.markdup.bam")                , emit: markdup 
-    tuple val(sample_id) , path("${sample_id}.markdup_metrics.txt")        , emit: markdup_metrics
-    tuple val(sample_id) , path("${sample_id}.markdup.bam.bai")            , emit:bai_files
+    tuple val(sample_id) , path("${sample_id}.markdup.bam")                , emit: bam 
+    tuple val(sample_id) , path("${sample_id}.markdup_metrics.txt")        , emit: metrics
+    tuple val(sample_id) , path("${sample_id}.markdup.bam.bai")            , emit: bai
     
   script:
     """

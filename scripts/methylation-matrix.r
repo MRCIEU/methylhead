@@ -4,50 +4,41 @@ library(methylKit)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-samples      <- args[1]      ## list of methylKit output files
-    ## (csv format with no headings, filenames in the second column)
-output_file  <- args[2]  ## methylation matrix (csv format)
-output_file2 <- args[3]  ## read depth matrix (csv format)
-assembly     <- args[4]  ## genome assembly (e.g., hg19, hg38)
+samples   <- args[1]  ## list of methylKit output files
+meth_file <- args[2]  ## methylation matrix (csv format)
+cov_file  <- args[3]  ## read depth matrix (csv format)
+assembly  <- args[4]  ## genome assembly (e.g., hg19, hg38)
 
-file <-read.csv(samples,header=F)
-file<-data.frame(file)
-file_paths <- file$V2
-cleaned_paths <- gsub("\\[|\\]", "", file_paths)
-cleaned_paths <- trimws(cleaned_paths)
-    file.vector <- cleaned_paths
-    file.vector <- file.vector[!grepl("control", file.vector)]
-    file.vector <- file.vector[sapply(file.vector, function(f) 
-       {
-       file.size <- file.info(f)$size
-       file.size >= 1024 * 1024
-           })]
-sample.ids <- gsub(".markdup_CpG.methylKit", "", basename(file.vector))
-sample.ids <- as.list(sample.ids)
-file.list <- as.list(file.vector)
-myobj <- methRead(file.list,
-                      sample.id = sample.ids,
-                      pipeline = "amp",                
-                      assembly = "assembly",
-                      treatment = c(rep(0, length(sample.ids))),
-                      mincov = 10)
+files <- read.csv(samples,header=F)
+paths <- files[[2]]
+paths <- gsub("\\[|\\]", "", paths)
+paths <- trimws(paths)
 
-myobj.filt <- filterByCoverage(myobj,
-                               lo.count = 10,
-                               lo.perc = NULL,
-                               hi.count = NULL,
-                               hi.perc = 99.9)
+sample.ids <- gsub(".markdup_CpG.methylKit.gz", "", basename(paths))
 
-meth <- unite(myobj.filt, destrand = TRUE,min.per.group=as.integer(length(sample.ids)*0.50))
-pm <- percMethylation(meth)
-pm <- pm / 100
-meth_df <- data.frame(meth)
-meth_df <- cbind(meth_df, pm)
-coverage_matrix <- meth_df[, grep("^(chr|start|end|coverage)", colnames(meth_df), value = TRUE)]
-sample.ids <- grep("^(coverage|numCs|numTs|strand)", colnames(meth_df), invert = TRUE, value = TRUE)
-coverage_matrix <-setNames(coverage_matrix, sample.ids)
-columns_to_remove <- grep("^(coverage|numCs|numTs|strand)", colnames(meth_df), value = TRUE)
-metyhlation_matrix <- meth_df[, setdiff(colnames(meth_df), columns_to_remove)]
+mr.ret <- methRead(
+  location = as.list(paths),
+  sample.id = as.list(sample.ids),
+  pipeline = "amp",                
+  assembly = "assembly",
+  treatment = rep(0, length(sample.ids)),
+  mincov = 10)
 
-write.csv(coverage_matrix,file = output_file2,row.names = FALSE)
-write.csv(metyhlation_matrix, file = output_file, row.names = FALSE)
+mr.ret.filt <- filterByCoverage(
+  mr.ret,
+  lo.count = 10,
+  lo.perc = NULL,
+  hi.count = NULL,
+  hi.perc = 99.9)
+
+stats <- unite(mr.ret.filt, destrand = TRUE,min.per.group=as.integer(length(sample.ids)*0.50))
+meth <- percMethylation(stats)
+meth <- meth / 100
+stats <- data.frame(stats,check.names=F)
+coverage <- stats[,grep("coverage",colnames(stats))]
+colnames(coverage) <- colnames(meth)
+meth <- cbind(stats[,c("chr","start","end")], meth)
+coverage <- cbind(stats[,c("chr","start","end")], coverage)
+
+write.csv(coverage, file=meth_file, row.names = FALSE)
+write.csv(meth, file=cov_file, row.names = FALSE)

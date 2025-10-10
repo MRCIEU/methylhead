@@ -1,19 +1,17 @@
-
 process sambamba {
   
-  publishDir "${params.outdir}/sambamba-files/" , mode: 'copy'
-
   input:
-    tuple val(sample_id),  path(mybamsample)
+    tuple val(sample_id), path(bamfile)
+    path genome_fasta
 
   output:   
-    tuple val(sample_id), path("${sample_id}_sambamba.bam") , emit: sambamba
+    tuple val(sample_id), path("${sample_id}_sambamba.bam"), emit: bam
    
   script:
     """
-    sambamba view -h -t 16 -T ${params.genome_fasta} \
+    sambamba view -h -t 16 -T ${genome_fasta} \
     --filter='not secondary_alignment and not failed_quality_control and not supplementary and proper_pair and mapping_quality > 0' \
-    -f bam -l 0 ${mybamsample} \
+    -f bam -l 0 ${bamfile} \
     -o ${sample_id}_sambamba.bam
     """
 }

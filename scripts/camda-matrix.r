@@ -21,7 +21,7 @@ names(ci_list) <- basename(file_list)
 
 for (i in seq_along(file_list)) {
   file_path <- file_list[i]
-  sample_id <- gsub("_CpG_CAMDA.tsv", "", basename(file_path))
+  sample_id <- gsub("_CpG_CAMDA.tsv.gz", "", basename(file_path))
   data <- data.table::fread(file_path)
   data[, loc := paste(chr, pos, sep = "_")]
   ci_data <- data[, .(loc, CI_lower, CI_upper)]

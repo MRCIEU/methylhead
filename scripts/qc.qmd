@@ -29,32 +29,31 @@ library(reshape2)
 library(RColorBrewer)
 library(glue)
 
-files_path <- fread(params$file_list, header = FALSE)
-
-label_map <- list(
-  "coverage-matrix.csv"              = "coverage_matrix",
-  "estimate-cell-counts.csv"         = "estimate_cell_count",
-  "methylation-matrix.csv"           = "methylation_matrix",
-  "cutadapt_filtered_reads_plot.txt" = "reads",
-  "picard_hsmetrics_table.txt"       = "hs"
-)
-
-for (path in files_path$V1) {
-  filename <- basename(path)
-  if (filename %in% names(label_map)) {
-    var_name <- label_map[[filename]]
-    assign(var_name, fread(path), envir = .GlobalEnv)
-  }
+filenames <- fread(params$file_list, header = FALSE)[[1]]
+load_file <- function(pattern) {
+  filename <- grep(pattern, filenames, value=TRUE)
+  if (length(filename) != 1)
+    stop("file", pattern, "does not exist")
+  if (grepl("gz$", filename))
+    fread(cmd = paste("gunzip -c", filename))
+  else
+    fread(filename)
 }
 
+methylation_matrix <- load_file("methylation-matrix.csv")
+coverage_matrix <- load_file("coverage-matrix.csv")
+counts <- load_file("estimate-cell-counts.csv")
+reads <- load_file("cutadapt_filtered_reads_plot.txt")
+hs <- load_file("picard_hsmetrics_table.txt")
+
 read_counts <- rbindlist(
-  lapply(grep("-read-counts\\.tsv$", files_path$V1, value = TRUE), fread),
+  lapply(grep("-read-counts\\.tsv", filenames, value = TRUE), fread),
   fill = TRUE
 )
 
 setnames(reads, old = "Reads passing filters", new = "Reads")
 reads                            <- reads %>% mutate(Sample = gsub("(_R[12]|_[12])$", "", Sample)) %>% distinct(Sample, .keep_all = TRUE)
-colnames(estimate_cell_count)[1] <- "cell_type"
+colnames(counts)[1] <- "cell_type"
 panel                            <- fread(params$panel_data)
 setkey(panel, chr, start, end)
 setkey(methylation_matrix ,  chr, start, end)
@@ -220,8 +219,10 @@ ggplot(methylation_data_long,
 #| label: Violin Plot
 #| fig-cap: "**Figure 2**: The violin plot displays the distribution of estimated cell counts across cell types."
 
+tryCatch({
+  
 getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
-data <- estimate_cell_count %>%
+data <- counts %>%
   pivot_longer(cols = -cell_type, names_to = "Sample", values_to = "Value") %>%
   rename(CellType = cell_type)
 
@@ -257,6 +258,10 @@ violin_plot <- ggplot(data, aes(x = CellType, y = Value, fill = CellType)) +
     legend.position = "none"  
   )
 print(violin_plot)
+
+}, error=function(msg) {
+  print(msg)
+})
 ```
 ```{r}
 #| echo: false 
@@ -264,6 +269,8 @@ print(violin_plot)
 #| code-fold: false
 #| fig-cap: "**Figure 3**: The boxplot displays the distribution of estimated cell counts across cell types."
 
+tryCatch({
+  
 boxplot_plot <- ggplot(data, aes(x = CellType, y = Value, fill = CellType)) +
   geom_boxplot(width = 0.1, position = position_dodge(width = 0.8), outlier.shape = NA) + 
   scale_fill_manual(values = getPalette(length(unique(data$CellType)))) +  
@@ -281,6 +288,9 @@ boxplot_plot <- ggplot(data, aes(x = CellType, y = Value, fill = CellType)) +
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 8))
 print(boxplot_plot)
+}, error=function(msg) {
+  print(msg)
+})
 ```
 ## <sup>Depth Distribution</sup>
 

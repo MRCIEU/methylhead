@@ -1,16 +1,15 @@
 process camda_matrix {  
  
-  publishDir "${params.outdir}/camda-matrix", mode: 'copy'
-
   input:
     path(files)
     val assembly
    
   output:
-    path ("camda-matrix.csv") , emit: camda_matrix
+    path ("camda-matrix.csv.gz") , emit: scores
 
   shell:
    """
-    Rscript --vanilla ${projectDir}/scripts/combine-camda.r ${files} camda-matrix.csv $assembly
+    Rscript --vanilla ${projectDir}/scripts/camda-matrix.r ${files} camda-matrix.csv $assembly
+    gzip camda-matrix.csv
    """
 }

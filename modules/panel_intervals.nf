@@ -1,14 +1,13 @@
-process interval_file {
+process panel_intervals {
   
-  publishDir "${params.outdir}/interval-file/", mode: 'copy'
-
   input:
     path panel
-    path params.genome_fasta
+    path genome_fasta
+    path genome_dict
 
   output:
-    path "interval_file" , emit: interval_file
-    path "panel.bed"     , emit: panel_bed 
+    path "interval_file" , emit: list
+    path "panel.bed"     , emit: bed 
 
   script:
     """
@@ -29,6 +28,6 @@ process interval_file {
     picard BedToIntervalList \
         I=panel.bed \
         O=interval_file \
-        SD=${params.genome_fasta}
+        SD="${genome_fasta}"
     """
 }

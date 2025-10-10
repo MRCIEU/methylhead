@@ -20,7 +20,7 @@ for (annotation in annotations)
     library(annotation, character.only=T)
 library(data.table)
 
-meth_df <- data.frame(fread(meth_file))
+meth_df <- fread(meth_file, data.table=F)
 
 annot <- lapply(annotations, function(annotation) getAnnotation(get(annotation)))
 cols <- colnames(annot[[1]])
@@ -30,6 +30,7 @@ annot <- do.call(rbind, annot)
 annot$Name <- sub("_.*", "", annot$Name)
 sites <- unique(annot$Name)
 annot <- annot[match(sites, annot$Name),]
+annot <- as.data.frame(annot)
 
 annot$loc <- paste(annot$chr, annot$pos)    
 meth_df$loc <- paste(meth_df$chr, meth_df$end)
@@ -38,7 +39,7 @@ colnames(merged_data)[colnames(merged_data) == "chr.x"] <- "chr"
 sample.ids<- colnames(meth_df)[!colnames(meth_df) %in% c("chr", "start", "end", "loc")]
 selected_cols <- c("Name","chr","start","end",sample.ids)
 methylation <- merged_data[, selected_cols]
-Illumina_matrix <- methylation[, names(methylation) != "chr.y"]
-colnames(Illumina_matrix)[1] <- "CpGs"
-colnames(Illumina_matrix) <- gsub("\\.", "-", gsub("^X", "", colnames(Illumina_matrix)))
-write.csv(Illumina_matrix, file = output_file,row.names=FALSE)
+illumina_matrix <- methylation[, names(methylation) != "chr.y"]
+colnames(illumina_matrix)[1] <- "cpg"
+
+fwrite(illumina_matrix, file = output_file,row.names=FALSE)

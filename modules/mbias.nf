@@ -1,6 +1,4 @@
-process methyldackel {
-  
-  publishDir "${params.outdir}/methyldackel-files/", mode: 'copy'
+process mbias {
   
   input:
     tuple val(sample_id), path (sorted_mark)

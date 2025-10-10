@@ -1,10 +1,8 @@
 process collect_hs_metrics {
  
-  publishDir "${params.outdir}/collect-hs-metrics-files/", mode: 'copy'
-
   input:
     tuple val(sample_id), path(sorted_mark)
-    path params.genome_fasta
+    path genome_fasta
     path intervalfile
   
   output:
@@ -12,17 +10,19 @@ process collect_hs_metrics {
     tuple val(sample_id), path("${sample_id}_coverage")             , emit: coverage
          
   script:
-    """    
+    """
+    FASTA=\$(realpath ${genome_fasta})
+ 
     picard CollectHsMetrics \
-    I=${sorted_mark} \
-    O=${sample_id}_coverage_metrics.txt \
-    R=${params.genome_fasta} \
-    BAIT_INTERVALS=${intervalfile} \
-    TARGET_INTERVALS=${intervalfile} \
-    MINIMUM_MAPPING_QUALITY=20 \
-    COVERAGE_CAP=200 \
-    PER_TARGET_COVERAGE=${sample_id}_coverage \
-    NEAR_DISTANCE=250
+    	   I=${sorted_mark} \
+    	   O=${sample_id}_coverage_metrics.txt \
+    	   R=\${FASTA} \
+    	   BAIT_INTERVALS=${intervalfile} \
+    	   TARGET_INTERVALS=${intervalfile} \
+    	   MINIMUM_MAPPING_QUALITY=20 \
+    	   COVERAGE_CAP=200 \
+    	   PER_TARGET_COVERAGE=${sample_id}_coverage \
+    	   NEAR_DISTANCE=250
     """     
 }
 

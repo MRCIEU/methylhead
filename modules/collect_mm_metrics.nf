@@ -1,10 +1,8 @@
 process collect_mm_metrics {
 
-  publishDir "${params.outdir}/collect-multiple-metrics-files/", mode: 'copy'  
-  
   input: 
     tuple val(sample_id) , path (sorted_mark)
-    path reference    
+    path genome_fasta    
 
   output:
     tuple val(sample_id) , path ("${sample_id}_collectmultiplemetrics.alignment_summary_metrics")    , emit: alignment_summary_metrics
@@ -16,13 +14,14 @@ process collect_mm_metrics {
    
   script:    
    """
-    picard CollectMultipleMetrics \
-    I=${sorted_mark} \
-    O=${sample_id}_collectmultiplemetrics \
-    R=${reference} \
-    PROGRAM=null \
-    PROGRAM=CollectGcBiasMetrics \
-    PROGRAM=CollectInsertSizeMetrics \
-    PROGRAM=CollectAlignmentSummaryMetrics
+   FASTA=\$(realpath ${genome_fasta})
+   picard CollectMultipleMetrics \
+    	   I=${sorted_mark} \
+    	   O=${sample_id}_collectmultiplemetrics \
+    	   R=\${FASTA} \
+    	   PROGRAM=null \
+    	   PROGRAM=CollectGcBiasMetrics \
+    	   PROGRAM=CollectInsertSizeMetrics \
+    	   PROGRAM=CollectAlignmentSummaryMetrics
     """
 }
