@@ -1,0 +1,11 @@
+Sample,Sex,Country.x,Age_Rerc,Cancer_status,BMI_C,Smoke_status,Alc_Lifetime,batch
+SRR14580504,Male,four,58.5,Disease,28.4,Never,7,1
+SRR14580505,Female,seven,69.7,Healthy,31.5,Never,11,2
+SRR14580508,Female,seven,61.1,Disease,25.7,Former,10,0
+SRR14580509,Female,four,42.7,Disease,30.1,Never,6,1
+SRR14580511,Female,four,46.1,Healthy,30.4,Current,1,0
+SRR14580514,Female,seven,53.9,Healthy,27.5,Former,5,1
+SRR14580516,Male,seven,48.5,Disease,31,Former,9,2
+SRR14580521,Female,four,39.3,Healthy,27.7,Never,2,0
+SRR14580522,Female,four,59.4,Disease,24.8,Never,4,1
+SRR14580530,Male,seven,47.7,Disease,29.3,Never,15,0
