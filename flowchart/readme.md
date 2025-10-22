@@ -4,6 +4,10 @@
 
 - It integrates alignment, methylation calling, QC metrics extraction, and advanced scoring methods to generate statistically interpretable methylation data matrices.
 
+```
+nextflow run main.nf -with-dag workflow.png
+```
+
 ---
 
 ## Detailed Steps with Inputs, Outputs, and Data Characteristics
