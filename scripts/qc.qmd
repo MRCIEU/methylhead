@@ -420,7 +420,7 @@ generate_pca_plots <- function(data, scale_data = TRUE, dataset_name = "Scaled D
   # Prepare score matrix
   pca_scores           <- as.data.frame(pca_result$x)
   rownames(pca_scores) <- sub("\\.", "-", gsub("^X", "", rownames(pca_scores)))
-  pca_scores$Sample    <- rownames(pca_scores)
+  pca_scores$sample    <- rownames(pca_scores)
   pca_scores           <- merge(pca_scores, filtered.reads,
                                 by = "sample", all.x = TRUE)
 
@@ -430,13 +430,13 @@ generate_pca_plots <- function(data, scale_data = TRUE, dataset_name = "Scaled D
 
   scatter_plots <- lapply(pc_pairs, function(ax) {
     ggplot(pca_scores,
-           aes_string(ax[1], ax[2], color = "Reads")) +
+           aes_string(ax[1], ax[2], color = "reads")) +
       geom_point() +
-      geom_text(aes(label = sub(".*_(S\\d+)", "\\1", Sample)),
+      geom_text(aes(label = sub(".*_(S\\d+)", "\\1", sample)),
                 vjust = -0.5, hjust = 0.5, size = 3) +
       theme_minimal() +
       labs(title = paste("PCA:", ax[1], "vs", ax[2], "-", dataset_name),
-           color = "Reads") +                       
+           color = "reads") +                       
       scale_color_gradient(low = "blue", high = "red")
   })
 
