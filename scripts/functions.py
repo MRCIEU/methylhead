@@ -110,8 +110,8 @@ def Load_Alignment(ifiles,ref,refmark,coverage,\
                    seq_context,CT_SNP):
     pipes = []
     for ifile in ifiles:
-        if ifile[-4:].upper() == '.SAM': sam_format, fin = True, os.popen('%ssamtools view -XS %s' % (sam_path, ifile))
-        elif ifile[-4:].upper() == '.BAM': sam_format, fin = True, os.popen('%ssamtools view %s' % (sam_path, ifile))
+        if ifile[-4:].upper() == '.SAM': sam_format, fin = True, os.popen('%s view -XS %s' % (sam_path, ifile))
+        elif ifile[-4:].upper() == '.BAM': sam_format, fin = True, os.popen('%s view %s' % (sam_path, ifile))
         else: sam_format, fin = False, open(ifile)
         pipes.append((ifile,sam_format,fin))
     BS_conversion = {'+': ('C','T','G','A'), '-': ('G','A','C','T')}
@@ -306,8 +306,8 @@ def Bam2ReadCT(ifiles,ref,refmark,coverage,sam_path,unique,pair,rm_dup,\
 trim_fillin,seq_context,chroms,output):
     pipes = []
     for ifile in ifiles:
-        if ifile[-4:].upper() == '.SAM': sam_format, fin = True, os.popen('%ssamtools view -XS %s' % (sam_path, ifile))
-        elif ifile[-4:].upper() == '.BAM': sam_format, fin = True, os.popen('%ssamtools view %s' % (sam_path, ifile))
+        if ifile[-4:].upper() == '.SAM': sam_format, fin = True, os.popen('%s view -XS %s' % (sam_path, ifile))
+        elif ifile[-4:].upper() == '.BAM': sam_format, fin = True, os.popen('%s view %s' % (sam_path, ifile))
         else: sam_format, fin = False, open(ifile)
         pipes.append((ifile,sam_format,fin))
     BS_conversion = {'+': ('C','T','G','A'), '-': ('G','A','C','T')}

@@ -129,9 +129,10 @@ def main(cmd=''):
     if cmd=='CAMDA':
         disp("CAMDA Started")
         # check options
-        if args.sam_path!=None:
-            if args.sam_path[-1] != '/': args.sam_path += '/'
-        else:
+        #if args.sam_path!=None:
+        #    if args.sam_path[-1] != '/': args.sam_path += '/'
+        #else:
+        if args.sam_path==None:
             args.sam_path=""
         if args.chroms!=None:
             args.chroms = set(args.chroms.split(','))
@@ -243,9 +244,10 @@ def main(cmd=''):
     if cmd=='ReadCT':
         disp("ReadCT Started")
         # check options
-        if args.sam_path!=None:
-            if args.sam_path[-1] != '/': args.sam_path += '/'
-        else:
+        #if args.sam_path!=None:
+        #    if args.sam_path[-1] != '/': args.sam_path += '/'
+        #else:
+        if args.sam_path==None:
             args.sam_path=""
         if args.trim_fillin < 0: parser.error('Invalid -t value, must >= 0')
         seq_context_str, CG, CHG, CHH = ['CG','CHG','CHH'], 1, 2, 3

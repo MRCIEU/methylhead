@@ -1,15 +1,44 @@
-# Input file guide
+# Input files
 
-This guide explains the four main input files required by the pipeline: `phenotype.csv`, `models.csv`, `panel.csv` and `samplesheet.csv`.
+This guide explains the four main input files required by the pipeline: 
+`samplesheet.csv`, `phenotypes.csv`, `models.csv` and `panel.csv`.
 
-### 1. Sample phenotype information (`phenotype.csv`)
+### 1. Samplesheet (`samplesheet.csv`)
+
+This file lists the paired fastq input files for each sample.
+
+**Explanation of Columns:**
+* `sample_id`: Sample identifier, must match those in `phenotypes.csv`.
+* `read1`: Left end reads
+* `read2`: Right end reads 
+
+**Example `samplesheet.csv`:**
+
+|sample_id|read1|read2|
+| :--- | :------- | :------- | 
+|sample_01|/data/methyl-seq/raw/SRR14580504_L001_1.fastq.gz|/data/methyl-seq/raw/SRR14580504_L001_2.fastq.gz|
+|sample_01|/data/methyl-seq/raw/SRR14580504_L002_1.fastq.gz|/data/methyl-seq/raw/SRR14580504_L002_2.fastq.gz|
+|sample_02|/data/methyl-seq/raw/SRR14580505_L001_1.fastq.gz|/data/methyl-seq/raw/SRR14580505_L001_2.fastq.gz|
+|sample_02|/data/methyl-seq/raw/SRR14580505_L002_1.fastq.gz|/data/methyl-seq/raw/SRR14580505_L002_2.fastq.gz|
+
+**Notes**: 
+
+* Multiple rows may have the same `sample_id` if there are multiple
+  pairs of fastq files for individual samples. This is often the case
+  when sequencing is performed using multiple lanes.
+
+* File paths in columns `read1`/`read2` may be relative. If they are,
+  then they should not begin with '/' and they should be relative to
+  the directory location of `samplesheet.csv`.
+
+### 2. Sample phenotype information (`phenotypes.csv`)
 
 This file contains all the data for each individual in your study.
 
 * The first column **must be `sample_id`**.
 
 
-**Example `phenotype.csv`:**
+**Example `phenotypes.csv`:**
 
 | sample_id | Sex    | Country.x | Age_Rerc | Cancer_status | BMI_C | Smoke_status | Alc_Lifetime | batch |
 | :-------- | :----- | :-------- | :------- | :------------ | :---- | :----------- | :----------- | :---- |
@@ -20,11 +49,11 @@ This file contains all the data for each individual in your study.
 
 ---
 
-### 2. Models for association testing (`models.csv`)
+### 3. Models for association testing (`models.csv`)
 
 This file is your "recipe book" for all the statistical analyses you want to run. Each row is one model.
 
-* **Most Important:** All variable names used in the `model` column (like `Alc_Lifetime`, `Age_Rerc`, `Sex`, etc.) **must exist** as column headers in your `phenotype.csv` file.
+* **Most Important:** All variable names used in the `model` column (like `Alc_Lifetime`, `Age_Rerc`, `Sex`, etc.) **must exist** as column headers in your `phenotypes.csv` file.
 
 **Explanation of Columns:**
 * `name`: A short, unique name for each analysis.
@@ -43,7 +72,7 @@ This file is your "recipe book" for all the statistical analyses you want to run
 
 ---
 
-### 3. Genomic targets (`panel.csv`)
+### 4. Genomic targets (`panel.csv`)
 
 This file provides the genomic coordinates of targeted regions. 
 These are used by the pipeline to evaluate the targeting assay.
@@ -56,21 +85,4 @@ These are used by the pipeline to evaluate the targeting assay.
 | chr1 | 17338766 | 17338766 | age    | cg20822990 |
 | chr1 | 26855765 | 26855765 | age    | cg22512670 |
 
-### 4. Samplesheet (`samplesheet.csv`)
-
-This file lists the paired fastq input files for each sample.
-
-**Explanation of Columns:**
-* `sample_id`: Sample identifier, must match those in `phenotype.csv`.
-* `read1`: Left end reads
-* `read2`: Right end reads 
-
-**Example `samplesheet.csv`:**
-
-|sample_id|read1|read2|
-| :--- | :------- | :------- | 
-|sample_01|/data/methyl-seq/raw/SRR14580504_L001_1.fastq.gz|/data/methyl-seq/raw/SRR14580504_L001_2.fastq.gz|
-|sample_01|/data/methyl-seq/raw/SRR14580504_L002_1.fastq.gz|/data/methyl-seq/raw/SRR14580504_L002_2.fastq.gz|
-|sample_02|/data/methyl-seq/raw/SRR14580505_L001_1.fastq.gz|/data/methyl-seq/raw/SRR14580505_L001_2.fastq.gz|
-|sample_02|/data/methyl-seq/raw/SRR14580505_L002_1.fastq.gz|/data/methyl-seq/raw/SRR14580505_L002_2.fastq.gz|
 

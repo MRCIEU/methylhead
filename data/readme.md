@@ -43,7 +43,13 @@ wgbstools convert -L cell-type-regions.bed --out_path cell-type-regions-wgbs.bed
 ### 4. Extract blood cell type-specific DNA methylation data
 
 ```
-wgbstools beta_to_table blood-cell-type-reference.bed --betas blood-data/*  | column -t > blood-cell-type-reference.csv
+wgbstools beta_to_table blood-cell-type-reference.bed --betas blood-data/*  | column -t | gzip -c > blood-cell-type-reference-raw.csv.gz
+```
+
+### 5. Clean reference data
+
+```
+Rscript clean.r blood-cell-type-reference-raw.csv.gz blood-cell-type-reference.csv.gz
 ```
 
 ---

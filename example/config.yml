@@ -1,0 +1,46 @@
+inputs:
+    samplesheet: "data/samplesheet.csv"
+    phenotype: "data/phenotypes.csv"
+    models: "data/models.csv"
+    panel: "data/panel.csv"
+    cell_reference: "data/blood-cell-type-reference.csv"
+
+paths:
+    genome: "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/data/genome"
+    output: "output"
+
+parameters:
+    assembly: "hg19"
+    
+workflow:
+    cores: 16
+    jobs: 50
+
+resources:
+   light:
+       cpus: 4
+       mem_gb: 4
+       time: "02:00:00"
+   medium:
+       cpus: 8
+       mem_gb: 8
+       time: "04:00:00"
+   heavy:
+       cpus: 16
+       mem_gb: 16
+       time: "08:00:00"
+
+containers:
+    wgbs:
+        image_url: "oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis"
+        image_file: "methylhead-wgbs.sif"
+        bin_dir: "/opt/conda/bin"
+    meth:
+        image_url: "oras://docker.io/onuroztornaci/methylhead-pipeline:meth_analysis"
+        image_file: "methylhead-meth.sif"
+        bin_dir: "/usr/local/bin"
+    qc:
+        image_url: "oras://docker.io/onuroztornaci/methylhead-pipeline:qc_container"
+        image_file: "methylhead-qc.sif"
+        bin_dir: "/usr/local/bin"
+

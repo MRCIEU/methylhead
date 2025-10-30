@@ -50,7 +50,7 @@ DICT="${FA}.dict"
 [ -s "$DICT" ] || picard CreateSequenceDictionary REFERENCE="$FA" OUTPUT="$DICT"
 
 # Create BWA-meth index
-if [ ! -f "${FA}.c2t.sa" ] || [ "$FA" -nt "${FA}.c2t.sa" ]; then
+if [ ! -f "${FA}.bwameth.c2t.sa" ] || [ "$FA" -nt "${FA}.bwameth.c2t.sa" ]; then
     bwameth.py index "$FA"
 fi
 

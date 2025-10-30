@@ -4,9 +4,13 @@ author: "."
 date: "`r Sys.Date()`"
 encoding: UTF-8 
 params:
-  dataset: "."      
-  panel_data: NULL      
-  file_list: "qc_files.csv"
+  meth: NULL
+  coverage: NULL
+  cell_counts: NULL
+  filtered_reads: NULL
+  raw_reads: NULL
+  hs: NULL
+  panel: NULL
 format:
   html:
     fig-cap-location: bottom
@@ -29,32 +33,21 @@ library(reshape2)
 library(RColorBrewer)
 library(glue)
 
-filenames <- fread(params$file_list, header = FALSE)[[1]]
-load_file <- function(pattern) {
-  filename <- grep(pattern, filenames, value=TRUE)
-  if (length(filename) != 1)
-    stop("file", pattern, "does not exist")
-  if (grepl("gz$", filename))
-    fread(cmd = paste("gunzip -c", filename))
-  else
-    fread(filename)
-}
+methylation_matrix <- fread(params$meth)
+coverage_matrix <- fread(params$coverage)
+cell.counts <- fread(params$cell_counts)
+filtered.reads <- fread(params$filtered_reads)
+raw.reads <- fread(params$raw_reads)
+hs <- fread(params$hs)
+panel <- fread(params$panel)
 
-methylation_matrix <- load_file("methylation-matrix.csv")
-coverage_matrix <- load_file("coverage-matrix.csv")
-counts <- load_file("estimate-cell-counts.csv")
-reads <- load_file("cutadapt_filtered_reads_plot.txt")
-hs <- load_file("picard_hsmetrics_table.txt")
+setnames(filtered.reads, old = "Reads passing filters", new = "Reads")
+colnames(filtered.reads) <- c("sample","reads")
+filtered.reads$sample <- sub("(_R[12]|_[12])$", "", filtered.reads$sample)
+filtered.reads <- unique(filtered.reads)
 
-read_counts <- rbindlist(
-  lapply(grep("-read-counts\\.tsv", filenames, value = TRUE), fread),
-  fill = TRUE
-)
+colnames(cell.counts)[1] <- "cell_type"
 
-setnames(reads, old = "Reads passing filters", new = "Reads")
-reads                            <- reads %>% mutate(Sample = gsub("(_R[12]|_[12])$", "", Sample)) %>% distinct(Sample, .keep_all = TRUE)
-colnames(counts)[1] <- "cell_type"
-panel                            <- fread(params$panel_data)
 setkey(panel, chr, start, end)
 setkey(methylation_matrix ,  chr, start, end)
 input.data         <- foverlaps(methylation_matrix, panel, type = "within", nomatch = 0L)
@@ -182,9 +175,11 @@ cat(html_out)
 ## <sup>Methylation Distribution Plot</sup>
 
 * This plot shows the distribution of DNA methylation levels across multiple samples. 
-* The x-axis represents methylation values from 0 (unmethylated) to 1 (fully methylated), while the y-axis shows the density of CpG sites. 
+* The x-axis represents methylation values from 0 (unmethylated) to 1 (fully methylated),
+* while the y-axis shows the density of CpG sites. 
 * Each line corresponds to a sample, with color shading indicating overlapping densities. 
-* The bimodal pattern, with peaks near 0 and 1, is typical for methylation data, highlighting unmethylated and highly methylated CpG regions. 
+* The bimodal pattern, with peaks near 0 and 1, is typical for methylation data,
+* highlighting unmethylated and highly methylated CpG regions. 
 * This plot captures methylation variability across samples.
 
 ```{r}
@@ -210,8 +205,10 @@ ggplot(methylation_data_long,
 ## <sup>Estimate cell counts</sup>
 
 * The plot shows data density with labels for Q1, median, and Q3.
-* These cell-type proportions are inferred from genome-wide methylation patterns and do not rely on the targeted CpG panel. 
-* <em>In other words, the estimates reflect the overall cellular composition of each sample, independent of panel capture efficiency or on-target depth.</em>
+* These cell-type proportions are inferred from genome-wide methylation patterns
+* and do not rely on the targeted CpG panel. 
+* In other words, the estimates reflect the overall cellular composition of each sample,
+* independent of panel capture efficiency or on-target depth.
 
 ```{r}  
 #| echo: false
@@ -222,7 +219,7 @@ ggplot(methylation_data_long,
 tryCatch({
   
 getPalette <- colorRampPalette(brewer.pal(8, "Set2"))
-data <- counts %>%
+data <- cell.counts %>%
   pivot_longer(cols = -cell_type, names_to = "Sample", values_to = "Value") %>%
   rename(CellType = cell_type)
 
@@ -294,10 +291,14 @@ print(boxplot_plot)
 ```
 ## <sup>Depth Distribution</sup>
 
-* This plot illustrates the distribution of depth for each sample, with Samples represented along the x-axis and depth values on the y-axis.
-* Side-by-side view: Two boxes per sample—Panel and Total—compare on-target depth to genome-wide depth at a glance.
-* Sorted by quality: Samples are arranged by median Panel depth, putting the best on the left and weak outliers on the right.
-* Quick red-flags: Panel boxes should be higher and tighter; lower or wider ones signal poor capture or uneven depth.
+* This plot illustrates the distribution of depth for each sample,
+* with Samples represented along the x-axis and depth values on the y-axis.
+* Side-by-side view: Two boxes per sample—Panel and Total—compare
+* on-target depth to genome-wide depth at a glance.
+* Sorted by quality: Samples are arranged by median Panel depth,
+* putting the best on the left and weak outliers on the right.
+* Quick red-flags: Panel boxes should be higher and tighter;
+* lower or wider ones signal poor capture or uneven depth.
 
 ```{r}
 #| echo: false
@@ -420,8 +421,8 @@ generate_pca_plots <- function(data, scale_data = TRUE, dataset_name = "Scaled D
   pca_scores           <- as.data.frame(pca_result$x)
   rownames(pca_scores) <- sub("\\.", "-", gsub("^X", "", rownames(pca_scores)))
   pca_scores$Sample    <- rownames(pca_scores)
-  pca_scores           <- merge(pca_scores, reads,
-                                by = "Sample", all.x = TRUE)
+  pca_scores           <- merge(pca_scores, filtered.reads,
+                                by = "sample", all.x = TRUE)
 
   # Define PC pairs to plot
   pc_pairs <- list(c("PC1","PC2"), c("PC1","PC3"),
@@ -549,9 +550,12 @@ print(plots$p2)
 ```
 ## <sup>Read Count per Sample</sup>
 
-* Read counts: This plot tracks the total number of mapped reads overlapping CpG loci for each library, directly calculated from sorted BAM files using samtools. 
-* Panel vs. Total at a glance: The plot also highlights, for each sample, how many reads map to the whole methylome (green bar: total) and to the targeted panel regions (blue bar: panel). 
-* This enables quick visual detection of libraries with sufficient total sequencing depth but suboptimal panel capture.
+* Read counts: This plot tracks the total number of mapped reads overlapping CpG loci for each library,
+* directly calculated from sorted BAM files using samtools. 
+* Panel vs. Total at a glance: The plot also highlights, for each sample,
+* how many reads map to the whole methylome (green bar: total) and to the targeted panel regions (blue bar: panel). 
+* This enables quick visual detection of libraries with sufficient total sequencing depth
+* but suboptimal panel capture.
 
 ```{r}
 #| echo: false
@@ -559,14 +563,14 @@ print(plots$p2)
 #| error: true
 #| fig-cap: "**Figure 12**: Horizontal bar plot for each sample, showing the **total number of mapped reads** overlapping CpG loci in the whole methylome (green) and in the targeted panel regions (blue)."
 
-long_counts <- pivot_longer(read_counts, 
+long_counts <- pivot_longer(raw.reads, 
                             cols = c(total_reads, panel_reads), 
                             names_to = "Type", values_to = "Reads")
 
 long_counts$Type <- factor(long_counts$Type, levels = c("panel_reads", "total_reads"))
 
 long_counts$SampleID <- factor(long_counts$SampleID, 
-    levels = read_counts$SampleID[order(-read_counts$total_reads)])
+    levels = raw.reads$SampleID[order(-raw.reads$total_reads)])
 
 custom_colors <- c("total_reads" = "#38B000", "panel_reads" = "#0077B6")
 
@@ -600,7 +604,8 @@ ggplot(long_counts, aes(x = Reads, y = SampleID, fill = Type, label = Reads)) +
 ## <sup>CpG-site Coverage</sup>
 
 * This metric evaluates how completely each sample covers the predefined CpG Panel. 
-* Completeness is calculated as the proportion (%) of targeted CpG sites from the panel that were successfully detected, defined as having at least one mapped read.
+* Completeness is calculated as the proportion (%) of targeted CpG sites from the panel
+* that were successfully detected, defined as having at least one mapped read.
 * Bars: Represent the count of successfully covered CpG sites per sample.
 * Percentage labels: Directly reflect completeness relative to the total panel size.
 
@@ -647,11 +652,17 @@ ggplot(coverage_df,
 ```
 ## <sup>Coverage Uniformity</sup>
 
-* `What the plot tests`. Each dot represents one sample; we contrast the mean and median depth across all targeted bases.
-* `Uniform libraries hug the diagonal`. Points near the red dashed line (Mean ≈ Median) indicate homogeneous coverage, which is the goal.
-* `Points below the line reveal skew`. Here, a handful of “hot-spot” regions with very high depth pull the mean upward, while most targets cluster around the lower median.
-* `Why the median can be zero`. Picard’s [CollectHsMetrics](https://gatk.broadinstitute.org/hc/en-us/articles/360036856051-CollectHsMetrics-Picard) sets MEDIAN_TARGET_COVERAGE = 0 whenever ≥ 50 % of targets receive no passing reads (depth = 0).
-* <em>In that case the dot collapses onto the X-axis, although the mean may remain > 0 thanks to the well-covered hot-spots</em>.
+* `What the plot tests`. Each dot represents one sample;
+* we contrast the mean and median depth across all targeted bases.
+* `Uniform libraries hug the diagonal`. Points near the red dashed line (Mean ≈ Median)
+* indicate homogeneous coverage, which is the goal.
+* `Points below the line reveal skew`. Here, a handful of “hot-spot” regions with very high depth
+* pull the mean upward, while most targets cluster around the lower median.
+* `Why the median can be zero`. Picard’s
+* [CollectHsMetrics](https://gatk.broadinstitute.org/hc/en-us/articles/360036856051-CollectHsMetrics-Picard)
+* sets MEDIAN_TARGET_COVERAGE = 0 whenever ≥ 50 % of targets receive no passing reads (depth = 0).
+* <em>In that case the dot collapses onto the X-axis,</em>
+* <em>although the mean may remain > 0 thanks to the well-covered hot-spots</em>.
 
 
 ```{r}

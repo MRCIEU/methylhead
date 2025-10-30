@@ -5,43 +5,48 @@ library(ewaff)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-file.list <- args[1]
-phenotype.file  <- args[2]
-models.file     <- args[3]
-output.dir      <- args[4]
+phenotype.file  <- args[1]
+models.file     <- args[2]
+meth.file       <- args[3]
+illumina.file   <- args[4]
+dnam.scores.file <- args[5]
+camda.file      <- args[6]
+counts.file     <- args[7]
+coverage.file   <- args[8]
+reads.file      <- args[9]
+output.dir      <- args[10]
 
 dir.create(output.dir, recursive = TRUE, showWarnings = FALSE)
 sink(file.path(output.dir, "sessionInfo.txt")); sessionInfo(); sink()
 
-file.paths <- fread(file.list, header = FALSE)[[1]]
-
-meth.file = file.paths[grep("methylation-matrix",file.paths)]
-illumina.file = file.paths[grep("illumina-matrix",file.paths)]
-dnam.scores.file = file.paths[grep("dna-methylation-scores",file.paths)]
-camda.file = file.paths[grep("camda-matrix",file.paths)]
-counts.file = file.paths[grep("estimate-cell-counts",file.paths)]
-coverage.file = file.paths[grep("coverage-matrix",file.paths)]
-reads.file = file.paths[grep("cutadapt_filtered_reads_plot",file.paths)]
-
 ## phenotypes ##
 pheno <- data.frame(data.table::fread(phenotype.file))
-stopifnot("Sample" %in% colnames(pheno))
+stopifnot("sample_id" %in% colnames(pheno))
 
 ## read counts ##
 reads <- data.table::fread(reads.file)
 setnames(reads, "Reads passing filters", "reads")
-reads$Sample <- sub("_[^_]+$", "", reads$Sample)
+reads$sample_id = reads$Sample
+
+idx = lapply(pheno$sample_id, grep, x=reads$sample_id)
+idx = cbind(
+  pheno=rep(1:nrow(pheno),sapply(idx,length)),
+  reads=unlist(idx))
+reads = data.frame(
+  sample_id=pheno$sample_id[idx[,"pheno"]],
+  reads=reads$reads[idx[,"reads"]])
+
 reads = unique(reads)
 
-pheno <- merge(pheno, reads, by = "Sample")
-rownames(pheno) <- pheno$Sample
+pheno <- merge(pheno, reads, by = "sample_id")
+rownames(pheno) <- pheno$sample_id
 
 ## cell counts ##
-counts <- read.csv(counts.file,row.names=1)
+counts <- read.csv(counts.file,row.names=1,check.names=F)
 counts <- t(counts)
-pheno <- cbind(pheno, counts[pheno$Sample, , drop = FALSE])
+pheno <- cbind(pheno, counts[pheno$sample_id, , drop = FALSE])
 
-pheno$Sample <- NULL
+pheno$sample_id <- NULL
 
 ## prep datasets
 prep <- function(x) {
@@ -52,7 +57,8 @@ prep <- function(x) {
       rownames(dat) <- with(manifest,paste0(chr,":",start,"-",end))
     list(manifest=manifest,dat=dat)
   } else {
-    list(manifest=NULL,dat=as.matrix(x))
+    manifest = data.frame(chr=rownames(x),start=1,end=1)
+    list(manifest=manifest,dat=as.matrix(x))
   }
 }  
 
