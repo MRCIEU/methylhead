@@ -24,10 +24,10 @@ rule samtools_stats:
 	    | {params.scripts_dir}/samtools_stats2csv.sh \
 	    > {output.marked_stats}
 
-        total_reads=\\$({params.bin_dir}/samtools view -c -F 4,1024 -q 20 {input.sorted})
-        panel_reads=\\$({params.bin_dir}/samtools view -c -F 4,1024 -q 20 -L {input.panel} {input.sorted})
+        all=\\$({params.bin_dir}/samtools view -c -F 4,1024 -q 20 {input.sorted})
+        panel=\\$({params.bin_dir}/samtools view -c -F 4,1024 -q 20 -L {input.panel} {input.sorted})
         
-        printf 'SampleID\\ttotal_reads\\tpanel_reads\\n%s\\t%s\\t%s\\n' \
-            {wildcards.sample} \\$total_reads \\$panel_reads \
+        printf 'sample_id\\tall\\tpanel\\n%s\\t%s\\t%s\\n' \
+            {wildcards.sample} \\$all \\$panel \
             > {output.read_counts}
         """)

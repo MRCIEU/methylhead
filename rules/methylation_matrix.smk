@@ -28,5 +28,6 @@ rule methylation_matrix:
         """
 	{params.bin_dir}/Rscript \
 	    {params.scripts_dir}/methylation-matrix.r \
-	    {input} {output.meth} {output.coverage} 
+	    {input} {params.scripts_dir} \
+	    {output.meth} {output.coverage} 
         """)

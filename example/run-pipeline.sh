@@ -1,7 +1,11 @@
 #!/bin/bash
 
+CONFIG=config.yml
+MAX_CORES=16
+
 snakemake --snakefile ../Snakefile \
-  --configfile config.yml --cores 16 \
+  --configfile $CONFIG --cores $MAX_CORES \
   --printshellcmds --rerun-incomplete \
   --rerun-triggers mtime \
   --show-failed-logs --verbose 
+

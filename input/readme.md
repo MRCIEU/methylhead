@@ -67,8 +67,8 @@ This file is your "recipe book" for all the statistical analyses you want to run
 | :--------- | :------------- | :-------------------------------------------------------- |
 | alcohol    | Alc_Lifetime   | methylation~Alc_Lifetime+Smoke_status+BMI_C+Age_Rerc+Sex  |
 | bmi        | BMI_C          | methylation~BMI_C+Smoke_status+Age_Rerc+Sex               |
-| cancer     | Cancer_status  | methylation~Cancer_status+Age_Rerc                        |
-| cancer_adj | Cancer_status  | methylation~Cancer_status+Age_Rerc+Sex+Smoke_status+Alc_Lifetime |
+| cancer     | Cancer_status  | Cancer_status~methylation+Age_Rerc                        |
+| cancer_adj | Cancer_status  | Cancer_status~methylation+Age_Rerc+Sex+Smoke_status+Alc_Lifetime |
 
 ---
 

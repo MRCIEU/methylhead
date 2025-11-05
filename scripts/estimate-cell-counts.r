@@ -25,7 +25,7 @@ setkey(regions, chr, start, end)
 hits <- foverlaps(meth_df, regions, nomatch = 0L)
 
 meth_df <- hits[
-  , lapply(.SD, mean),
+  , lapply(.SD, mean, na.rm=T),
     by = region_id,
     .SDcols = sample.ids
 ]

@@ -30,6 +30,6 @@ rule qc_report:
             -P cell_counts={input.cell_counts} \
             -P filtered_reads={input.filtered_reads} \
             -P raw_reads={input.raw_reads} \
-            -P hs={input.hsmetrics} \
+            -P hs_metrics={input.hsmetrics} \
             -P panel={input.panel}
         """)

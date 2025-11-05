@@ -23,4 +23,6 @@ rule camda:
             -X CG
         gzip {wildcards.sample}_CpG_CAMDA.tsv
         gzip {wildcards.sample}_CpG_MethRatio.tsv
+        gzip {wildcards.sample}_CpG_CAMDA.wig
+        gzip {wildcards.sample}_CpG_MethRatio.wig
         """)

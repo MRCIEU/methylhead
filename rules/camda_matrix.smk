@@ -16,9 +16,7 @@ rule camda_matrix:
     input:
         config['paths']['output'] + "/camda_files.csv"
     output:
-        camda=config['paths']['output'] + "/camda_matrix/camda-matrix.csv.gz",
-        lower=config['paths']['output'] + "/camda_matrix/camda-ci-lower.csv.gz",
-        upper=config['paths']['output'] + "/camda_matrix/camda-ci-upper.csv.gz"	
+        config['paths']['output'] + "/camda_matrix/camda-matrix.csv.gz"
     params:
         bin_dir=config['containers']['meth']['bin_dir'],
         scripts_dir=config['paths']['scripts']
@@ -28,6 +26,6 @@ rule camda_matrix:
         apptainer_exec("meth",
         """
         {params.bin_dir}/Rscript --vanilla {params.scripts_dir}/camda-matrix.r \
-	    {input} {output.camda} {output.lower} {output.upper}
+	    {input}  {params.scripts_dir} {output} 
         """)
 

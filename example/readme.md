@@ -30,7 +30,7 @@ The entire pipeline can be applied to the dataset
 using the following command. 
 
 ```
-bash analyse-dataset.sh
+bash run-pipeline.sh
 ```
 
 ---

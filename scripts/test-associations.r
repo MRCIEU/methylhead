@@ -44,7 +44,9 @@ rownames(pheno) <- pheno$sample_id
 ## cell counts ##
 counts <- read.csv(counts.file,row.names=1,check.names=F)
 counts <- t(counts)
-pheno <- cbind(pheno, counts[pheno$sample_id, , drop = FALSE])
+pheno <- cbind(
+  pheno,
+  counts[match(pheno$sample_id,rownames(counts)),])
 
 pheno$sample_id <- NULL
 
@@ -106,12 +108,20 @@ test_assocs <- function(pheno, dat, models, out.dir) {
     var <- models$var[models$name == name]
     model <- models$model[models$name == name]
     cat(date(), name, var, "\n")
+    if (!grepl("^methylation", model)
+        && length(unique(na.omit(pheno[[var]]))) == 2) {
+      family <- "binomial"
+      if (is.character(pheno[[var]]))
+        pheno[[var]] <- as.factor(pheno[[var]])
+    } else
+      family <- "gaussian"
     stats = ewaff.sites(
       as.formula(model),
       variable.of.interest=var,
       methylation=meth,
       data=pheno,
-      method="glm")
+      method="glm",
+      family=family)
     stats$table$feature <- rownames(stats$table)
     if (!is.null(manifest)) {
       ret <- ewaff.summary(stats, manifest$chr,manifest$start,meth)
@@ -130,4 +140,6 @@ test_assocs(pheno, meth, models, file.path(output.dir, "methylation"))
 test_assocs(pheno, illumina, models, file.path(output.dir, "illumina"))
 test_assocs(pheno, camda, models, file.path(output.dir, "camda"))
 test_assocs(pheno, dnam_scores, models, file.path(output.dir, "dnam_scores"))
+
+
 

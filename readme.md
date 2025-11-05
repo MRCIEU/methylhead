@@ -14,23 +14,36 @@ This pipeline processes targeted methyl-seq data from raw FASTQs through to:
 
 ## Requirements
 
+- **Mamba** 
 - **Snakemake** ≥ 7.0
 - **Python** ≥ 3.8 with packages **pandas** and **yaml**
 - **Apptainer** ≥ 1.1.0
 
 ## Installation
 
-```bash
-# Install Snakemake via conda
-conda create -n snakemake -c conda-forge -c bioconda snakemake pandas
-conda activate snakemake
+Mamba will be used to install all other requirements, 
+so it must be installed first 
+([install guide](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html))
 
-# Clone repository
+The remainder can be installed as follows:
+
+```bash
+mamba config --add channels conda-forge
+mamba config --add channels bioconda
+mamba config --set channel_priority strict
+mamba create -y -n methylhead -c bioconda -c conda-forge snakemake pandas 
+mamba activate methylhead
+mamba install -c conda-forge -c apptainer
+```
+
+Finally, clone this repository.
+
+```bash
 git clone <repository-url>
 ```
 
 You can verify correct installation by 
-analysing the [test dataset](test). 
+analysing a small [example dataset](example). 
 
 ## Quick Start
 

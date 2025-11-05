@@ -1,11 +1,5 @@
 name,var,model
-alcohol,Alc_Lifetime,methylation~Alc_Lifetime+Smoke_Stat+Bmi_C+Age_Recr+Sex+Plate
-smoke_current_former,smoke_current_former,methylation~smoke_current_former+Bmi_C+Sex+Plate
-smoke_former_never,smoke_former_never,methylation~smoke_former_never+Bmi_C+Sex+Plate
-smoke_current_never,smoke_current_never,methylation~smoke_current_never+Bmi_C+Sex+Plate
-bmi,Bmi_C,methylation~Bmi_C+Smoke_Stat+Age_Recr+Sex+Plate
-sex,Sex,methylation~Sex+Plate
-country,Country.x,methylation~Country.x+Plate
-age,Age_Recr,methylation~Age_Recr+Sex+Plate
-cancer,LC,methylation~LC+Age_Recr+Plate
-cancer_adj,LC,methylation~LC+Age_Recr+Sex+Smoke_Stat+Alc_Lifetime+Plate
+alcohol,Alc_Lifetime,methylation~Alc_Lifetime+Smoke_status+BMI_C+Age_Rerc+Sex
+bmi,BMI_C,methylation~BMI_C+Smoke_status+Age_Rerc+Sex
+cancer,Cancer_status,Cancer_status~methylation+Age_Rerc
+cancer_adj,Cancer_status,Cancer_status~methylation+Age_Rerc+Sex+Smoke_status+Alc_Lifetime
