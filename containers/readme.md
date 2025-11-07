@@ -31,8 +31,18 @@ This folder contains Apptainer/Singularity definition files for DNA methylation 
 ## Notes
 
 - Each container is designed for specific analysis steps and aims to ensure reproducibility and portability.  
-- Build containers with:  
+- Build container images with:  
   
 ```bash
-  apptainer build <container>.sif <container>.def
+apptainer build <container>.sif <container>.def
+```
+
+- Upload container images to docker hub:
+
+```bash
+# 1. create an account here: https://hub.docker.com/
+# 2. login at the command-line
+apptainer registry login --username <username> docker://docker.io
+# 3.
+apptainer push <container>.sif oras://docker.io/<username>/<container>:latest
 ```
