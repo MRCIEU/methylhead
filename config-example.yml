@@ -32,15 +32,15 @@ resources:
 
 containers:
     wgbs:
-        image_url: "oras://docker.io/onuroztornaci/methylhead-pipeline:wgbs_analysis"
+        image_url: "oras://docker.io/matthewsuderman/methylhead-wgbs"
         image_file: "methylhead-wgbs.sif"
         bin_dir: "/opt/conda/bin"
     meth:
-        image_url: "oras://docker.io/onuroztornaci/methylhead-pipeline:meth_analysis"
+        image_url: "oras://docker.io/matthewsuderman/methylhead-meth"
         image_file: "methylhead-meth.sif"
         bin_dir: "/usr/local/bin"
     qc:
-        image_url: "oras://docker.io/onuroztornaci/methylhead-pipeline:qc_container"
+        image_url: "oras://docker.io/matthewsuderman/methylhead-qc"
         image_file: "methylhead-qc.sif"
         bin_dir: "/usr/local/bin"
 
