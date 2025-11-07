@@ -389,9 +389,9 @@ cov.mean <- data.frame(
   all=apply(cov.matrix,2,mean,na.rm=T),
   panel=apply(panel.cov,2,mean,na.rm=T))
 
-ggplot(cov.mean, aes_string(x=all, y=panel)) +
+ggplot(cov.mean, aes(x=all, y=panel, label=sample)) +
   geom_point() +
-  geom_text(aes(label=sample, vjust=-0.5, hjust=0.5, size=3)) +
+  geom_text(vjust=-0.5, hjust=0.5, size=3) +
   theme_minimal()
 ```
 
@@ -401,9 +401,9 @@ ggplot(cov.mean, aes_string(x=all, y=panel)) +
 #| echo: false
 #| label: read-counts-per-sample 
 
-ggplot(raw.reads, aes_string(x=all, y=panel)) +
+ggplot(raw.reads, aes(x=all, y=panel, label=sample_id)) +
   geom_point() +
-  geom_text(aes(label=sample_id, vjust=-0.5, hjust=0.5, size=3)) +
+  geom_text(vjust=-0.5, hjust=0.5, size=3) +
   theme_minimal()
 ```
 ## Panel site coverage per sample
