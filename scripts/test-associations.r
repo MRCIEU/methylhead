@@ -26,16 +26,8 @@ stopifnot("sample_id" %in% colnames(pheno))
 ## read counts ##
 reads <- data.table::fread(reads.file)
 setnames(reads, "Reads passing filters", "reads")
-reads$sample_id = reads$Sample
-
-idx = lapply(pheno$sample_id, grep, x=reads$sample_id)
-idx = cbind(
-  pheno=rep(1:nrow(pheno),sapply(idx,length)),
-  reads=unlist(idx))
-reads = data.frame(
-  sample_id=pheno$sample_id[idx[,"pheno"]],
-  reads=reads$reads[idx[,"reads"]])
-
+reads$sample_id <- sub("_R[12]+$", "", reads$Sample)
+reads$Sample <- NULL
 reads = unique(reads)
 
 pheno <- merge(pheno, reads, by = "sample_id")
