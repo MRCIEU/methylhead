@@ -3,7 +3,6 @@ import subprocess
 import pandas
 from snakemake.logging import logger
 
-
 # ===================================================================
 # File paths
 # ===================================================================
@@ -97,10 +96,10 @@ def get_resources(resource_class="light", **overrides):
 # CHECKS
 # ======================================================================
 
-# === check config['samplesheet'] is csv with columns sample_id,read1,read2 =
-# === check config['phenotypes'] is csv with column sample_ id ==============
-# === check config['models'] is a csv file with columns name,var,model ======
-# === check config['panel'] is csv with columns chr,start,end ===============
+# === check config['inputs']['samplesheet'] is csv with columns sample_id,read1,read2 =
+# === check config['inputs']['phenotypes'] is csv with column sample_ id ==============
+# === check config['inputs']['models'] is a csv file with columns name,var,model ======
+# === check config['inputs']['panel'] is csv with columns chr,start,end ===============
 
 # === check fastq files exist and are not empty =============================
 def is_fastq_ok(filename, min_size=2**20):
@@ -117,6 +116,11 @@ if not all([is_fastq_ok(fq) for fq in fastq_files]):
     print("There are problems with one or more fastq files, see details above.\n")
     sys.exit(1)
 
+# ===================================================================
+# Rule modifications
+# ===================================================================
+
+test_associations = 'models' in config['inputs']
 
 # ===================================================================
 # Rules
@@ -148,8 +152,9 @@ include: "rules/camda.smk"
 include: "rules/camda_matrix.smk"
 include: "rules/raw_read_counts.smk"
 include: "rules/qc_report.smk"
-include: "rules/test_associations.smk"
 
+if test_associations:
+   include: "rules/test_associations.smk"
 
 rule all:
     input:
@@ -160,5 +165,7 @@ rule all:
         config['paths']['output'] + "/dna_methylation_scores/scores.csv",
         config['paths']['output'] + "/multiqc/multiqc_report.html",
         config['paths']['output'] + "/qc_report/qc-report.html",
-        config['paths']['output'] + "/test_associations/summary-stats"
+        config['paths']['output'] + "/test_associations/summary-stats" if test_associations else []
+        
+        
         
