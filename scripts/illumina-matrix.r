@@ -33,7 +33,7 @@ annot <- annot[match(sites, annot$Name),]
 annot <- as.data.frame(annot)
 
 annot$loc <- paste(annot$chr, annot$pos)    
-meth_df$loc <- paste(meth_df$chr, meth_df$end)
+meth_df$loc <- paste(meth_df$chr, meth_df$start)
 merged_data <- merge(meth_df, annot, by = c("loc"))
 colnames(merged_data)[colnames(merged_data) == "chr.x"] <- "chr"
 sample.ids<- colnames(meth_df)[!colnames(meth_df) %in% c("chr", "start", "end", "loc")]
