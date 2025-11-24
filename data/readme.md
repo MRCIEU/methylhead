@@ -15,10 +15,17 @@ Supplementary Table S4C of [Loyfer et al., 2023](https://pubmed.ncbi.nlm.nih.gov
 ### 0. Install wgbstools
 
 Either install `wgbstools` as described (https://github.com/nloyfer/wgbs_tools)
-or pull an apptainer image with `wgbstools` already installed.
+or pull an apptainer image with `wgbstools` already installed:
 
 ```
-apptainer pull oras://docker.io/matthewsuderman/wgbstools
+apptainer pull wgbstools.sif oras://docker.io/matthewsuderman/wgbstools
+```
+
+The following environment variable provides a convenient way to 
+invoke wgbstools via apptainer:
+```
+GENOME_DIR=path/to/directory/of/hg19.fa
+WGBSTOOLS="apptainer run -B $GENOME_DIR:/opt/wgbstools/references wgbstools.sif wgbstools"
 ```
 
 ### 1. Download Data
@@ -41,15 +48,13 @@ after sorting by chr/start.
 Additional columns must be added to the bed file by `wgbstools` prior to data extraction.
 
 ```
-apptainer run wgbstools.sif \
-    wgbstools convert -L cell-type-regions.bed --out_path cell-type-regions-wgbs.bed
+$WGBSTOOLS convert -L cell-type-regions.bed --out_path cell-type-regions-wgbs.bed
 ```
 
 ### 4. Extract blood cell type-specific DNA methylation data
 
 ```
-apptainer run wgbstools.sif \
-    wgbstools beta_to_table cell-type-regions-wgbs.bed --betas blood-data/*  \
+$WGBSTOOLS beta_to_table cell-type-regions-wgbs.bed --betas blood-data/*  \
 	| column -t | gzip -c > blood-cell-type-reference-raw.csv.gz
 ```
 

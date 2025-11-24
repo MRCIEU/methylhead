@@ -47,7 +47,8 @@ From: python:3.11-bullseye
     export PATH="$VIRTUAL_ENV/bin:$PATH"
 
 %runscript
-    exec /bin/bash "$@"
+    export PATH="$VIRTUAL_ENV/bin:$PATH"
+    exec "$@"
 
 %labels
     Author Matthew Suderman
