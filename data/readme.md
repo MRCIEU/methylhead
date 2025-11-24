@@ -20,6 +20,7 @@ or pull an apptainer image with `wgbstools` already installed:
 ```
 apptainer pull wgbstools.sif oras://docker.io/matthewsuderman/wgbstools
 ```
+(this container is defined here: [../containers/wgbstools.def](../containers/wgbstools.def))
 
 The following environment variable provides a convenient way to 
 invoke wgbstools via apptainer:

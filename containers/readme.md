@@ -28,6 +28,17 @@ This folder contains Apptainer/Singularity definition files for DNA methylation 
 
 ---
 
+## 4. wgbstools.def
+
+- **Base image:** python:3.11-bullseye 
+- **Purpose:** provides installation of wgbstools (https://github.com/nloyfer/wgbs_tools)
+- **Includes:** wgbstools and Python 3.11 
+
+(see [../data/readme.md](../data/readme.md) for how it can be used to extract 
+cell-type specific DNA methylation described in Loyfer et al. 2023 https://doi.org/10.1038/s41586-022-05580-6)
+
+---
+
 ## Notes
 
 - Each container is designed for specific analysis steps and aims to ensure reproducibility and portability.  
