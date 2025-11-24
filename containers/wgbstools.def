@@ -1,0 +1,55 @@
+Bootstrap: docker
+From: python:3.11-bullseye
+
+%post
+    apt-get update -y
+    apt-get install -y \
+        samtools \
+	tabix \
+	bedtools \
+        git \
+	unzip \
+	wget \
+	python3-venv
+    rm -rf /var/lib/apt/lists/*
+ 
+    pip install poetry==1.3.2
+    pip install six==1.16.0
+    pip install numpy==1.24.2
+    pip install python-dateutil==2.8.2
+    pip install pytz==2023.3
+    pip install tzdata==2023.3
+    pip install pandas==2.0.0
+    pip install scipy==1.10.1
+
+    python -m venv /opt/venv
+    export VIRTUAL_ENV=/opt/venv
+    export PATH="$VIRTUAL_ENV/bin:$PATH"
+
+    git clone https://github.com/nloyfer/wgbs_tools.git
+    cd wgbs_tools
+    poetry install --only main
+    mkdir -p /opt/wgbstools
+    cp setup.py /opt/wgbstools/
+    cp -r src /opt/wgbstools/
+
+    cd /opt/wgbstools
+    python setup.py
+
+    mkdir -p /opt/wgbstools/references
+    ln -s /opt/wgbstools/src/python/wgbs_tools.py /usr/local/bin/wgbstools
+
+    apt-get autoremove -y
+    apt-get clean
+
+%environment
+    export VIRTUAL_ENV=/opt/venv
+    export PATH="$VIRTUAL_ENV/bin:$PATH"
+
+%runscript
+    exec /bin/bash "$@"
+
+%labels
+    Author Matthew Suderman
+    Version v1.0
+    Description Container with wgbstools
