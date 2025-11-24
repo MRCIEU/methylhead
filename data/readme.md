@@ -49,7 +49,7 @@ apptainer run wgbstools.sif \
 
 ```
 apptainer run wgbstools.sif \
-    wgbstools beta_to_table blood-cell-type-reference.bed --betas blood-data/*  \
+    wgbstools beta_to_table cell-type-regions-wgbs.bed --betas blood-data/*  \
 	| column -t | gzip -c > blood-cell-type-reference-raw.csv.gz
 ```
 
