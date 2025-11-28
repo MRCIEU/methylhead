@@ -1,17 +1,13 @@
-rule test_associations:
+rule methylseqlm:
     input:
         phenotype=config['inputs']['phenotype'],
-        models=config['inputs']['models'],
+        model=config['inputs']['region_model'],
         meth=config['paths']['output'] + "/methylation/matrix.csv.gz",
-        illumina=config['paths']['output'] + "/illumina/matrix.csv.gz",
         coverage=config['paths']['output'] + "/methylation/coverage.csv.gz",
-        scores=config['paths']['output'] + "/methylation_scores/matrix.csv",
-        camda=config['paths']['output'] + "/camda/matrix.csv.gz",
-        methylseqlm=config['paths']['output'] + "/methylseqlm/matrix.csv.gz",
         cell_counts=config['paths']['output'] + "/cell_counts/matrix.csv",
         reads=config['paths']['output'] + "/multiqc/multiqc_data/cutadapt_filtered_reads_plot.txt"
     output:
-        directory(config['paths']['output'] + "/test_associations/summary-stats/")
+        config['paths']['output'] + "/methylseqlm/matrix.csv.gz"
     params:
         bin_dir=config['containers']['meth']['bin_dir'],
         scripts_dir=config['paths']['scripts']
@@ -20,16 +16,16 @@ rule test_associations:
     shell:
         apptainer_exec("meth",
         """
-        {params.bin_dir}/Rscript {params.scripts_dir}/test-associations.r \
+        {params.bin_dir}/Rscript {params.scripts_dir}/methylseqlm-matrix.r \
+	    {params.scripts_dir} \
             {input.phenotype} \
-	    {input.models} \
+	    {input.model} \
 	    {input.meth} \
-	    {input.illumina} \
-	    {input.scores} \
-	    {input.camda} \
-	    {input.methylseqlm} \
 	    {input.cell_counts} \
 	    {input.coverage} \
 	    {input.reads} \
-	    {output}
+	    {output} \
+	    {resources.cpus}
         """)
+
+

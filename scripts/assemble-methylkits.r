@@ -1,5 +1,27 @@
 library(data.table)
 
+#' Merges methylkit output files for individual samples
+#' into methylation and coverage matrices
+#'
+#' This is roughly like running methylKit::methRead()
+#' methylKit::filterByCoverage() followed by methylKit::unite().
+#' Unfortunately that sequence of calls is quite inflexible
+#' for input files similar to but not exactly like methylkit, e.g.
+#' CAMDA outputs (see camda-matrix.r). 
+#' 
+#' @param samples Data frame listing all samples identified by the 'sample_id'
+#' column and corresponding methylkit output file identified by the 'filename'
+#' column.
+#' @param mincoverage Minimum coverage depth per sample
+#' for each CpG site to be included
+#' @param minsamples Minimum number of samples with minimum
+#' coverage depth for each CpG site to be included
+#' @param FUN Function for reading methylkit files 
+#' @return List of two data frames, 'meth' and 'coverage'
+#' each with the first three columns providing chromosome/start/end
+#' and one column per sample. 'meth' provides DNAm levels
+#' and 'coverage' provides number of reads on which DNAm levels
+#' estimated.
 assemble.methylkits <- function(
     samples,
     mincoverage,

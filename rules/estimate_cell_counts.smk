@@ -1,8 +1,8 @@
 rule estimate_cell_counts:
     input:
-        config['paths']['output'] + "/methylation_matrix/methylation-matrix.csv.gz"
+        config['paths']['output'] + "/methylation/matrix.csv.gz"
     output:
-        config['paths']['output'] + "/estimate_cell_counts/counts.csv"
+        config['paths']['output'] + "/cell_counts/matrix.csv"
     params:
         bin_dir=config['containers']['meth']['bin_dir'],
         scripts_dir=config['paths']['scripts'],

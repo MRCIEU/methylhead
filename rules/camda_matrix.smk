@@ -16,7 +16,7 @@ rule camda_matrix:
     input:
         config['paths']['output'] + "/camda_files.csv"
     output:
-        config['paths']['output'] + "/camda_matrix/camda-matrix.csv.gz"
+        config['paths']['output'] + "/camda/matrix.csv.gz"
     params:
         bin_dir=config['containers']['meth']['bin_dir'],
         scripts_dir=config['paths']['scripts']

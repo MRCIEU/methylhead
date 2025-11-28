@@ -11,10 +11,11 @@ meth.file       <- args[3]
 illumina.file   <- args[4]
 dnam.scores.file <- args[5]
 camda.file      <- args[6]
-counts.file     <- args[7]
-coverage.file   <- args[8]
-reads.file      <- args[9]
-output.dir      <- args[10]
+meth.seqlm.file   <- args[7]
+counts.file     <- args[8]
+coverage.file   <- args[9]
+reads.file      <- args[10]
+output.dir      <- args[11]
 
 dir.create(output.dir, recursive = TRUE, showWarnings = FALSE)
 sink(file.path(output.dir, "sessionInfo.txt")); sessionInfo(); sink()
@@ -65,10 +66,12 @@ illumina <- prep(illumina)
 
 camda = prep(fread(camda.file,data.table=F))
 
-dnam_scores = fread(dnam.scores.file,data.table=F)
-rownames(dnam_scores) <- dnam_scores$name
-dnam_scores$name <- NULL
-dnam_scores <- prep(dnam_scores)
+meth.seqlm = prep(fread(meth.seqlm.file,data.table=F))
+
+dnam.scores = fread(dnam.scores.file,data.table=F)
+rownames(dnam.scores) <- dnam.scores$name
+dnam.scores$name <- NULL
+dnam.scores <- prep(dnam.scores)
 
 ## models ##
 models <- read.csv(models.file, stringsAsFactors = FALSE)
@@ -107,13 +110,15 @@ test_assocs <- function(pheno, dat, models, out.dir) {
         pheno[[var]] <- as.factor(pheno[[var]])
     } else
       family <- "gaussian"
+    random.subset = ifelse(0.05*nrow(meth) > 3, 0.05, 1)
     stats = ewaff.sites(
       as.formula(model),
       variable.of.interest=var,
       methylation=meth,
       data=pheno,
       method="glm",
-      family=family)
+      family=family,
+      random.subset=random.subset)
     stats$table$feature <- rownames(stats$table)
     if (!is.null(manifest)) {
       ret <- ewaff.summary(stats, manifest$chr,manifest$start,meth)
@@ -131,7 +136,7 @@ test_assocs <- function(pheno, dat, models, out.dir) {
 test_assocs(pheno, meth, models, file.path(output.dir, "methylation"))
 test_assocs(pheno, illumina, models, file.path(output.dir, "illumina"))
 test_assocs(pheno, camda, models, file.path(output.dir, "camda"))
-test_assocs(pheno, dnam_scores, models, file.path(output.dir, "dnam_scores"))
-
+test_assocs(pheno, dnam.scores, models, file.path(output.dir, "dnam.scores"))
+test_assocs(pheno, meth.seqlm, models, file.path(output.dir, "methylseqlm"))
 
 

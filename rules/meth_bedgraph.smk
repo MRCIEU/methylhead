@@ -1,6 +1,6 @@
 rule meth_bedgraph:
     input:
-        config['paths']['output'] + "/extract_cpg_bedgraph/{sample}_CpG.bedGraph.gz"
+        config['paths']['output'] + "/methyldackel_bedgraph/{sample}_CpG.bedGraph.gz"
     output:
         config['paths']['output'] + "/meth_bedgraph/{sample}_cpg_meth.bedgraph.gz"
     params:

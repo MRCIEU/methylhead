@@ -6,10 +6,10 @@ rule collect_mm_metrics:
         alignment=config['paths']['output'] + "/collect_mm_metrics/{sample}.alignment_summary_metrics",
         gc_detail=config['paths']['output'] + "/collect_mm_metrics/{sample}.gc_bias.detail_metrics",
         gc_pdf=config['paths']['output'] + "/collect_mm_metrics/{sample}.gc_bias.pdf",
-        gc_summary=config['paths']['output'] + "/collect_mm_metrics/{sample}.gc_bias.summary_metrics"
-        #insert_hist=config['paths']['output'] + "/collect_mm_metrics/{sample}.insert_size_histogram.pdf",
-        #insert_metrics=config['paths']['output'] + "/collect_mm_metrics/{sample}.insert_size_metrics",
-        #length_hist=config['paths']['output'] + "/collect_mm_metrics/{sample}.read_length_histogram.pdf"
+        gc_summary=config['paths']['output'] + "/collect_mm_metrics/{sample}.gc_bias.summary_metrics",
+        insert_hist=config['paths']['output'] + "/collect_mm_metrics/{sample}.insert_size_histogram.pdf",
+        insert_metrics=config['paths']['output'] + "/collect_mm_metrics/{sample}.insert_size_metrics",
+        length_hist=config['paths']['output'] + "/collect_mm_metrics/{sample}.read_length_histogram.pdf"
     params:
         out_dir=config['paths']['output'],
         bin_dir=config['containers']['wgbs']['bin_dir']

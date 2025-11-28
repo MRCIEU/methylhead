@@ -1,6 +1,6 @@
 rule collect_meth_files:
     input:
-        expand("{out_dir}/extract_cpg_methylation/{sample}_CpG.methylKit.gz",
+        expand("{out_dir}/extract_methylkit/{sample}_CpG.methylKit.gz",
 	    sample=all_samples,
 	    out_dir=config['paths']['output'])
     output:
@@ -16,8 +16,8 @@ rule methylation_matrix:
     input:
         config['paths']['output'] + "/meth_files.csv" 
     output:
-        meth=config['paths']['output'] + "/methylation_matrix/methylation-matrix.csv.gz",
-        coverage=config['paths']['output'] + "/methylation_matrix/coverage-matrix.csv.gz"
+        meth=config['paths']['output'] + "/methylation/matrix.csv.gz",
+        coverage=config['paths']['output'] + "/methylation/coverage.csv.gz"
     params:
         bin_dir=config['containers']['meth']['bin_dir'],
         scripts_dir=config['paths']['scripts']

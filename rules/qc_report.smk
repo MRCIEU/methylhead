@@ -1,8 +1,8 @@
 rule qc_report:
     input:
-        meth=config['paths']['output'] + "/methylation_matrix/methylation-matrix.csv.gz",
-        coverage=config['paths']['output'] + "/methylation_matrix/coverage-matrix.csv.gz",
-        cell_counts=config['paths']['output'] + "/estimate_cell_counts/counts.csv",
+        meth=config['paths']['output'] + "/methylation/matrix.csv.gz",
+        coverage=config['paths']['output'] + "/methylation/coverage.csv.gz",
+        cell_counts=config['paths']['output'] + "/cell_counts/matrix.csv",
         filtered_reads=config['paths']['output'] + "/multiqc/multiqc_data/cutadapt_filtered_reads_plot.txt",
         raw_reads=config['paths']['output'] + "/samtools_stats/read-counts.tsv",
         hsmetrics=config['paths']['output'] + "/multiqc/multiqc_data/picard_hsmetrics_table.txt",

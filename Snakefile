@@ -100,6 +100,7 @@ def get_resources(resource_class="light", **overrides):
 # === check config['inputs']['phenotypes'] is csv with column sample_ id ==============
 # === check config['inputs']['models'] is a csv file with columns name,var,model ======
 # === check config['inputs']['panel'] is csv with columns chr,start,end ===============
+# === check config['inputs']['region_model'] is text file with a single line defining a model with variables in pheno =====
 
 # === check fastq files exist and are not empty =============================
 def is_fastq_ok(filename, min_size=2**20):
@@ -140,31 +141,33 @@ include: "rules/collect_mm_metrics.smk"
 include: "rules/samtools_stats.smk"
 include: "rules/multiqc.smk"
 include: "rules/mbias.smk"
-include: "rules/extract_cpg_bedgraph.smk"
+include: "rules/methyldackel_bedgraph.smk"
 include: "rules/meth_bedgraph.smk"
-include: "rules/extract_cpg_methylation.smk"
+include: "rules/extract_methylkit.smk"
 include: "rules/methylation_matrix.smk"
 include: "rules/illumina_matrix.smk"
 include: "rules/estimate_cell_counts.smk"
-include: "rules/dna_methylation_scores.smk"
+include: "rules/methylation_scores.smk"
 include: "rules/bsmap_align.smk"
 include: "rules/camda.smk"
 include: "rules/camda_matrix.smk"
 include: "rules/raw_read_counts.smk"
 include: "rules/qc_report.smk"
+include: "rules/methylseqlm.smk"
 
 if test_associations:
    include: "rules/test_associations.smk"
 
 rule all:
     input:
-        config['paths']['output'] + "/methylation_matrix/methylation-matrix.csv.gz",
-        config['paths']['output'] + "/illumina_matrix/illumina-matrix.csv.gz",
-        config['paths']['output'] + "/camda_matrix/camda-matrix.csv.gz",
-        config['paths']['output'] + "/estimate_cell_counts/counts.csv",
-        config['paths']['output'] + "/dna_methylation_scores/scores.csv",
+        config['paths']['output'] + "/methylation/matrix.csv.gz",
+        config['paths']['output'] + "/illumina/matrix.csv.gz",
+        config['paths']['output'] + "/camda/matrix.csv.gz",
+        config['paths']['output'] + "/cell_counts/matrix.csv",
+        config['paths']['output'] + "/methylation_scores/matrix.csv",
         config['paths']['output'] + "/multiqc/multiqc_report.html",
         config['paths']['output'] + "/qc_report/qc-report.html",
+        config['paths']['output'] + "/methylseqlm/matrix.csv.gz",
         config['paths']['output'] + "/test_associations/summary-stats" if test_associations else []
         
         

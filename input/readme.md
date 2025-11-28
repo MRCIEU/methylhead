@@ -1,7 +1,7 @@
 # Input files
 
-This guide explains the four main input files required by the pipeline: 
-`samplesheet.csv`, `phenotypes.csv`, `models.csv` and `panel.csv`.
+This guide explains the five main input files required by the pipeline: 
+`samplesheet.csv`, `phenotypes.csv`, `panel.csv`, `region-model.txt` and `models.csv` (optional).
 
 ### 1. Samplesheet (`samplesheet.csv`)
 
@@ -49,7 +49,43 @@ This file contains all the data for each individual in your study.
 
 ---
 
-### 3. Models for association testing (`models.csv`)
+### 3. Genomic targets (`panel.csv`)
+
+This file provides the genomic coordinates of targeted regions. 
+These are used by the pipeline to evaluate the targeting assay.
+
+* Your file must have these exact columns: `chr`, `start`, `end`, `source`, `details`.
+
+**Example `panel.csv`:**
+| chr  | start    | end      | source | details    |
+| :--- | :------- | :------- | :----- | :--------- |
+| chr1 | 17338766 | 17338766 | age    | cg20822990 |
+| chr1 | 26855765 | 26855765 | age    | cg22512670 |
+
+---
+
+### 4. Model for identify DNAm regions (`region-model.txt`)
+
+This file provides the model based on which regions of
+similar methylation variation are identified.
+This model should include all available variables
+in the phenotype input file
+likely to be associated with DNA methylation levels.
+
+**Example `region-model.txt`:**
+```
+~ Sex + Country.x + Age_Rerc + Cancer_status + BMI_C + Smoke_status + Alc_Lifetime + batch + reads + Blood.B + Blood.Granulocytes
+```
+
+**Note**:
+
+* It should be written without a dependent variable
+
+* 'reads' and any estimated cell counts can be included even if not present in the phenotype input file as they will be generated from the data
+
+---
+
+### 5. Models for association testing (`models.csv`)
 
 This file is your "recipe book" for all the statistical analyses you want to run. Each row is one model.
 
@@ -70,19 +106,5 @@ This file is your "recipe book" for all the statistical analyses you want to run
 | cancer     | Cancer_status  | Cancer_status~methylation+Age_Rerc                        |
 | cancer_adj | Cancer_status  | Cancer_status~methylation+Age_Rerc+Sex+Smoke_status+Alc_Lifetime |
 
----
-
-### 4. Genomic targets (`panel.csv`)
-
-This file provides the genomic coordinates of targeted regions. 
-These are used by the pipeline to evaluate the targeting assay.
-
-* Your file must have these exact columns: `chr`, `start`, `end`, `source`, `details`.
-
-**Example `panel.csv`:**
-| chr  | start    | end      | source | details    |
-| :--- | :------- | :------- | :----- | :--------- |
-| chr1 | 17338766 | 17338766 | age    | cg20822990 |
-| chr1 | 26855765 | 26855765 | age    | cg22512670 |
 
 
