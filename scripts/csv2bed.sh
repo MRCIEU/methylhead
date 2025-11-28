@@ -1,9 +1,19 @@
 #!/bin/bash
 
-PANEL=$1
-BED=$2
-
 set -euo pipefail
+
+if [ $# -eq 1 ]; then
+    PANEL=/dev/stdin
+    BED=$1
+elif [ $# -eq 2 ]; then
+    PANEL=$1
+    BED=$2
+else
+    echo "Usage: $0 <output.bed>  (reads from stdin)" >&2
+    echo "   or: $0 <input.csv> <output.bed>" >&2
+    exit 1
+fi
+
 
 awk 'BEGIN {
     FS = ","
