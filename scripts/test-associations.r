@@ -32,7 +32,6 @@ reads$Sample <- NULL
 reads = unique(reads)
 
 pheno <- merge(pheno, reads, by = "sample_id")
-rownames(pheno) <- pheno$sample_id
 
 ## cell counts ##
 counts <- read.csv(counts.file,row.names=1,check.names=F)
@@ -41,37 +40,33 @@ pheno <- cbind(
   pheno,
   counts[match(pheno$sample_id,rownames(counts)),])
 
+rownames(pheno) <- pheno$sample_id
 pheno$sample_id <- NULL
 
 ## prep datasets
-prep <- function(x) {
+prep <- function(x,ids,row.names=NULL) {
+  if (!is.null(row.names))
+    rownames(x) <- x[[row.names]]
   if ("chr" %in% colnames(x)) {
     manifest <- x[,c("chr","start","end")]
-    dat <- as.matrix(x[,setdiff(colnames(x),colnames(manifest))])
-    if (is.null(rownames(dat)))
-      rownames(dat) <- with(manifest,paste0(chr,":",start,"-",end))
-    list(manifest=manifest,dat=dat)
-  } else {
-    manifest = data.frame(chr=rownames(x),start=1,end=1)
-    list(manifest=manifest,dat=as.matrix(x))
-  }
+    if (is.null(row.names)) 
+      rownames(x) <- with(manifest,paste0(chr,":",start,"-",end))
+  } else 
+    manifest <- data.frame(chr=rownames(x),start=1,end=1)
+  dat <- as.matrix(x[,intersect(colnames(x),ids)])
+  rownames(dat) <- rownames(manifest) <- rownames(x)
+  list(manifest=manifest,dat=dat)
 }  
 
-meth = prep(fread(meth.file,data.table=F))
+meth <- prep(fread(meth.file,data.table=F),rownames(pheno))
 
-illumina <- fread(illumina.file,data.table=F)
-rownames(illumina) <- illumina$cpg
-illumina$cpg <- NULL
-illumina <- prep(illumina)
+illumina <- prep(fread(illumina.file,data.table=F),rownames(pheno),"cpg")
 
-camda = prep(fread(camda.file,data.table=F))
+camda <- prep(fread(camda.file,data.table=F),rownames(pheno))
 
-meth.seqlm = prep(fread(meth.seqlm.file,data.table=F))
+meth.seqlm <- prep(fread(meth.seqlm.file,data.table=F),rownames(pheno))
 
-dnam.scores = fread(dnam.scores.file,data.table=F)
-rownames(dnam.scores) <- dnam.scores$name
-dnam.scores$name <- NULL
-dnam.scores <- prep(dnam.scores)
+dnam.scores <- prep(fread(dnam.scores.file,data.table=F),rownames(pheno),"name")
 
 ## models ##
 models <- read.csv(models.file, stringsAsFactors = FALSE)

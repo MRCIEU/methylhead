@@ -84,5 +84,7 @@ meth.seqlm = methylseqlm.merge(
   segments,
   as.matrix(coverage[,common]))
 
-fwrite(meth.seqlm, file=output.file, row.names=FALSE)
+fwrite(
+  data.frame(segments, meth.seqlm, check.names=F),
+  file=output.file, row.names=FALSE)
 
