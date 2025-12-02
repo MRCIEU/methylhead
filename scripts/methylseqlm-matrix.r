@@ -54,6 +54,11 @@ if (!all(is.na(var.counts))) {
 model.def <- readLines(model.file)
 
 design = model.matrix(as.formula(model.def), pheno)
+is.variable = apply(design,2,var,na.rm=T) > 0
+pca = prcomp(design[,is.variable],center=T,scale=T)
+is.variable = pca$sdev^2/sum(pca$sdev^2) > 0.01
+design = cbind(intercept=1,pca$x[,is.variable])
+
 meth <- fread(meth.file, data.table=F)
 coverage <- fread(coverage.file, data.table=F)
 
