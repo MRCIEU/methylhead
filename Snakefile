@@ -123,6 +123,8 @@ if not all([is_fastq_ok(fq) for fq in fastq_files]):
 
 test_associations = 'models' in config['inputs']
 
+identify_regions = 'region_model' in config['inputs']
+
 # ===================================================================
 # Rules
 # ===================================================================
@@ -153,7 +155,9 @@ include: "rules/camda.smk"
 include: "rules/camda_matrix.smk"
 include: "rules/raw_read_counts.smk"
 include: "rules/qc_report.smk"
-include: "rules/methylseqlm.smk"
+
+if identify_regions:
+   include: "rules/methylseqlm.smk"
 
 if test_associations:
    include: "rules/test_associations.smk"
@@ -167,7 +171,7 @@ rule all:
         config['paths']['output'] + "/methylation_scores/matrix.csv",
         config['paths']['output'] + "/multiqc/multiqc_report.html",
         config['paths']['output'] + "/qc_report/qc-report.html",
-        config['paths']['output'] + "/methylseqlm/matrix.csv.gz",
+        config['paths']['output'] + "/methylseqlm/matrix.csv.gz" if identify_regions else [],
         config['paths']['output'] + "/test_associations/summary-stats" if test_associations else []
         
         
