@@ -118,6 +118,9 @@ segment = function(meth,pos,x,max_dmr,n0=1,m0=10,alpha=2) {
   ## max_dmr: length in bases of the maximum DMR
   ## n0: weight for sigma prior
   ## m0,alpha: parameters penalizing model complexity
+  if (length(pos) == 1)
+    return(cbind(start=1,end=1))
+  stopifnot(length(pos) > 1)
   stopifnot(length(pos) == nrow(meth))
   stopifnot(ncol(meth) == nrow(x))
   stopifnot(!is.unsorted(pos))
@@ -203,7 +206,7 @@ methylseqlm.segment = function(meth,chr,pos,x,max_dmr,n0=1,m0=10,alpha=2) {
   ## segment the genome
   segments = mclapply(unique(chr), function(cur) {
     idx = which(chr==cur)
-    segments = segment(meth[idx,],pos[idx],x,max_dmr,n0,m0,alpha)
+    segments = segment(meth[idx,,drop=F],pos[idx],x,max_dmr,n0,m0,alpha)
     segments[,"start"] = idx[segments[,"start"]]
     segments[,"end"] = idx[segments[,"end"]]
     data.frame(

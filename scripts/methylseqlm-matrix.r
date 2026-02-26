@@ -12,8 +12,22 @@ reads.file      <- args[7]
 output.file      <- args[8]
 cores <- as.integer(args[9])
 
+
+scripts.dir = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/scripts/epic/methylhead/scripts"
+phenotype.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/data/epic-clinical/data.csv"
+model.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/scripts/epic/region-model.txt"
+meth.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/results/epic/20251031/methylation/matrix.csv.gz"
+counts.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/results/epic/20251031/cell_counts/matrix.csv"
+coverage.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/results/epic/20251031/methylation/coverage.csv.gz"
+reads.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/results/epic/20251031/multiqc/multiqc_data/cutadapt_filtered_reads_plot.txt"
+output.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/results/epic/20251031/methylseqlm/matrix.csv.gz"
+cores = 8
+
+
+
 library(data.table)
 library(parallel)
+library(impute)
 options(mc.cores=cores)
 
 source(file.path(scripts.dir, "methylseqlm.r"))
@@ -42,6 +56,7 @@ pheno <- cbind(
 
 pheno$sample_id <- NULL
 
+## remove cell counts that couldn't be estimated
 var.counts <- apply(counts,2,var,na.rm=T)
 if (!all(is.na(var.counts))) {
   if (any(is.na(var.counts))) 
@@ -51,44 +66,66 @@ if (!all(is.na(var.counts))) {
 } else
   cell.types <- c()
 
+## construct design matrix
 model.def <- readLines(model.file)
-
+old = options(na.action = "na.pass")
 design = model.matrix(as.formula(model.def), pheno)
+options(old)
+
+## impute missing values in design matrix
+is.bad.column = apply(design, 2, function(v) mean(is.na(v)) > 0.8)
+is.bad.row = apply(design, 1, function(v) mean(is.na(v)) > 0.5)
+if (any(is.bad.column))
+  warning(sum(is.bad.column), " variables have too many missing values")
+if (any(is.bad.row))
+  warning(sum(is.bad.row), " samples have too many missing values")
+if (nrow(design) < 10)
+  warning(nrow(design), " is really too few samples for DMR analysis")
+design = impute.knn(
+  design[!is.bad.row,!is.bad.column],
+  k=10, rowmax=0.5, colmax=0.8, maxp=1500, rng.seed=362436069
+)$data
+
+## remove variables with too little variance in design matrix
 is.variable = apply(design,2,var,na.rm=T) > 0
 pca = prcomp(design[,is.variable],center=T,scale=T)
 is.variable = pca$sdev^2/sum(pca$sdev^2) > 0.01
 design = cbind(intercept=1,pca$x[,is.variable])
 
+## load methylation data
 meth <- fread(meth.file, data.table=F)
 coverage <- fread(coverage.file, data.table=F)
-
 sites <- meth[,c("chr","start","end")]
 
+## merge methylation and phenotype data
 common <- intersect(rownames(design), colnames(meth))
-
 if (length(common) < ncol(meth))
   warning(
     ncol(meth)-length(common),
-    " samples lost due to missing values in phenotype data")
+    " methylation profiles lost due to missingness in phenotype data")
 
+## scale methylation data
 meth.std = t(scale(t(meth[,common])))
 meth.std = impute.fun(meth.std,1,mean,na.rm=T)
 if (any(is.na(meth.std))) meth.std[is.na(meth.std)] = 0
 
+## segment methylome
 segments <- methylseqlm.segment(
-  meth.std,
+  meth.std, 
   sites$chr,
   sites$start,
   design[common,], 
   max_dmr=20000,
   n0=1,m0=10,alpha=2)
 
+## calculate segment methylation levels
 common = setdiff(colnames(meth),colnames(sites))
 meth.seqlm = methylseqlm.merge(
   as.matrix(meth[,common]),
   segments,
   as.matrix(coverage[,common]))
 
+## save outputs
 fwrite(
   data.frame(segments, meth.seqlm, check.names=F),
   file=output.file, row.names=FALSE)
