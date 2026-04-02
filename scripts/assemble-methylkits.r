@@ -1,4 +1,5 @@
 library(data.table)
+library(parallel)
 
 #' Merges methylkit output files for individual samples
 #' into methylation and coverage matrices
@@ -57,7 +58,7 @@ assemble.methylkits <- function(
   
   sites <- sites[order(sites$chr,sites$base),]
   
-  methcoverage <- sapply(samples$filename, function(filename) {
+  methcoverage <- mclapply(samples$filename, function(filename) {
     cat(date(), " loading data from ", basename(filename),
         " (", which(filename == samples$filename), " of ", nrow(samples),
         ")\n")
@@ -68,6 +69,7 @@ assemble.methylkits <- function(
     idx <- match(sites$chrBase, dat$chrBase)
     c(dat$meth[idx], dat$coverage[idx])
   })
+  methcoverage <- do.call(cbind, methcoverage)
   
   meth <- methcoverage[1:nrow(sites),]
   coverage <- methcoverage[nrow(sites) + 1:nrow(sites),]

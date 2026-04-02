@@ -4,6 +4,10 @@ args <- commandArgs(trailingOnly = TRUE)
 samples_file <- args[1]
 scripts_dir <- args[2]
 matrix_file <- args[3]
+cores <- as.integer(args[4])
+
+library(parallel)
+options(mc.cores=cores)
 
 library(data.table)
 

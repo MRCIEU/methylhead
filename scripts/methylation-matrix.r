@@ -6,6 +6,10 @@ samples_file <- args[1]  ## list of methylKit output files
 scripts_dir <- args[2]
 meth_file <- args[3]  ## methylation matrix (csv format)
 cov_file  <- args[4]  ## read depth matrix (csv format)
+cores <- as.integer(args[5])
+
+library(parallel)
+options(mc.cores=cores)
 
 library(data.table)
 

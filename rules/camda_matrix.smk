@@ -26,6 +26,7 @@ rule camda_matrix:
         apptainer_exec("meth",
         """
         {params.bin_dir}/Rscript --vanilla {params.scripts_dir}/camda-matrix.r \
-	    {input}  {params.scripts_dir} {output} 
+	    {input}  {params.scripts_dir} {output} {resources.cpus}
         """)
+
 

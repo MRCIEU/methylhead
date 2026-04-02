@@ -12,19 +12,6 @@ reads.file      <- args[7]
 output.file      <- args[8]
 cores <- as.integer(args[9])
 
-
-scripts.dir = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/scripts/epic/methylhead/scripts"
-phenotype.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/data/epic-clinical/data.csv"
-model.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/scripts/epic/region-model.txt"
-meth.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/results/epic/20251031/methylation/matrix.csv.gz"
-counts.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/results/epic/20251031/cell_counts/matrix.csv"
-coverage.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/results/epic/20251031/methylation/coverage.csv.gz"
-reads.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/results/epic/20251031/multiqc/multiqc_data/cutadapt_filtered_reads_plot.txt"
-output.file = "/projects/MRC-IEU/research/projects/icep2/wp3/004/working/results/epic/20251031/methylseqlm/matrix.csv.gz"
-cores = 8
-
-
-
 library(data.table)
 library(parallel)
 library(impute)
