@@ -4,11 +4,15 @@ This folder contains Apptainer/Singularity definition files for DNA methylation 
 
 ---
 
-## 1. meth-analysis.def
+## 1. meth-analysis/meth-analysis.def
 
-- **Base image:** rocker/r-ver:4.4.3  
-- **Purpose:** DNA methylation analysis with R 4.4.3 and Python integration.  
-- **Includes:** R packages (`methylKit`, Bioconductor annotations), Python 3 with `pandas` and `numpy`, GitHub packages `meffonym` and `ewaff`.
+- **Base image:** ubuntu:24.04
+- **Purpose:** DNA methylation analysis with Python 3.12.3, Quarto 1.7.32 and R 4.5.3
+- **Includes:** R packages (`data.table`, `ggplot2`, Bioconductor annotations), 
+  Python `pandas` and `numpy`, GitHub R packages `meffonym` and `ewaff`.
+  
+The container is described as a sequence of incremental builds to be modularize the code
+and reduce build time for development, especially debugging.
 
 ---
 
@@ -45,7 +49,10 @@ cell-type specific DNA methylation described in Loyfer et al. 2023 https://doi.o
 - Build container images with:  
   
 ```bash
-apptainer build <container>.sif <container>.def
+snakemake meth-analysis/meth-analysis.sif
+snakemake wgbs-analysis.sif
+snakemake qc-analysis.sif
+snakemake wgbs-tools.sif
 ```
 
 - Upload container images to docker hub:

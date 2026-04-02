@@ -1,0 +1,11 @@
+Bootstrap: localimage
+From: meth-analysis-python.sif
+ 
+%runscript
+    . /opt/venv/bin/activate
+    exec "$@"
+    
+%labels
+    Author Matthew Suderman
+    Version v1.0
+    Description Python 3.12.3, Quarto 1.7.32 and R 4.5.3

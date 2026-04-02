@@ -7,8 +7,7 @@ library(parallel)
 #' This is roughly like running methylKit::methRead()
 #' methylKit::filterByCoverage() followed by methylKit::unite().
 #' Unfortunately that sequence of calls is quite inflexible
-#' for input files similar to but not exactly like methylkit, e.g.
-#' CAMDA outputs (see camda-matrix.r). 
+#' for input files similar to but not exactly like methylkit.
 #' 
 #' @param samples Data frame listing all samples identified by the 'sample_id'
 #' column and corresponding methylkit output file identified by the 'filename'

@@ -151,8 +151,6 @@ include: "rules/illumina_matrix.smk"
 include: "rules/estimate_cell_counts.smk"
 include: "rules/methylation_scores.smk"
 include: "rules/bsmap_align.smk"
-include: "rules/camda.smk"
-include: "rules/camda_matrix.smk"
 include: "rules/raw_read_counts.smk"
 include: "rules/qc_report.smk"
 
@@ -166,7 +164,6 @@ rule all:
     input:
         config['paths']['output'] + "/methylation/matrix.csv.gz",
         config['paths']['output'] + "/illumina/matrix.csv.gz",
-        config['paths']['output'] + "/camda/matrix.csv.gz",
         config['paths']['output'] + "/cell_counts/matrix.csv",
         config['paths']['output'] + "/methylation_scores/matrix.csv",
         config['paths']['output'] + "/multiqc/multiqc_report.html",

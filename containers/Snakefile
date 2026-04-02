@@ -1,0 +1,60 @@
+
+##############################################
+# HELPERS
+##############################################
+
+import re
+from pathlib import Path
+
+def extract_from(def_file):
+    """
+    Given a definition file, extract entry
+    specified in the 'From:' line.
+    
+    Returns:str or None
+    """
+    pattern = re.compile(r"^\s*From:\s*(\S+)\s*$")
+    
+    with open(def_file, "r") as f:
+        for line in f:
+            match = pattern.match(line)
+            if match:
+                return match.group(1)  
+    return None
+                                                                        
+def get_upstream_sif(sif_file):
+    def_file = Path(sif_file).with_suffix('.def')
+    def_from = extract_from(def_file)
+    if not def_from.endswith('.sif'):
+        return None
+    def_from = Path(sif_file).parent / Path(def_from)
+    upstream_def = Path(def_from).with_suffix('.def')
+    if not upstream_def.exists():
+        raise FileNotFoundError(f"Upstream .def file {def_file} not found for {sif_file}")
+    return def_from
+
+
+##############################################
+# RULES
+##############################################
+
+rule all:
+    input:
+        expand("{target}",target=[])
+
+rule build_sif:
+    input:
+        lambda wildcards: (
+            [Path(wildcards.sif).with_suffix('.def')] +
+            ([get_upstream_sif(wildcards.sif)]
+             if get_upstream_sif(wildcards.sif) else [])
+        )
+    output:
+        "{sif}"
+    shell:
+        """
+        echo 'Building {output} from {input}'
+	cd `dirname {output}`; \
+            apptainer build `basename {output}` `basename {input[0]}`
+        """
+

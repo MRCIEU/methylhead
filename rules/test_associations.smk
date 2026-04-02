@@ -6,7 +6,6 @@ rule test_associations:
         illumina=config['paths']['output'] + "/illumina/matrix.csv.gz",
         coverage=config['paths']['output'] + "/methylation/coverage.csv.gz",
         scores=config['paths']['output'] + "/methylation_scores/matrix.csv",
-        camda=config['paths']['output'] + "/camda/matrix.csv.gz",
         methylseqlm=config['paths']['output'] + "/methylseqlm/matrix.csv.gz",
         cell_counts=config['paths']['output'] + "/cell_counts/matrix.csv",
         reads=config['paths']['output'] + "/multiqc/multiqc_data/cutadapt_filtered_reads_plot.txt"
@@ -26,7 +25,6 @@ rule test_associations:
 	    {input.meth} \
 	    {input.illumina} \
 	    {input.scores} \
-	    {input.camda} \
 	    {input.methylseqlm} \
 	    {input.cell_counts} \
 	    {input.coverage} \

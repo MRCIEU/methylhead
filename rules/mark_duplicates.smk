@@ -2,8 +2,8 @@ rule mark_duplicates:
     input:
         config['paths']['output'] + "/sort_bam/{sample}_sorted.bam"
     output:
-        bam=temp(config['paths']['output'] + "/mark_duplicates/{sample}.markdup.bam"),
-        bai=temp(config['paths']['output'] + "/mark_duplicates/{sample}.markdup.bam.bai"),
+        bam=config['paths']['output'] + "/mark_duplicates/{sample}.markdup.bam",
+        bai=config['paths']['output'] + "/mark_duplicates/{sample}.markdup.bam.bai",
         metrics=config['paths']['output'] + "/mark_duplicates/{sample}.markdup_metrics.txt"
     params:
         bin_dir=config['containers']['wgbs']['bin_dir']
