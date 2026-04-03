@@ -12,6 +12,7 @@ paths:
 
 parameters:
     assembly: "hg19"
+    region_size: 100
     
 workflow:
     cores: 16

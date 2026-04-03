@@ -145,12 +145,13 @@ include: "rules/multiqc.smk"
 include: "rules/mbias.smk"
 include: "rules/methyldackel_bedgraph.smk"
 include: "rules/meth_bedgraph.smk"
+include: "rules/extract_methyl_entropy.smk"
 include: "rules/extract_methylkit.smk"
 include: "rules/methylation_matrix.smk"
 include: "rules/illumina_matrix.smk"
+include: "rules/methyl_entropy_matrix.smk"
 include: "rules/estimate_cell_counts.smk"
 include: "rules/methylation_scores.smk"
-include: "rules/bsmap_align.smk"
 include: "rules/raw_read_counts.smk"
 include: "rules/qc_report.smk"
 
@@ -164,6 +165,7 @@ rule all:
     input:
         config['paths']['output'] + "/methylation/matrix.csv.gz",
         config['paths']['output'] + "/illumina/matrix.csv.gz",
+        config['paths']['output'] + "/methyl_entropy/matrix.csv.gz",
         config['paths']['output'] + "/cell_counts/matrix.csv",
         config['paths']['output'] + "/methylation_scores/matrix.csv",
         config['paths']['output'] + "/multiqc/multiqc_report.html",

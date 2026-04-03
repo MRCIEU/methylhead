@@ -13,8 +13,8 @@ rule extract_methylkit:
         apptainer_exec("wgbs",
         """
         {params.bin_dir}/MethylDackel extract --methylKit \
-	    -o {params.out_dir}/extract_methylkit/{wildcards.sample} \
-	    {input.fasta} {input.bam}
+            -o {params.out_dir}/extract_methylkit/{wildcards.sample} \
+            {input.fasta} {input.bam}
         gzip {params.out_dir}/extract_methylkit/{wildcards.sample}_CpG.methylKit
         """)
 

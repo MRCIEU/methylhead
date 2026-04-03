@@ -29,7 +29,7 @@ From: meth-analysis-quarto.sif
     rm -rf /var/lib/apt/lists/
 
 %environment
-    export PYTHONPATH=$PYTHONPATH:/opt/methylseqextractor
+    export PYTHONPATH=$PYTHONPATH:/opt
  
 %runscript
     . /opt/venv/bin/activate

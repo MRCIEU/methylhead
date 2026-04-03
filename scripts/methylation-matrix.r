@@ -1,36 +1,45 @@
 #!/usr/bin/env Rscript
 
-args <- commandArgs(trailingOnly = TRUE)
+samples_file=args[1]  ## list of methylKit output files (csv format)
+sites_file  =args[2]  ## list of sites with frequencies (csv format)
+meth_file   =args[3]  ## methylation matrix (csv format)
+cov_file    =args[4]  ## read depth matrix (csv format)
+cores       =as.integer(args[5])
 
-samples_file <- args[1]  ## list of methylKit output files
-scripts_dir <- args[2]
-meth_file <- args[3]  ## methylation matrix (csv format)
-cov_file  <- args[4]  ## read depth matrix (csv format)
-cores <- as.integer(args[5])
+mincov=10
+minsamples=0.5
 
 library(parallel)
 options(mc.cores=cores)
 
 library(data.table)
 
-source(file.path(scripts_dir, "assemble-methylkits.r"))
+samples = fread(samples_file)
+sites = fread(sites_file)
+colnames(sites) = c("chr", "pos", "count")
+sites = sites[sites$count > nrow(samples)*minsamples,]
+sites$loc = paste(sites$chr, sites$pos, sep=":")
 
-samples <- read.csv(samples_file)
+ret = mclapply(samples$filename, function(filename) {
+  cat(date(), " loading data from ", basename(filename),
+      " (", which(filename == samples$filename), " of ", nrow(samples),
+      ")\n")
+  dat = fread(filename)
+  dat = dat[dat$coverage >= mincov,]
+  dat$meth = dat$freqC/(dat$freqC + dat$freqT)  
+  dat$loc = paste(dat$chr, dat$base, sep=":")
+  idx = match(regions$loc, dat$loc)
+  c(dat$meth[idx],dat$coverage[idx])
+})
+ret = do.call(cbind, ret)
+meth = ret[1:nrow(regions),]
+coverage = ret[nrow(regions) + 1:nrow(regions),]
+colnames(meth) = colnames(coverage) = samples$sample_id
 
-ret <- assemble.methylkits(
-  samples,
-  mincov=10,
-  minsamples=0.5*nrow(samples))
+sites$start = sites$pos
+sites$end = sites$pos+1
+sites = sites[,c("chr","start","end")]
 
-fwrite(ret$meth, file=meth_file, row.names = FALSE)
-fwrite(ret$coverage, file=cov_file, row.names = FALSE)
-
-
-## previously used
-## methylKit::methRead,filterByCoverage,unite
-## replaced with assemble.methylseq()
-## because methylKit handled gzip input
-## by unzipping all inputs to /tmp (and never deleting them)
-## and unnecessarily loading all data into memory
-
+fwrite(cbind(sites, meth), file=meth_file, row.names = FALSE)
+fwrite(cbind(sites, coverage), file=cov_file, row.names = FALSE)
 
