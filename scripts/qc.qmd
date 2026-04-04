@@ -231,9 +231,9 @@ long.counts <- stack(as.data.frame(cell.counts))
 colnames(long.counts) <- c("count", "type")
 
 iqr.counts <- data.frame(
-  "q1"=round(apply(cell.counts, 2, quantile, probs=0.25),2),
-  "med"=round(apply(cell.counts, 2, quantile, probs=0.5),2),
-  "q3"=round(apply(cell.counts, 2, quantile, probs=0.75),2))
+  "q1"=round(apply(cell.counts, 2, quantile, probs=0.25, na.rm=T),2),
+  "med"=round(apply(cell.counts, 2, quantile, probs=0.5, na.rm=T),2),
+  "q3"=round(apply(cell.counts, 2, quantile, probs=0.75, na.rm=T),2))
 iqr.counts$type <- rownames(iqr.counts)
   
 ggplot(long.counts, aes(x=type, y=count, fill=type)) +

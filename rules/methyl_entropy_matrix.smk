@@ -19,13 +19,12 @@ rule collect_entropy_regions:
         config['paths']['output'] + "/methyl_entropy_regions.csv"
     resources:
         **get_resources("medium")
+    params:
+        scripts_dir=config['paths']['scripts']
     shell:
         apptainer_exec("meth",
         """
-        csvtk concat @{input} \
-        | csvtk cut -t -f 1,2,3 \
-        | csvtk freq -t -f 1,2,3 \
-        > {output}
+	bash {params.scripts_dir}/collect_features.sh {input} "1,2,3" {output}
         """)
 
 rule methyl_entropy_matrix:

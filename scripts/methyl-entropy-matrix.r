@@ -19,7 +19,7 @@ library(data.table)
 
 samples = fread(samples_file)
 regions = fread(regions_file)
-colnames(regions) = c("chr", "start", "end",
+colnames(regions) = c("chr", "start", "end", "count")
 regions = regions[regions$count > nrow(samples)*minsamples,]
 regions$loc = paste(regions$chr, regions$start, sep=":")
 

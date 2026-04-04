@@ -1,5 +1,7 @@
 #!/usr/bin/env Rscript
 
+args <- commandArgs(trailingOnly = TRUE)
+
 samples_file=args[1]  ## list of methylKit output files (csv format)
 sites_file  =args[2]  ## list of sites with frequencies (csv format)
 meth_file   =args[3]  ## methylation matrix (csv format)
@@ -28,12 +30,12 @@ ret = mclapply(samples$filename, function(filename) {
   dat = dat[dat$coverage >= mincov,]
   dat$meth = dat$freqC/(dat$freqC + dat$freqT)  
   dat$loc = paste(dat$chr, dat$base, sep=":")
-  idx = match(regions$loc, dat$loc)
+  idx = match(sites$loc, dat$loc)
   c(dat$meth[idx],dat$coverage[idx])
 })
 ret = do.call(cbind, ret)
-meth = ret[1:nrow(regions),]
-coverage = ret[nrow(regions) + 1:nrow(regions),]
+meth = ret[1:nrow(sites),]
+coverage = ret[nrow(sites) + 1:nrow(sites),]
 colnames(meth) = colnames(coverage) = samples$sample_id
 
 sites$start = sites$pos

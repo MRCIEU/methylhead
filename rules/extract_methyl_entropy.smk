@@ -5,7 +5,6 @@ rule extract_methyl_entropy:
     output:
         config['paths']['output'] + "/extract_methyl_entropy/{sample}.csv.gz"
     params:
-        bin_dir=config['containers']['meth']['bin_dir'],
         scripts_dir=config['paths']['scripts'],
         region_size=config['parameters']['region_size']
     resources:

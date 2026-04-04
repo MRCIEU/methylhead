@@ -9,7 +9,7 @@ rule collect_meth_files:
         with open(output.files, "w") as f:
             f.write("sample_id,filename\n")
             for fn in input:
-                id=os.path.basename(fn).replace("_CpG.methylKit.gz","")         
+                id=os.path.basename(fn).replace("_CpG.methylKit.gz","")    
                 f.write(f"{id},{fn}\n")
 
 rule collect_methyl_sites:
@@ -17,15 +17,14 @@ rule collect_methyl_sites:
         config['paths']['output'] + "/meth_files.csv" 
     output:
         config['paths']['output'] + "/meth_sites.csv"
+    params:
+        scripts_dir=config['paths']['scripts']
     resources:
         **get_resources("medium")
     shell:
         apptainer_exec("meth",
         """
-        csvtk concat @{input} \
-        | csvtk cut -t -f 2,3 \
-        | csvtk freq -t -f 1,2 \
-        > {output}
+	bash {params.scripts_dir}/collect_features.sh -t {input} "2,3" {output}
         """)
 
 rule methylation_matrix:
@@ -43,7 +42,7 @@ rule methylation_matrix:
     shell:
         apptainer_exec("meth",
         """
-	{params.bin_dir}/Rscript \
+        {params.bin_dir}/Rscript \
             {params.scripts_dir}/methylation-matrix.r \
             {input.files} {input.regions} \
             {output.meth} {output.coverage} \
