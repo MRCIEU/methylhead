@@ -32,6 +32,7 @@ rule methyl_entropy_matrix:
         files=config['paths']['output'] + "/methyl_entropy_files.csv",
         regions=config['paths']['output'] + "/methyl_entropy_regions.csv"
     output:
+        flips  =config['paths']['output'] + "/methyl_entropy/flips.csv.gz",
         entropy=config['paths']['output'] + "/methyl_entropy/matrix.csv.gz",
         meth   =config['paths']['output'] + "/methyl_entropy/meth.csv.gz",
         sites  =config['paths']['output'] + "/methyl_entropy/sites.csv.gz"
@@ -46,6 +47,6 @@ rule methyl_entropy_matrix:
         {params.bin_dir}/Rscript \
             {params.scripts_dir}/methyl-entropy-matrix.r \
             {input.files} {input.regions}  \
-            {output.entropy} {output.meth} {output.sites} \
+            {output.flips} {output.entropy} {output.meth} {output.sites} \
             {resources.cpus}
         """)
