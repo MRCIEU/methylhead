@@ -24,7 +24,7 @@ rule collect_entropy_regions:
     shell:
         apptainer_exec("meth",
         """
-	bash {params.scripts_dir}/collect_features.sh {input} "1,2,3" {output}
+	bash {params.scripts_dir}/collect-entropy-regions.sh {input} {output}
         """)
 
 rule methyl_entropy_matrix:

@@ -24,7 +24,7 @@ rule collect_methyl_sites:
     shell:
         apptainer_exec("meth",
         """
-	bash {params.scripts_dir}/collect_features.sh -t {input} "2,3" {output}
+	bash {params.scripts_dir}/collect-methyl-sites.sh {input} {output}
         """)
 
 rule methylation_matrix:

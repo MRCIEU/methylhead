@@ -10,6 +10,15 @@ From: meth-analysis-python.sif
     mv csvtk /usr/local/bin/
     rm $ARCHIVE 
 
+    cd /usr/local/bin
+    ln -s /usr/bin/R
+    ln -s /usr/bin/Rscript
+    ln -s /usr/bin/python
+    ln -s /usr/bin/python3
+    ln -s /usr/bin/python3-config
+    ln -s /usr/bin/pip
+    ln -s /usr/bin/pip3
+
 %runscript
     . /opt/venv/bin/activate
     exec "$@"
