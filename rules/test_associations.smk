@@ -3,6 +3,8 @@ rule test_associations:
         phenotype=config['inputs']['phenotype'],
         models=config['inputs']['models'],
         meth=config['paths']['output'] + "/methylation/matrix.csv.gz",
+        entropy=config['paths']['output'] + "/methyl_entropy/matrix.csv.gz",
+        flips=config['paths']['output'] + "/methyl_entropy/flips.csv.gz",
         illumina=config['paths']['output'] + "/illumina/matrix.csv.gz",
         coverage=config['paths']['output'] + "/methylation/coverage.csv.gz",
         scores=config['paths']['output'] + "/methylation_scores/matrix.csv",
@@ -23,6 +25,8 @@ rule test_associations:
             {input.phenotype} \
 	    {input.models} \
 	    {input.meth} \
+	    {input.entropy} \
+	    {input.flips} \
 	    {input.illumina} \
 	    {input.scores} \
 	    {input.methylseqlm} \

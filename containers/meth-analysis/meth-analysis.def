@@ -1,15 +1,7 @@
 Bootstrap: localimage
-From: meth-analysis-python.sif
-
+From: meth-analysis-csvtk.sif
 
 %post
-    ARCHIVE=csvtk_linux_amd64.tar.gz
-    wget https://github.com/shenwei356/csvtk/releases/download/v0.36.0/$ARCHIVE
-    gunzip -c $ARCHIVE | tar xv
-    chmod a+x csvtk
-    mv csvtk /usr/local/bin/
-    rm $ARCHIVE 
-
     cd /usr/local/bin
     ln -s /usr/bin/R
     ln -s /usr/bin/Rscript
@@ -26,4 +18,4 @@ From: meth-analysis-python.sif
 %labels
     Author Matthew Suderman
     Version v1.0
-    Description Python 3.12.3, Quarto 1.7.32 and R 4.5.3
+    Description Python 3.12.3, Quarto 1.7.32, R 4.5.3 and csvtk 0.36.0

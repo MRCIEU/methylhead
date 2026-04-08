@@ -8,13 +8,15 @@ args <- commandArgs(trailingOnly = TRUE)
 phenotype.file  <- args[1]
 models.file     <- args[2]
 meth.file       <- args[3]
-illumina.file   <- args[4]
-dnam.scores.file <- args[5]
-meth.seqlm.file   <- args[6]
-counts.file     <- args[7]
-coverage.file   <- args[8]
-reads.file      <- args[9]
-output.dir      <- args[10]
+entropy.file    <- args[4]
+flips.file      <- args[5]
+illumina.file   <- args[6]
+dnam.scores.file <- args[7]
+meth.seqlm.file   <- args[8]
+counts.file     <- args[9]
+coverage.file   <- args[10]
+reads.file      <- args[11]
+output.dir      <- args[12]
 
 dir.create(output.dir, recursive = TRUE, showWarnings = FALSE)
 sink(file.path(output.dir, "sessionInfo.txt")); sessionInfo(); sink()
@@ -58,6 +60,10 @@ prep <- function(x,ids,row.names=NULL) {
 }  
 
 meth <- prep(fread(meth.file,data.table=F),rownames(pheno))
+
+entropy <- prep(fread(entropy.file,data.table=F),rownames(pheno))
+
+flips <- prep(fread(flips.file,data.table=F),rownames(pheno))
 
 illumina <- prep(fread(illumina.file,data.table=F),rownames(pheno),"cpg")
 
@@ -126,6 +132,8 @@ test_assocs <- function(pheno, dat, models, out.dir) {
 }
 
 test_assocs(pheno, meth, models, file.path(output.dir, "methylation"))
+test_assocs(pheno, entropy, models, file.path(output.dir, "entropy"))
+test_assocs(pheno, flips, models, file.path(output.dir, "flips"))
 test_assocs(pheno, illumina, models, file.path(output.dir, "illumina"))
 test_assocs(pheno, dnam.scores, models, file.path(output.dir, "dnam.scores"))
 test_assocs(pheno, meth.seqlm, models, file.path(output.dir, "methylseqlm"))

@@ -1,0 +1,16 @@
+Bootstrap: localimage
+From: meth-analysis-python.sif
+
+
+%post
+    ARCHIVE=csvtk_linux_amd64.tar.gz
+    wget https://github.com/shenwei356/csvtk/releases/download/v0.36.0/$ARCHIVE
+    gunzip -c $ARCHIVE | tar xv
+    chmod a+x csvtk
+    mv csvtk /usr/local/bin/
+    rm $ARCHIVE 
+
+%runscript
+    . /opt/venv/bin/activate
+    exec "$@"
+    
