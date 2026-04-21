@@ -1,4 +1,4 @@
-# Methylhead Pipeline - Snakemake Implementation
+# Methylhead pipeline for methyl-seq analysis
 
 Snakemake conversion of the methylhead Nextflow pipeline for targeted methyl-seq analysis.
 
@@ -62,14 +62,19 @@ The main modifications are in the 'inputs' and 'paths' sections.
 
 ### 3. Run the Pipeline
 
-#### Stand-alone server
 
 ```bash
-```
-
-#### Cluster (SLURM)
-
-```bash
+params=(
+	--snakefile methylhead/Snakefile  ## path to pipeline Snakefile
+	--configfile config.yml           ## path to pipeline configuration file
+	--cores 32                        ## number of processors to use
+	--printshellcmds                  ## print rule shell commands 
+	--rerun-incomplete                ## rerun rules with incomplete outputs
+	--rerun-triggers mtime            ## rerun rules with outputs older than inputs
+	--show-failed-logs                ## print log outputs of failed rules
+	--verbose
+)
+snakemake "${params[@]}" 
 ```
 
 ## License

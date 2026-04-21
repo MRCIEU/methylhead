@@ -34,6 +34,7 @@ ret = mclapply(samples$filename, function(filename) {
   dat = dat[idx,]
 
   ## conditional entropy
+  epsilon = 1e-12
   pu = dat$nmeth/(dat$nmeth + dat$nunmeth) ## P(unmeth)
   pm = dat$nunmeth/(dat$nmeth + dat$nunmeth) ## P(meth)
   puu = dat$nuu/(dat$nuu + dat$num) ## P(unmeth|unmeth before)
@@ -41,8 +42,8 @@ ret = mclapply(samples$filename, function(filename) {
   pum = dat$nmu/(dat$nmm + dat$nmu) ## P(unmeth|meth before)
   pmm = dat$nmm/(dat$nmm + dat$nmu) ## P(meth|meth before)
   dat$entropy = (
-    -pu*(puu*log2(puu) + pmu*log2(pmu))
-    -pm*(pum*log2(pum) + pmm*log2(pmm))) 
+    -pu*(puu*log2(puu+epsilon) + pmu*log2(pmu+epsilon))
+    -pm*(pum*log2(pum+epsilon) + pmm*log2(pmm+epsilon))) 
 
   c(dat$flip_pct, dat$entropy, dat$meth_pct, dat$nmeth+dat$nunmeth)
 })
