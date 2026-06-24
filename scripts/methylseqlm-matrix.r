@@ -60,6 +60,10 @@ design = model.matrix(as.formula(model.def), pheno)
 options(old)
 
 ## impute missing values in design matrix
+if (any(is.infinite(design)))
+  design[is.infinite(design)] = NA
+if (any(is.nan(design)))
+  design[is.nan(design)] = NA
 is.bad.column = apply(design, 2, function(v) mean(is.na(v)) > 0.8)
 is.bad.row = apply(design, 1, function(v) mean(is.na(v)) > 0.5)
 if (any(is.bad.column))
