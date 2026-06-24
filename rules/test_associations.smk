@@ -4,6 +4,7 @@ rule test_associations:
         models=config['inputs']['models'],
         meth=config['paths']['output'] + "/methylation/matrix.csv.gz",
         entropy=config['paths']['output'] + "/methyl_entropy/matrix.csv.gz",
+        entmeth=config['paths']['output'] + "/methyl_entropy/meth.csv.gz",
         flips=config['paths']['output'] + "/methyl_entropy/flips.csv.gz",
         illumina=config['paths']['output'] + "/illumina/matrix.csv.gz",
         coverage=config['paths']['output'] + "/methylation/coverage.csv.gz",
@@ -26,6 +27,7 @@ rule test_associations:
 	    {input.models} \
 	    {input.meth} \
 	    {input.entropy} \
+	    {input.entmeth} \
 	    {input.flips} \
 	    {input.illumina} \
 	    {input.scores} \
