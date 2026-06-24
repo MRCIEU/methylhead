@@ -1,5 +1,5 @@
 Bootstrap: localimage
-From: meth-analysis-python.sif
+From: meth-analysis-genetics.sif
 
 
 %post

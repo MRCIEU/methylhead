@@ -1,0 +1,36 @@
+Bootstrap: localimage
+From: meth-analysis-python.sif
+
+%post
+    apt update -y
+    apt install -y tabix
+
+    cd /opt
+    git clone https://github.com/hippo-yf/bsgenova.git
+
+    wget https://github.com/brentp/somalier/releases/download/v0.3.2/somalier
+    wget https://github.com/brentp/somalier/files/3412453/sites.hg19.vcf.gz
+    chmod a+x somalier
+
+    wget https://s3.amazonaws.com/plink2-assets/alpha7/plink2_linux_x86_64_20260504.zip
+    unzip plink2_linux_x86_64_20260504.zip
+    rm plink2_linux_x86_64_20260504.zip
+
+    wget https://github.com/samtools/bcftools/releases/download/1.10.2/bcftools-1.10.2.tar.bz2 -O bcftools.tar.bz2
+    tar -xjvf bcftools.tar.bz2
+    cd bcftools-1.10.2/
+    ./configure
+    make
+    sudo make install
+    cd ..
+    rm -rf bcftools-1.10.2
+    rm bcftools.tar.bz2
+
+    apt-get autoremove -y
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+%runscript
+    . /opt/venv/bin/activate
+    exec "$@"
+    
