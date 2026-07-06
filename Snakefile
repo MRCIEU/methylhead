@@ -54,7 +54,7 @@ samples = pandas.read_csv(config["inputs"]["samplesheet"])
 all_samples = samples["sample_id"].unique().tolist()
 
 # === normalize fastq file paths =====================================
-fastq_dir = dirname(config["inputs"]["samplesheet"])
+fastq_dir = config["inputs"]["fastq"]
 samples["read1"] = [normalize_path(path, fastq_dir) for path in samples["read1"]]
 samples["read2"] = [normalize_path(path, fastq_dir) for path in samples["read2"]]
 

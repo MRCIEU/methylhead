@@ -1,4 +1,5 @@
 inputs:
+    fastq: "path/to/fastq/files"
     samplesheet: "path/to/samplesheet.csv"
     phenotype: "path/to/phenotypes.csv"
     models: "path/to/models.csv"
