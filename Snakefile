@@ -3,6 +3,9 @@ import subprocess
 import pandas
 from snakemake.logging import logger
 
+shell.prefix("umask 002; ")
+## generate outputs with group read/write permissions
+
 # ===================================================================
 # File paths
 # ===================================================================

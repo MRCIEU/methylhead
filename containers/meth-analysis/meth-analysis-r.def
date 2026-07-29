@@ -17,7 +17,7 @@ From: meth-analysis-ubuntu.sif
         'IlluminaHumanMethylationEPICv2anno.20a1.hg38',
         'data.table','ggplot2','gridExtra','RColorBrewer','knitr'
       ), ask=FALSE, update=FALSE);
-      remotes::install_github('perishky/meffonym');
+      remotes::install_github('perishky/meffonym'); 
       remotes::install_github('perishky/ewaff')
     "
 
